@@ -1,0 +1,162 @@
+{
+  "window.zoomLevel": 2,
+  "workbench.activityBar.visible": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.snippetSuggestions": "top",
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.formatOnSave": true,
+  "editor.cursorBlinking": "smooth",
+  "zenMode.hideTabs": false,
+  "zenMode.hideStatusBar": false,
+  "zenMode.hideLineNumbers": false,
+  "editor.cursorSurroundingLines": 5,
+  "editor.parameterHints.enabled": false,
+  "editor.wordBasedSuggestions": false,
+  "prettier.semi": false,
+  "prettier.tabWidth": 2,
+  "prettier.jsxBracketSameLine": true,
+  "prettier.jsxSingleQuote": true,
+  "synthwave84.disableGlow": true,
+  "synthwave84.brightness": 0.1,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "jestrunner.configPath": "./operator/jest.config.js",
+  "openInGitHub.defaultBranch": "master",
+  "openInGitHub.defaultRemote": "origin",
+  "openInGithub.maxBuffer": 512000,
+  "openInGitHub.excludeCurrentRevision": false,
+  "workbench.colorCustomizations": {
+    "editor.selectionBackground": "#ffffff23",
+    "editor.rangeHighlightBackground": "#ffffff23",
+    "editorBracketMatch.background": "#f008",
+    "editorBracketMatch.border": "#f00",
+    "editor.wordHighlightStrongBackground": "#3e4998",
+    "editor.wordHighlightBackground": "#3e4998",
+    "editor.findMatchBackground": "#282c34",
+    "editor.findMatchHighlightBackground": "#0b790e97",
+    "editor.selectionForeground": "#99eeff",
+    "editorIndentGuide.activeBackground": "#1d76db",
+    "[Night Owl]": {
+      // "editor.background": "#000"
+    }
+  },
+  "files.exclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/*.js": {
+      "when": "$(basename).ts"
+    },
+    // "**/node_modules/**": true,
+    "**/tmp/**": true,
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    // "**/node_modules": true,
+    "**/bower_components": true,
+    // "**/dist/**": true,
+    "report*": true,
+    "**/log/**": true,
+    "**/.fdk/**": true,
+    "**/.cache/**": true
+  },
+  "files.watcherExclude": {
+    "**/.cache/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/tmp/**": true,
+    "**/.yarn/**": true,
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist/**": true,
+    "**/log/**": true,
+    "**/logs/**": true,
+    "**/.fdk/**": true,
+    "**/plz-out/**": true,
+    "**/public/**": true
+  },
+  "search.exclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/tmp/**": true,
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist/**": true,
+    "**/log/**": true
+  },
+  "macros.list": {
+    "fzyfind": [
+      "editor.action.clipboardCopyAction",
+      {
+        "command": "$delay",
+        "args": {
+          "delay": 100
+        }
+      },
+      "fuzzySearch.activeTextEditor",
+      {
+        "command": "$delay",
+        "args": {
+          "delay": 100
+        }
+      },
+      "editor.action.clipboardPasteAction"
+    ]
+  },
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact",
+    "typescriptreact": "javascriptreact",
+    "jsx-sublime-babel-tags": "javascriptreact"
+  },
+  "gitlens.views.search.enabled": false,
+  "gitlens.views.compare.enabled": false,
+  "gitlens.recentChanges.highlight.locations": ["overview", "gutter", "line"],
+  "gitlens.menus": {
+    "editor": false,
+    "editorGroup": false,
+    "editorTab": false,
+    "explorer": {
+      "clipboard": true,
+      "compare": true,
+      "history": true,
+      "remote": true
+    },
+    "scmGroup": {
+      "compare": true,
+      "openClose": true,
+      "stash": true,
+      "stashInline": true
+    },
+    "scmItem": {
+      "clipboard": true,
+      "compare": true,
+      "history": true,
+      "remote": true,
+      "stash": true
+    }
+  },
+  "gitlens.codeLens.enabled": false,
+  "gitlens.statusBar.enabled": false,
+  "gitlens.views.repositories.enabled": false,
+  "workbench.editor.showTabs": true,
+  "workbench.iconTheme": "material-icon-theme",
+  "editor.minimap.enabled": true,
+  "workbench.sideBar.location": "left",
+  "workbench.colorTheme": "Moonlight II Italic",
+  "workbench.startupEditor": "newUntitledFile",
+  "editor.multiCursorModifier": "alt"
+}
