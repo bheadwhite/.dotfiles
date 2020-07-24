@@ -98,16 +98,26 @@
     "when": "textInputFocus && amVim.mode != 'INSERT' && !renameInputVisible"
   },
   {
+    "key": "shift+k",
+    "command": "scrollLineUp",
+    "when": "textInputFocus && amVim.mode != 'INSERT' && !renameInputVisible"
+  },
+  {
+    "key": "shift+,",
+    "command": "workbench.action.focusLeftGroup",
+    "when": "textInputFocus && !renameInputVisible && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "shift+.",
+    "command": "workbench.action.focusRightGroup",
+    "when": "textInputFocus && !renameInputVisible && amVim.mode != 'INSERT'"
+  },
+  {
     "key": "shift+m",
     "command": "cursorMove",
     "args": {
       "to": "viewPortCenter"
     },
-    "when": "textInputFocus && amVim.mode != 'INSERT' && !renameInputVisible"
-  },
-  {
-    "key": "shift+k",
-    "command": "scrollLineUp",
     "when": "textInputFocus && amVim.mode != 'INSERT' && !renameInputVisible"
   },
   // #endregion
@@ -239,19 +249,23 @@
     "when": "textInputFocus"
   },
   {
-    "key": "ctrl+shift+alt+cmd+k",
-    "command": "type",
-    "args": {
-      "text": "{"
-    },
+    "key": "ctrl+cmd+j",
+    "command": "indentation-level-movement.moveDown",
     "when": "amVim.mode != 'INSERT'"
   },
   {
-    "key": "ctrl+shift+alt+cmd+j",
-    "command": "type",
-    "args": {
-      "text": "}"
-    },
+    "key": "ctrl+cmd+k",
+    "command": "indentation-level-movement.moveUp",
+    "when": "amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "ctrl+cmd+shift+j",
+    "command": "macros.indentSelectToEnd",
+    "when": "amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "ctrl+cmd+shift+k",
+    "command": "macros.indentSelectToBeginning",
     "when": "amVim.mode != 'INSERT'"
   },
   {
@@ -329,15 +343,15 @@
   {
     "key": "shift+l",
     "command": "workbench.action.editor.nextChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && amVim.mode != 'INSERT' && !renameInputVisible"
+    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
   },
   {
     "key": "shift+h",
     "command": "workbench.action.editor.previousChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && amVim.mode != 'INSERT' && !renameInputVisible"
+    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
   },
   {
-    "key": "ctrl+shift+alt+cmd+r",
+    "key": "ctrl+cmd+r",
     "command": "copyRelativeFilePath"
   },
   // #endregion
@@ -385,12 +399,12 @@
     "when": "terminalFocus"
   },
   {
-    "key": "ctrl+shift+alt+cmd+j",
+    "key": "cmd+j",
     "command": "workbench.action.terminal.scrollDown",
     "when": "terminalFocus"
   },
   {
-    "key": "ctrl+shift+alt+cmd+k",
+    "key": "cmd+k",
     "command": "workbench.action.terminal.scrollUp",
     "when": "terminalFocus"
   },
@@ -434,12 +448,12 @@
     "when": "amVim.mode != 'VISUAL'"
   },
   {
-    "key": "shift+alt+l",
+    "key": "ctrl+shift+cmd+l",
     "command": "editor.action.dirtydiff.next",
     "when": "editorTextFocus"
   },
   {
-    "key": "shift+alt+h",
+    "key": "ctrl+shift+cmd+h",
     "command": "editor.action.dirtydiff.previous",
     "when": "editorTextFocus"
   },
@@ -542,11 +556,11 @@
     "command": "-workbench.action.focusLeftGroup"
   },
   {
-    "key": "ctrl+alt+l",
+    "key": "ctrl+shift+.",
     "command": "workbench.action.moveEditorToRightGroup"
   },
   {
-    "key": "ctrl+alt+h",
+    "key": "ctrl+shift+,",
     "command": "workbench.action.moveEditorToLeftGroup"
   },
   {
@@ -584,7 +598,7 @@
     "when": "config.emmet.triggerExpansionOnTab && editorTextFocus && !editorReadonly && !editorTabMovesFocus"
   },
   {
-    "key": "ctrl+shift+alt+cmd+t",
+    "key": "ctrl+cmd+t",
     "command": "editor.emmet.action.splitJoinTag"
   },
   {
@@ -621,5 +635,84 @@
     "key": "alt+cmd+up",
     "command": "-editor.action.insertCursorAbove",
     "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+alt+l",
+    "command": "editor.action.marker.next",
+    "when": "editorFocus"
+  },
+  {
+    "key": "alt+f8",
+    "command": "-editor.action.marker.next",
+    "when": "editorFocus"
+  },
+  {
+    "key": "shift+alt+h",
+    "command": "editor.action.marker.prev",
+    "when": "editorFocus"
+  },
+  {
+    "key": "shift+alt+f8",
+    "command": "-editor.action.marker.prev",
+    "when": "editorFocus"
+  },
+  {
+    "key": "escape",
+    "command": "closeDirtyDiff",
+    "when": "dirtyDiffVisible"
+  },
+  {
+    "key": "ctrl+cmd+l",
+    "command": "bookmarks.jumpToNext",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+cmd+l",
+    "command": "-bookmarks.jumpToNext",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+cmd+h",
+    "command": "bookmarks.jumpToPrevious",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+cmd+j",
+    "command": "-bookmarks.jumpToPrevious",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+cmd+m",
+    "command": "bookmarks.toggle",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+cmd+k",
+    "command": "-bookmarks.toggle",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+ctrl+l",
+    "command": "editor.action.diffReview.next",
+    "when": "activeViewlet == 'workbench.view.scm' && isInDiffEditor"
+  },
+  {
+    "key": "cmd+ctrl+h",
+    "command": "editor.action.diffReview.prev",
+    "when": "activeViewlet == 'workbench.view.scm' && isInDiffEditor"
+  },
+  {
+    "key": "space",
+    "command": "copy-copy-paste.copy",
+    "when": "amVim.mode == 'VISUAL LINE' && textEditorFocus"
+  },
+  {
+    "key": "space",
+    "command": "copy-copy-paste.copy",
+    "when": "amVim.mode == 'VISUAL' && textEditorFocus"
+  },
+  {
+    "key": "cmd+ctrl+p",
+    "command": "copy-copy-paste.history"
   }
 ]

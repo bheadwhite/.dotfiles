@@ -12,6 +12,7 @@
   "editor.cursorSurroundingLines": 5,
   "editor.parameterHints.enabled": false,
   "editor.wordBasedSuggestions": false,
+  "amVim.bindCtrlCommands": false,
   "prettier.semi": false,
   "prettier.tabWidth": 2,
   "prettier.jsxBracketSameLine": true,
@@ -114,6 +115,21 @@
         }
       },
       "editor.action.clipboardPasteAction"
+    ],
+    "indentSelectToBeginning": [
+      "cursorEnd",
+      "indentation-level-movement.selectUp",
+      "cursorHomeSelect"
+    ],
+    "indentSelectToEnd": [
+      {
+        "command": "type",
+        "args": {
+          "text": "V"
+        }
+      },
+      "indentation-level-movement.selectDown",
+      "cursorEndSelect"
     ]
   },
   "emmet.includeLanguages": {
