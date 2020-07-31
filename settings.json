@@ -1,11 +1,12 @@
 {
-  "window.zoomLevel": 2,
+  "window.zoomLevel": 0,
   "workbench.activityBar.visible": false,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.snippetSuggestions": "top",
+  "editor.snippetSuggestions": "bottom",
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.formatOnSave": true,
   "editor.cursorBlinking": "smooth",
+  "editor.tabSize": 2,
   "zenMode.hideTabs": false,
   "zenMode.hideStatusBar": false,
   "zenMode.hideLineNumbers": false,
@@ -26,6 +27,7 @@
   "openInGitHub.defaultRemote": "origin",
   "openInGithub.maxBuffer": 512000,
   "openInGitHub.excludeCurrentRevision": false,
+  "telemetry.enableTelemetry": false,
   "workbench.colorCustomizations": {
     "editor.selectionBackground": "#ffffff23",
     "editor.rangeHighlightBackground": "#ffffff23",
@@ -84,6 +86,7 @@
     "**/public/**": true
   },
   "search.exclude": {
+    "**/.cache/**": true,
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
     "**/node_modules/**": true,
@@ -99,6 +102,15 @@
     "**/log/**": true
   },
   "macros.list": {
+    "customJ": [
+      {
+        "command": "type",
+        "args": {
+          "text": ""
+        }
+      },
+      "workbench.action.focusFirstEditorGroup"
+    ],
     "fzyfind": [
       "editor.action.clipboardCopyAction",
       {
@@ -174,5 +186,7 @@
   "workbench.sideBar.location": "left",
   "workbench.colorTheme": "Moonlight II Italic",
   "workbench.startupEditor": "newUntitledFile",
-  "editor.multiCursorModifier": "alt"
+  "editor.multiCursorModifier": "alt",
+  "githd.logView.displayExpressStatus": false,
+  "githd.logView.expressMode": true
 }

@@ -118,7 +118,7 @@
     "args": {
       "to": "viewPortCenter"
     },
-    "when": "textInputFocus && amVim.mode != 'INSERT' && !renameInputVisible"
+    "when": "textInputFocus && !renameInputVisible && amVim.mode != 'INSERT' && !panelFocus"
   },
   // #endregion
 
@@ -191,9 +191,9 @@
     "when": "listFocus && !inputFocus && !inDebugRepl"
   },
   {
-    "key": "alt+enter",
+    "key": "space",
     "command": "breadcrumbs.revealFocused",
-    "when": "breadcrumbsActive && breadcrumbsVisible"
+    "when": "breadcrumbsActive && breadcrumbsVisible && !inputFocus"
   },
   {
     "key": "alt+shift+enter",
@@ -249,12 +249,12 @@
     "when": "textInputFocus"
   },
   {
-    "key": "ctrl+cmd+j",
+    "key": "ctrl+alt+cmd+j",
     "command": "indentation-level-movement.moveDown",
     "when": "amVim.mode != 'INSERT'"
   },
   {
-    "key": "ctrl+cmd+k",
+    "key": "ctrl+alt+cmd+k",
     "command": "indentation-level-movement.moveUp",
     "when": "amVim.mode != 'INSERT'"
   },
@@ -399,12 +399,12 @@
     "when": "terminalFocus"
   },
   {
-    "key": "cmd+j",
+    "key": "shift+j",
     "command": "workbench.action.terminal.scrollDown",
     "when": "terminalFocus"
   },
   {
-    "key": "cmd+k",
+    "key": "shift+k",
     "command": "workbench.action.terminal.scrollUp",
     "when": "terminalFocus"
   },
@@ -429,7 +429,7 @@
     "when": "terminalFocus"
   },
   {
-    "key": "cmd+`",
+    "key": "ctrl+`",
     "command": "workbench.action.terminal.toggleTerminal"
   },
 
@@ -467,7 +467,8 @@
   },
   {
     "key": "alt+enter",
-    "command": "workbench.files.action.collapseExplorerFolders"
+    "command": "workbench.files.action.collapseExplorerFolders",
+    "when": "explorerViewletVisible"
   },
   {
     "key": "cmd+k cmd+r",
@@ -704,15 +705,120 @@
   {
     "key": "space",
     "command": "copy-copy-paste.copy",
-    "when": "amVim.mode == 'VISUAL LINE' && textEditorFocus"
+    "when": "!findInputFocussed && amVim.mode == 'VISUAL LINE' && textInputFocus"
   },
   {
     "key": "space",
     "command": "copy-copy-paste.copy",
-    "when": "amVim.mode == 'VISUAL' && textEditorFocus"
+    "when": "!findInputFocussed && amVim.mode == 'VISUAL' && textInputFocus"
   },
   {
     "key": "cmd+ctrl+p",
     "command": "copy-copy-paste.history"
+  },
+  {
+    "key": "cmd+`",
+    "command": "workbench.action.focusPanel",
+    "when": "!panelFocus && !workbench.panel.terminal.visible"
+  },
+  {
+    "key": "cmd+`",
+    "command": "workbench.action.closePanel",
+    "when": "workbench.panel.terminal.visible"
+  },
+  {
+    "key": "ctrl+shift+h",
+    "command": "workbench.action.previousPanelView",
+    "when": "panelFocus"
+  },
+  {
+    "key": "ctrl+shift+l",
+    "command": "workbench.action.nextPanelView",
+    "when": "panelFocus"
+  },
+  {
+    "key": "ctrl+cmd+r",
+    "command": "renameFile",
+    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "enter",
+    "command": "-renameFile",
+    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "cmd+shift+,",
+    "command": "workbench.action.previousPanelView",
+    "when": "panelFocus"
+  },
+  {
+    "key": "space",
+    "command": "amVim.space",
+    "when": "editorTextFocus && amVim.mode != 'INSERT' && !inputFocus"
+  },
+  {
+    "key": "space",
+    "command": "-amVim.space",
+    "when": "editorTextFocus && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "space",
+    "command": "-breadcrumbs.revealFocused",
+    "when": "breadcrumbsActive && breadcrumbsVisible"
+  },
+  {
+    "key": "shift+escape",
+    "command": "workbench.action.closePanel",
+    "when": "panelFocus"
+  },
+  {
+    "key": "shift+cmd+enter",
+    "command": "workbench.action.toggleMaximizedPanel",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "shift+cmd+k",
+    "command": "workbench.action.terminal.scrollUpPage",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "pageup",
+    "command": "-workbench.action.terminal.scrollUpPage",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "shift+cmd+j",
+    "command": "workbench.action.terminal.scrollDownPage",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "pagedown",
+    "command": "-workbench.action.terminal.scrollDownPage",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "space",
+    "command": "debug.toggleBreakpoint",
+    "when": "breakpointsFocused"
+  },
+  {
+    "key": "space",
+    "command": "-debug.toggleBreakpoint",
+    "when": "breakpointsFocused && !inputFocus"
+  },
+  {
+    "key": "alt+j",
+    "command": "search.action.focusSearchList",
+    "when": "searchInputBoxFocus && searchViewletVisible && !listFocus"
+  },
+  {
+    "key": "alt+j",
+    "command": "list.focusDown",
+    "when": "focusedView == 'workbench.scm' && !listFocus"
+  },
+  {
+    "key": "cmd+enter",
+    "command": "workbench.files.action.refreshFilesExplorer",
+    "when": "filesExplorerFocus && explorerViewletFocus"
   }
 ]
