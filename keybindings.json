@@ -466,7 +466,7 @@
     "command": "git.revertSelectedRanges"
   },
   {
-    "key": "alt+enter",
+    "key": "shift+alt+enter",
     "command": "workbench.files.action.collapseExplorerFolders",
     "when": "explorerViewletVisible"
   },
@@ -582,11 +582,11 @@
     "command": "workbench.action.focusLeftGroup"
   },
   {
-    "key": "ctrl+shift+alt+cmd+l",
+    "key": "ctrl+cmd+.",
     "command": "editor.emmet.action.nextEditPoint"
   },
   {
-    "key": "ctrl+shift+alt+cmd+h",
+    "key": "ctrl+cmd+,",
     "command": "editor.emmet.action.prevEditPoint"
   },
   {
@@ -820,5 +820,15 @@
     "key": "cmd+enter",
     "command": "workbench.files.action.refreshFilesExplorer",
     "when": "filesExplorerFocus && explorerViewletFocus"
+  },
+  {
+    "key": "alt+space",
+    "command": "filesExplorer.openFilePreserveFocus",
+    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder && !inputFocus"
+  },
+  {
+    "key": "escape",
+    "command": "workbench.action.focusFirstEditorGroup",
+    "when": "!listHasSelectionOrFocus && explorerViewletFocus && listFocus && explorerViewletVisible"
   }
 ]
