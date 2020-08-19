@@ -1,6 +1,8 @@
 {
   "amVim.bindCtrlCommands": false,
+  "diffEditor.renderSideBySide": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
+  "terminal.integrated.shell.osx": "/bin/zsh",
   "editor.cursorBlinking": "phase",
   "editor.cursorSmoothCaretAnimation": true,
   "editor.cursorSurroundingLines": 5,
@@ -28,8 +30,7 @@
   "gitlens.views.repositories.enabled": false,
   "gitlens.views.search.enabled": false,
   "javascript.updateImportsOnFileMove.enabled": "always",
-
-  "jestrunner.configPath": "./jest.config.js",
+  "jestrunner.configPath": "./operator/jest.config.js", //tcn
   "openInGitHub.defaultBranch": "master",
   "openInGitHub.defaultRemote": "origin",
   "openInGitHub.excludeCurrentRevision": false,
@@ -38,13 +39,17 @@
   "prettier.jsxSingleQuote": true,
   "prettier.semi": false,
   "prettier.tabWidth": 2,
+  "activeDocumentIndicator.opacity": 75,
   "synthwave84.brightness": 0.1,
   "synthwave84.disableGlow": true,
+  "scoper.highlightColor": "",
+  "scoper.braces": false,
+  "scoper.squareBrackets": false,
+  "scoper.parentheses": false,
   "telemetry.enableCrashReporter": false,
   "telemetry.enableTelemetry": false,
-  "typescript.tsserver.useSeparateSyntaxServer": false,
+  "terminal.integrated.cursorBlinking": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "window.title": "${dirty} ${activeEditorMedium}${separator}${rootName}",
   "window.zoomLevel": 1,
   "workbench.activityBar.visible": false,
   "workbench.colorTheme": "Moonlight II Italic",
@@ -65,15 +70,18 @@
     "editorBracketMatch.background": "#f008",
     "editorBracketMatch.border": "#f00",
     "editor.wordHighlightStrongBackground": "#3e4998",
+    "editor.focusedStackFrameHighlightBackground": "#ff0000",
     "editor.wordHighlightBackground": "#3e4998",
     "editor.findMatchBackground": "#282c34",
-    "list.inactiveSelectionBackground": "#103533",
     "editor.findMatchHighlightBackground": "#06570997",
     "editor.selectionForeground": "#99eeff",
     "editorIndentGuide.activeBackground": "#1d76db",
-    "[Night Owl]": {
-      // "editor.background": "#000"
-    }
+    "list.inactiveSelectionForeground": "#fff",
+    "list.activeSelectionForeground": "#fff",
+    "list.activeSelectionBackground": "#26007e",
+    "list.focusBackground": "#2e5704",
+    "panel.background": "#000",
+    "terminal.border": "#ff0000"
   },
   "files.exclude": {
     "**/.git/objects/**": true,
@@ -142,6 +150,46 @@
     "**/log/**": true
   },
   "macros.list": {
+    "focusTerminal": [
+      // "when": "!panelFocus"
+      "workbench.action.focusPanel",
+      "settings.cycle.termOn"
+    ],
+    "unFocusTerminal": [
+      "workbench.action.focusFirstEditorGroup",
+      "settings.cycle.termOff"
+    ],
+    "customSwitchAppHack": ["workbench.action.terminal.focus"],
+    "customFindInFiles": [
+      "workbench.action.findInFiles",
+      {
+        "command": "$delay",
+        "args": {
+          "delay": 10
+        }
+      },
+      "list.focusDown"
+    ],
+    "customScmFocus": [
+      "workbench.action.focusSideBar",
+      "list.focusDown",
+      "list.focusUp"
+    ],
+    "customY": [
+      "copy-copy-paste.copy",
+      {
+        "command": "$delay",
+        "args": {
+          "delay": 10
+        }
+      },
+      {
+        "command": "type",
+        "args": {
+          "text": "y"
+        }
+      }
+    ],
     "customJ": [
       {
         "command": "type",
@@ -184,6 +232,61 @@
       "cursorEndSelect"
     ]
   },
+  "settings.cycle": [
+    {
+      "id": "termOn",
+      "overrideWorkspaceSettings": true,
+      "values": [
+        {
+          "workbench.colorCustomizations": {
+            "editor.selectionBackground": "#ffffff23",
+            "editor.rangeHighlightBackground": "#ffffff23",
+            "editorBracketMatch.background": "#f008",
+            "editorBracketMatch.border": "#f00",
+            "editor.wordHighlightStrongBackground": "#3e4998",
+            "editor.focusedStackFrameHighlightBackground": "#ff0000",
+            "editor.wordHighlightBackground": "#3e4998",
+            "editor.findMatchBackground": "#282c34",
+            "editor.findMatchHighlightBackground": "#06570997",
+            "editor.selectionForeground": "#99eeff",
+            "editorIndentGuide.activeBackground": "#1d76db",
+            "list.inactiveSelectionForeground": "#fff",
+            "list.activeSelectionForeground": "#fff",
+            "list.activeSelectionBackground": "#26007e",
+            "list.focusBackground": "#2e5704",
+
+            "panel.background": "#000",
+            "terminal.border": "#ff0000"
+          }
+        }
+      ]
+    },
+    {
+      "id": "termOff",
+      "overrideWorkspaceSettings": true,
+      "values": [
+        {
+          "workbench.colorCustomizations": {
+            "editor.selectionBackground": "#ffffff23",
+            "editor.rangeHighlightBackground": "#ffffff23",
+            "editorBracketMatch.background": "#f008",
+            "editorBracketMatch.border": "#f00",
+            "editor.wordHighlightStrongBackground": "#3e4998",
+            "editor.focusedStackFrameHighlightBackground": "#ff0000",
+            "editor.wordHighlightBackground": "#3e4998",
+            "editor.findMatchBackground": "#282c34",
+            "editor.findMatchHighlightBackground": "#06570997",
+            "editor.selectionForeground": "#99eeff",
+            "editorIndentGuide.activeBackground": "#1d76db",
+            "list.inactiveSelectionForeground": "#fff",
+            "list.activeSelectionForeground": "#fff",
+            "list.activeSelectionBackground": "#26007e",
+            "list.focusBackground": "#2e5704"
+          }
+        }
+      ]
+    }
+  ],
   "emmet.includeLanguages": {
     "javascript": "javascriptreact",
     "typescript": "typescriptreact",
@@ -213,5 +316,6 @@
       "remote": true,
       "stash": true
     }
-  }
+  },
+  "editor.renameOnType": true
 }

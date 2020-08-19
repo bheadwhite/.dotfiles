@@ -21,34 +21,35 @@ export ZSH_THEME="powerlevel10k/powerlevel10k"
     # ---------------
 
 # cursor blinking
-    # Activate vim mode.
-    bindkey -v
 
-    # Remove mode switching delay.
-    KEYTIMEOUT=5
+# Activate vim mode.
+bindkey -v
 
-    # Change cursor shape for different vi modes.
-    function zle-keymap-select {
-      if [[ ${KEYMAP} == vicmd ]] ||
-         [[ $1 = 'block' ]]; then
-        echo -ne '\e[1 q'
+# Remove mode switching delay.
+KEYTIMEOUT=5
 
-      elif [[ ${KEYMAP} == main ]] ||
-           [[ ${KEYMAP} == viins ]] ||
-           [[ ${KEYMAP} = '' ]] ||
-           [[ $1 = 'beam' ]]; then
-        echo -ne '\e[5 q'
-      fi
-    }
-    zle -N zle-keymap-select
+## Change cursor shape for different vi modes.
+function zle-keymap-select {
+    if [[ ${KEYMAP} == vicmd ]] ||
+        [[ $1 = 'block' ]]; then
+    echo -ne '\e[1 q'
 
-    # Use beam shape cursor on startup.
+    elif [[ ${KEYMAP} == main ]] ||
+        [[ ${KEYMAP} == viins ]] ||
+        [[ ${KEYMAP} = '' ]] ||
+        [[ $1 = 'beam' ]]; then
     echo -ne '\e[5 q'
+    fi
+}
+zle -N zle-keymap-select
 
-    # Use beam shape cursor for each new prompt.
-    preexec() {
-       echo -ne '\e[5 q'
-    }
+# Use beam shape cursor on startup.
+echo -ne '\e[5 q'
+
+# Use beam shape cursor for each new prompt.
+preexec() {
+    echo -ne '\e[5 q'
+}
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -150,12 +151,21 @@ alias cloudservices="gcloud services list"
 alias k="kubectl"
 alias mvim="open -a MacVim"
 alias nvimconfig="code ~/.vim/vim.init"
-alias coveragereport="open /Users/brent.whitehead/Projects/neo/coverage/lcov-report/index.html"
+alias creport="open /Users/brent.whitehead/Projects/neo/coverage/lcov-report/index.html"
 alias buildneo="rm -rf node_modules/ && rm -rf /tools/frontend-tools/tcn-frontend-scripts/node_modules/ && yarn install"
 # how to log within matrix api
 # log-pod matrix-api -c matrix-api | rg 'CreateFileTemplate' | jq
 # jesses check if anything is running
 alias jesse="kubectl get pods -o wide | grep -v Running"
+streamjesse() {
+    while true; do
+        clear;
+        jesse;
+        sleep 2;
+    done
+}
+
+alias recomp="touch /Users/brent.whitehead/Projects/neo/operator/src/apps/lms/AsyncAction.ts"
 
 alias streamfront="log-pod matrix-api -f -c matrix-api | rg -v 'room303' | rg -v 'ListNewEvent' | rg -v 'GetHistory'"
 alias streamback="stream-pod lms-api -c matrix-lms-api "
@@ -179,6 +189,27 @@ alias streamlms="osascript \
 -e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
 -e 'delay 1' \
 -e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"d\" using {command down}' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streamschedjq\"' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52'
+"
+alias streamlmsstg="osascript \
+-e 'tell application \"iTerm2\" to activate' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"n\" using {command down}' \
+-e 'delay 1' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"kstaging\"' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streamfrontjq\"' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"d\" using {command down}' \
+-e 'delay 1' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"kstaging\"' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streambackjq\"' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"d\" using {command down}' \
+-e 'delay 1' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"kstaging\"' \
+-e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
 -e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streamschedjq\"' \
 -e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52'
 "
@@ -211,6 +242,18 @@ stream-pod () {
     kubectl logs "$pod" -f "${@:2:$#-2}"
 }
 
+cover () {
+    yarn test $1 --coverage --collectCoverageFrom="**/*$1*/**/*.{ts,tsx}" --coveragePathIgnorePatterns=".fixture.*" "${@:2:$#-2}"
+}
+coverP () {
+    echo -n "test: "
+    read TEST
+
+    echo -n "coverage dir: "
+    read DIR
+    yarn test $TEST --coverage --collectCoverageFrom="**/$DIR**/*.{ts,tsx}" --coveragePathIgnorePatterns=".fixture.*" "${@:1:$#-1}"
+}
+
 # lms-persist = db
 # scheduler = worker. processes the stuff.
 # lms-api = backend server. queues all the data for scheduler. all api calls end up being intercepted here.
@@ -239,13 +282,6 @@ lms() {
     $NEO/plz-out/bin/services/lms/lmsctl "${@:1:$#-1}"
 }
 
-logjesse() {
-    while true; do
-        clear;
-        jesse;
-        sleep 2;
-    done
-}
 
 forward-persist() {
     kubectl port-forward service/matrix-lms-persist   50090:50051

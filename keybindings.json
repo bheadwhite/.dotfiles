@@ -53,11 +53,12 @@
   {
     "key": "enter",
     "command": "workbench.action.keepEditor",
-    "when": "editorFocus && !editorPinned"
+    "when": "editorFocus && !editorPinned && !listFocus"
   },
   {
     "key": "shift+cmd+g",
-    "command": "workbench.scm.focus"
+    "command": "workbench.scm.focus",
+    "when": "!findWidgetVisible && !workbench.scm.visible"
   },
   {
     "key": "cmd+1",
@@ -101,16 +102,6 @@
     "key": "shift+k",
     "command": "scrollLineUp",
     "when": "textInputFocus && amVim.mode != 'INSERT' && !renameInputVisible"
-  },
-  {
-    "key": "shift+,",
-    "command": "workbench.action.focusLeftGroup",
-    "when": "textInputFocus && !renameInputVisible && amVim.mode != 'INSERT'"
-  },
-  {
-    "key": "shift+.",
-    "command": "workbench.action.focusRightGroup",
-    "when": "textInputFocus && !renameInputVisible && amVim.mode != 'INSERT'"
   },
   {
     "key": "shift+m",
@@ -186,11 +177,6 @@
     "when": "listFocus && !inputFocus"
   },
   {
-    "key": "enter",
-    "command": "list.select",
-    "when": "listFocus && !inputFocus && !inDebugRepl"
-  },
-  {
     "key": "space",
     "command": "breadcrumbs.revealFocused",
     "when": "breadcrumbsActive && breadcrumbsVisible && !inputFocus"
@@ -230,23 +216,27 @@
   },
   {
     "key": "cmd+l",
-    "command": "cursorEnd",
+    "command": "type",
+    "args": { "text": "$" },
     "when": "textInputFocus"
   },
   {
     "key": "cmd+h",
-    "command": "cursorHome",
+    "command": "type",
+    "args": { "text": "^" },
     "when": "textInputFocus"
   },
   {
     "key": "alt+l",
-    "command": "cursorWordEndRight",
-    "when": "textInputFocus"
+    "command": "type",
+    "args": { "text": "e" },
+    "when": "textInputFocus && amVim.Mode != 'INSERT'"
   },
   {
     "key": "alt+h",
-    "command": "cursorWordStartLeft",
-    "when": "textInputFocus"
+    "command": "type",
+    "args": { "text": "b" },
+    "when": "textInputFocus && amVim.Mode != 'INSERT'"
   },
   {
     "key": "ctrl+alt+cmd+j",
@@ -354,6 +344,16 @@
     "key": "ctrl+cmd+r",
     "command": "copyRelativeFilePath"
   },
+  {
+    "key": "y",
+    "command": "macros.customY",
+    "when": "amVim.mode == 'VISUAL' && editorTextFocus"
+  },
+  {
+    "key": "y",
+    "command": "macros.customY",
+    "when": "amVim.mode == 'VISUAL LINE' && editorTextFocus"
+  },
   // #endregion
 
   // #region ------------------------------------------- VIM
@@ -399,12 +399,12 @@
     "when": "terminalFocus"
   },
   {
-    "key": "shift+j",
+    "key": "ctrl+cmd+j",
     "command": "workbench.action.terminal.scrollDown",
     "when": "terminalFocus"
   },
   {
-    "key": "shift+k",
+    "key": "ctrl+cmd+k",
     "command": "workbench.action.terminal.scrollUp",
     "when": "terminalFocus"
   },
@@ -547,14 +547,6 @@
   {
     "key": "ctrl+shift+l",
     "command": "workbench.action.focusRightGroup"
-  },
-  {
-    "key": "cmd+k cmd+right",
-    "command": "-workbench.action.focusRightGroup"
-  },
-  {
-    "key": "cmd+k cmd+left",
-    "command": "-workbench.action.focusLeftGroup"
   },
   {
     "key": "ctrl+shift+.",
@@ -718,13 +710,8 @@
   },
   {
     "key": "cmd+`",
-    "command": "workbench.action.focusPanel",
-    "when": "!panelFocus && !workbench.panel.terminal.visible"
-  },
-  {
-    "key": "cmd+`",
-    "command": "workbench.action.closePanel",
-    "when": "workbench.panel.terminal.visible"
+    "command": "macros.focusTerminal",
+    "when": "!panelFocus"
   },
   {
     "key": "ctrl+shift+h",
@@ -777,7 +764,7 @@
     "when": "terminalFocus"
   },
   {
-    "key": "shift+cmd+k",
+    "key": "ctrl+shift+cmd+k",
     "command": "workbench.action.terminal.scrollUpPage",
     "when": "terminalFocus"
   },
@@ -787,7 +774,7 @@
     "when": "terminalFocus"
   },
   {
-    "key": "shift+cmd+j",
+    "key": "ctrl+shift+cmd+j",
     "command": "workbench.action.terminal.scrollDownPage",
     "when": "terminalFocus"
   },
@@ -829,6 +816,166 @@
   {
     "key": "escape",
     "command": "workbench.action.focusFirstEditorGroup",
-    "when": "!listHasSelectionOrFocus && explorerViewletFocus && listFocus && explorerViewletVisible"
+    "when": "sideBarFocus && listFocus && !listHasSelectionOrFocus"
+  },
+  {
+    "key": "shift+cmd+g",
+    "command": "editor.action.previousMatchFindAction",
+    "when": "editorFocus && findWidgetVisible"
+  },
+  {
+    "key": "shift+enter",
+    "command": "-editor.action.previousMatchFindAction",
+    "when": "editorFocus && findInputFocussed"
+  },
+  {
+    "key": "cmd+`",
+    "command": "macros.unFocusTerminal",
+    "when": "panelFocus"
+  },
+  {
+    "key": "ctrl+cmd+space",
+    "command": "workbench.action.togglePanel"
+  },
+  {
+    "key": "f15",
+    "command": "editor.action.marker.nextInFiles",
+    "when": "editorFocus"
+  },
+  {
+    "key": "f8",
+    "command": "-editor.action.marker.nextInFiles",
+    "when": "editorFocus"
+  },
+  {
+    "key": "f13",
+    "command": "editor.action.marker.prevInFiles",
+    "when": "editorFocus"
+  },
+  {
+    "key": "shift+f8",
+    "command": "-editor.action.marker.prevInFiles",
+    "when": "editorFocus"
+  },
+  {
+    "key": "shift+cmd+g",
+    "command": "macros.customScmFocus",
+    "when": "workbench.scm.visible && !findWidgetVisible"
+  },
+  {
+    "key": "shift+backspace",
+    "command": "bracketeer.removeQuotes",
+    "when": "amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "shift+alt+cmd+'",
+    "command": "-bracketeer.removeQuotes"
+  },
+  {
+    "key": "shift+cmd+backspace",
+    "command": "bracketeer.removeBrackets",
+    "when": "amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "shift+alt+cmd+i",
+    "command": "-bracketeer.removeBrackets"
+  },
+  {
+    "key": "ctrl+cmd+shift+f14",
+    "command": "customSwitchAppHack",
+    "when": "textEditorFocus"
+  },
+  {
+    "key": "ctrl+cmd+g",
+    "command": "search.action.focusNextSearchResult",
+    "when": "hasSearchResult || inSearchEditor"
+  },
+  {
+    "key": "f4",
+    "command": "-search.action.focusNextSearchResult",
+    "when": "hasSearchResult || inSearchEditor"
+  },
+  {
+    "key": "ctrl+shift+cmd+g",
+    "command": "search.action.focusPreviousSearchResult",
+    "when": "hasSearchResult || inSearchEditor"
+  },
+  {
+    "key": "shift+f4",
+    "command": "-search.action.focusPreviousSearchResult",
+    "when": "hasSearchResult || inSearchEditor"
+  },
+  {
+    "key": "alt+j",
+    "command": "search.focus.nextInputBox",
+    "when": "inSearchEditor && inputBoxFocus || inputBoxFocus && searchViewletVisible"
+  },
+  {
+    "key": "cmd+down",
+    "command": "-search.focus.nextInputBox",
+    "when": "inSearchEditor && inputBoxFocus || inputBoxFocus && searchViewletVisible"
+  },
+  {
+    "key": "alt+k",
+    "command": "search.focus.previousInputBox",
+    "when": "inSearchEditor && inputBoxFocus || inputBoxFocus && searchViewletVisible && !searchInputBoxFocus"
+  },
+  {
+    "key": "cmd+up",
+    "command": "-search.focus.previousInputBox",
+    "when": "inSearchEditor && inputBoxFocus || inputBoxFocus && searchViewletVisible && !searchInputBoxFocus"
+  },
+  {
+    "key": "ctrl+cmd+o",
+    "command": "togglePeekWidgetFocus",
+    "when": "inReferenceSearchEditor || referenceSearchVisible"
+  },
+  {
+    "key": "cmd+k f2",
+    "command": "-togglePeekWidgetFocus",
+    "when": "inReferenceSearchEditor || referenceSearchVisible"
+  },
+  {
+    "key": "shift+h",
+    "command": "workbench.action.compareEditor.previousChange",
+    "when": "isInDiffEditor && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "shift+l",
+    "command": "workbench.action.compareEditor.nextChange",
+    "when": "isInDiffEditor && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "alt+enter",
+    "command": "list.select",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "alt+enter",
+    "command": "-notebook.cell.executeAndInsertBelow",
+    "when": "notebookCellListFocused"
+  },
+  {
+    "key": "alt+enter",
+    "command": "-debug.openBreakpointToSide",
+    "when": "breakpointsFocused"
+  },
+  {
+    "key": "home home",
+    "command": "editor.debug.action.showDebugHover",
+    "when": "editorTextFocus && inDebugMode"
+  },
+  {
+    "key": "cmd+k cmd+i",
+    "command": "-editor.debug.action.showDebugHover",
+    "when": "editorTextFocus && inDebugMode"
+  },
+  {
+    "key": "ctrl+cmd+7",
+    "command": "settings.cycle.termOn"
+  },
+  {
+    "key": "ctrl+cmd+6",
+    "command": "settings.cycle.termOff"
   }
 ]
