@@ -1,6 +1,6 @@
 # If you come from bash you might have to change your $PATH.
 #export PATH=$HOME/bin:/usr/local/bin:$PATH
-export PATH=$PATH/$HOME/Desktop/github/limelight/bin
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/Desktop/github/limelight/bin"
 
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/brent.whitehead/.oh-my-zsh"
@@ -10,6 +10,10 @@ export ZSH="/Users/brent.whitehead/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 export ZSH_THEME="powerlevel10k/powerlevel10k"
+
+#NVM
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -139,6 +143,7 @@ alias reseth="git reset --hard"
 alias br="git branch"
 alias skunk="gcloud sql connect development-skunk -u skunk --project tcn-cloud-dev"
 alias skunkForward="kubectl port-forward service/skunkdb 8432:5432"
+alias lmsForward="kubectl port-forward service/matrix-db 8431:5432"
 
 alias buildprotos="yarn clean && yarn build-protos"
 alias zshrc="code ~/.zshrc"
@@ -374,4 +379,13 @@ evans-persist-repl() {
 #need to plz build services/lms/... first
 lmsctl() {
     $NEO/plz-out/bin/services/lms/lmsctl "${@:1:$#-1}"
+}
+
+# launch google chrome with debugging
+chromebug(){
+    /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222
+}
+
+lmsDb() {
+    kubectl exec admin-0 -it psql -- -hmatrix-db -Ulms
 }

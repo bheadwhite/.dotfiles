@@ -1,9 +1,12 @@
 {
-  "amVim.bindCtrlCommands": false,
-  "diffEditor.renderSideBySide": false,
+  "diffEditor.renderSideBySide": true,
+  "debug.javascript.usePreview": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.suggestSelection": "recentlyUsed",
   "terminal.integrated.shell.osx": "/bin/zsh",
   "editor.cursorBlinking": "phase",
+  "editor.tabCompletion": "off",
   "editor.cursorSmoothCaretAnimation": true,
   "editor.cursorSurroundingLines": 5,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -21,6 +24,9 @@
   "editor.tabSize": 2,
   "editor.wordBasedSuggestions": false,
   "explorer.openEditors.visible": 0,
+  "gitlab.instanceUrl": "https://git.tcncloud.net",
+  "gitlab.pipelineGitRemoteName": "https://git.tcncloud.net/m/neo/-/pipelines?page=1&scope=all&username=brent.whitehead",
+  "gitlab.showPipelineUpdateNotifications": true,
   "githd.logView.displayExpressStatus": false,
   "githd.logView.expressMode": true,
   "gitlens.codeLens.enabled": false,
@@ -70,7 +76,6 @@
     "editorBracketMatch.background": "#f008",
     "editorBracketMatch.border": "#f00",
     "editor.wordHighlightStrongBackground": "#3e4998",
-    "editor.focusedStackFrameHighlightBackground": "#ff0000",
     "editor.wordHighlightBackground": "#3e4998",
     "editor.findMatchBackground": "#282c34",
     "editor.findMatchHighlightBackground": "#06570997",
@@ -244,7 +249,6 @@
             "editorBracketMatch.background": "#f008",
             "editorBracketMatch.border": "#f00",
             "editor.wordHighlightStrongBackground": "#3e4998",
-            "editor.focusedStackFrameHighlightBackground": "#ff0000",
             "editor.wordHighlightBackground": "#3e4998",
             "editor.findMatchBackground": "#282c34",
             "editor.findMatchHighlightBackground": "#06570997",
@@ -272,7 +276,6 @@
             "editorBracketMatch.background": "#f008",
             "editorBracketMatch.border": "#f00",
             "editor.wordHighlightStrongBackground": "#3e4998",
-            "editor.focusedStackFrameHighlightBackground": "#ff0000",
             "editor.wordHighlightBackground": "#3e4998",
             "editor.findMatchBackground": "#282c34",
             "editor.findMatchHighlightBackground": "#06570997",
@@ -317,5 +320,47 @@
       "stash": true
     }
   },
-  "editor.renameOnType": true
+  "gitlab.customQueries": [
+    {
+      "name": "Issues assigned to me",
+      "type": "issues",
+      "scope": "assigned_to_me",
+      "state": "opened",
+      "noItemText": "There is no issue assigned to you."
+    },
+    // {
+    //   "name": "Issues created by me",
+    //   "type": "issues",
+    //   "scope": "created_by_me",
+    //   "state": "opened",
+    //   "noItemText": "There is no issue created by you."
+    // },
+    {
+      "name": "Merge requests assigned to me",
+      "type": "merge_requests",
+      "scope": "assigned_to_me",
+      "state": "opened",
+      "noItemText": "There is no MR assigned to you."
+    }
+    // {
+    //   "name": "Merge requests created by me",
+    //   "type": "merge_requests",
+    //   "scope": "created_by_me",
+    //   "state": "opened",
+    //   "noItemText": "There is no MR created by you."
+    // },
+    // {
+    //   "name": "All project merge requests",
+    //   "type": "merge_requests",
+    //   "scope": "all",
+    //   "state": "opened",
+    //   "noItemText": "The project has no merge requests"
+    // }
+  ],
+  "editor.renameOnType": true,
+  "editor.quickSuggestions": {
+    "other": false,
+    "comments": false,
+    "strings": false
+  }
 }

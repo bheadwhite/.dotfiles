@@ -210,33 +210,48 @@
 
   // #region ---------------------------------------------- CURSOR
   {
-    "key": "shift+cmd+l",
-    "command": "cursorEndSelect",
-    "when": "textInputFocus"
-  },
-  {
     "key": "cmd+l",
     "command": "type",
     "args": { "text": "$" },
-    "when": "textInputFocus"
+    "when": "textInputFocus && amVim.mode != 'INSERT'"
   },
   {
     "key": "cmd+h",
     "command": "type",
     "args": { "text": "^" },
-    "when": "textInputFocus"
+    "when": "textInputFocus && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "cmd+l",
+    "command": "cursorEnd",
+    "when": "textInputFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "cmd+h",
+    "command": "cursorHome",
+    "when": "textInputFocus && amVim.mode == 'INSERT'"
   },
   {
     "key": "alt+l",
     "command": "type",
     "args": { "text": "e" },
-    "when": "textInputFocus && amVim.Mode != 'INSERT'"
+    "when": "textInputFocus && amVim.mode != 'INSERT'"
   },
   {
     "key": "alt+h",
     "command": "type",
     "args": { "text": "b" },
-    "when": "textInputFocus && amVim.Mode != 'INSERT'"
+    "when": "textInputFocus && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "alt+l",
+    "command": "cursorWordEndRight",
+    "when": "textInputFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "alt+h",
+    "command": "cursorWordStartLeft",
+    "when": "textInputFocus && amVim.mode == 'INSERT'"
   },
   {
     "key": "ctrl+alt+cmd+j",
@@ -865,7 +880,7 @@
   {
     "key": "shift+backspace",
     "command": "bracketeer.removeQuotes",
-    "when": "amVim.mode == 'VISUAL'"
+    "when": "amVim.mode != 'INSERT'"
   },
   {
     "key": "shift+alt+cmd+'",
@@ -874,7 +889,7 @@
   {
     "key": "shift+cmd+backspace",
     "command": "bracketeer.removeBrackets",
-    "when": "amVim.mode == 'VISUAL'"
+    "when": "amVim.mode != 'INSERT'"
   },
   {
     "key": "shift+alt+cmd+i",
@@ -977,5 +992,67 @@
   {
     "key": "ctrl+cmd+6",
     "command": "settings.cycle.termOff"
+  },
+  {
+    "key": "shift+cmd+l",
+    "command": "issuesAndMrs.focus"
+  },
+  {
+    "key": "shift+cmd+\\",
+    "command": "gl.pipelineActions"
+  },
+  {
+    "key": "shift+cmd+home",
+    "command": "gl.openCurrentMergeRequest"
+  },
+  {
+    "key": "space",
+    "command": "findThenJump.initiate",
+    "when": "textInputFocus && !renameInputVisible && amVim.mode == 'NORMAL' && !editorSimpleInput"
+  },
+  {
+    "key": "alt+enter",
+    "command": "git.openFile",
+    "when": "isInDiffEditor && workbench.scm.visible"
+  },
+  {
+    "key": "alt+k",
+    "command": "workbench.action.focusSideBar",
+    "when": "isInDiffEditor && workbench.scm.visible && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "alt+j",
+    "command": "workbench.action.focusSideBar",
+    "when": "isInDiffEditor && workbench.scm.visible && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "ctrl+a",
+    "command": "-cursorLineStart",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "shift+cmd+i",
+    "command": "-increaseByOne.integers",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "tab",
+    "command": "-acceptSelectedSuggestion",
+    "when": "suggestWidgetVisible && textInputFocus"
+  },
+  {
+    "key": "enter",
+    "command": "acceptSelectedSuggestion",
+    "when": "suggestWidgetVisible && textInputFocus"
+  },
+  {
+    "key": "tab",
+    "command": "tabout",
+    "when": "editorTextFocus && !editorHasMultipleSelections && !inSnippetMode"
+  },
+  {
+    "key": "tab",
+    "command": "-tabout",
+    "when": "editorTextFocus && !editorHasMultipleSelections && !inSnippetMode && !suggestWidgetVisible"
   }
 ]
