@@ -1,3 +1,4 @@
+
 # If you come from bash you might have to change your $PATH.
 #export PATH=$HOME/bin:/usr/local/bin:$PATH
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/Desktop/github/limelight/bin"
@@ -144,6 +145,7 @@ alias br="git branch"
 alias skunk="gcloud sql connect development-skunk -u skunk --project tcn-cloud-dev"
 alias skunkForward="kubectl port-forward service/skunkdb 8432:5432"
 alias lmsForward="kubectl port-forward service/matrix-db 8431:5432"
+alias k="kubectl"
 
 alias buildprotos="yarn clean && yarn build-protos"
 alias zshrc="code ~/.zshrc"
@@ -159,7 +161,6 @@ alias nvimconfig="code ~/.vim/vim.init"
 alias creport="open /Users/brent.whitehead/Projects/neo/coverage/lcov-report/index.html"
 alias buildneo="rm -rf node_modules/ && rm -rf /tools/frontend-tools/tcn-frontend-scripts/node_modules/ && yarn install"
 # how to log within matrix api
-# log-pod matrix-api -c matrix-api | rg 'CreateFileTemplate' | jq
 # jesses check if anything is running
 alias jesse="kubectl get pods -o wide | grep -v Running"
 streamjesse() {
@@ -171,6 +172,7 @@ streamjesse() {
 }
 
 alias recomp="touch /Users/brent.whitehead/Projects/neo/operator/src/apps/lms/AsyncAction.ts"
+
 
 alias streamfront="log-pod matrix-api -f -c matrix-api | rg -v 'room303' | rg -v 'ListNewEvent' | rg -v 'GetHistory'"
 alias streamback="stream-pod lms-api -c matrix-lms-api "
@@ -197,27 +199,6 @@ alias streamlms="osascript \
 -e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streamschedjq\"' \
 -e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52'
 "
-alias streamlmsstg="osascript \
--e 'tell application \"iTerm2\" to activate' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"n\" using {command down}' \
--e 'delay 1' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"kstaging\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streamfrontjq\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"d\" using {command down}' \
--e 'delay 1' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"kstaging\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streambackjq\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"d\" using {command down}' \
--e 'delay 1' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"kstaging\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streamschedjq\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52'
-"
 
 alias checkpush="osascript \
 -e 'tell application \"iTerm2\" to activate' \
@@ -235,12 +216,16 @@ g-add () {
     git add "**/$1/**"
 }
 
+jq-skip () {
+    jq -R 'fromjson? | select(type == "object")' "${@:1:$#-1}"
+}
+
 get-pod () {
     kubectl get pod | grep $1 | awk '{print $1}' | head -n 1
 }
 log-pod () {
     pod=$(get-pod $1)
-    kubectl logs "$pod" "${@:2:$#-2}"
+    kubectl logs "$pod" "${@:2:$#-2}" 
 }
 stream-pod () {
     pod=$(get-pod $1)
@@ -249,6 +234,7 @@ stream-pod () {
 
 cover () {
     yarn test $1 --coverage --collectCoverageFrom="**/*$1*/**/*.{ts,tsx}" --coveragePathIgnorePatterns=".fixture.*" "${@:2:$#-2}"
+    creport
 }
 coverP () {
     echo -n "test: "
@@ -281,6 +267,8 @@ bindkey "^U" backward-kill-line
 # CHANGE TO THE LOCATION OF NEO FOR SCRIPT TO WORK
 export NEO=~/go/src/git.tcncloud.net/m/neo
 export GOPATH=/Users/brent.whitehead/go
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOPATH
 
 # k8s helpers
 lms() {
@@ -389,3 +377,15 @@ chromebug(){
 lmsDb() {
     kubectl exec admin-0 -it psql -- -hmatrix-db -Ulms
 }
+
+httpCosmos(){
+    yarn cosmos:build && cd cosmos-static && npx http-server -p 3000
+}
+
+# portforward a namespace and run it on 9090
+# ie robby-bowler namespace
+# spin up his namespace on your machine and run it on 9090
+# kubectl port-forward -n robert-bowler matrix-api-644948f9df-jfgfv 9090:9090
+# start up neo and connect to that namespace on 9090
+# yarn start --env.namespace_apihost=http://localhost:9090
+

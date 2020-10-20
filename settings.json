@@ -35,7 +35,9 @@
   "gitlens.views.compare.enabled": false,
   "gitlens.views.repositories.enabled": false,
   "gitlens.views.search.enabled": false,
+  "go.useLanguageServer": false,
   "javascript.updateImportsOnFileMove.enabled": "always",
+  "jestRunIt.jestConfigPath": "./operator/jest.config.js",
   "jestrunner.configPath": "./operator/jest.config.js", //tcn
   "openInGitHub.defaultBranch": "master",
   "openInGitHub.defaultRemote": "origin",
@@ -84,9 +86,7 @@
     "list.inactiveSelectionForeground": "#fff",
     "list.activeSelectionForeground": "#fff",
     "list.activeSelectionBackground": "#26007e",
-    "list.focusBackground": "#2e5704",
-    "panel.background": "#000",
-    "terminal.border": "#ff0000"
+    "list.focusBackground": "#2e5704"
   },
   "files.exclude": {
     "**/.git/objects/**": true,
@@ -155,6 +155,34 @@
     "**/log/**": true
   },
   "macros.list": {
+    "goPrevChange": [
+      "workbench.action.editor.previousChange",
+      "editor.action.dirtydiff.previous"
+    ],
+    "goNextChange": [
+      "workbench.action.editor.nextChange",
+      "editor.action.dirtydiff.next"
+    ],
+    "selectInnerWord": [
+      {
+        "command": "type",
+        "args": {
+          "text": "v"
+        }
+      },
+      {
+        "command": "type",
+        "args": {
+          "text": "i"
+        }
+      },
+      {
+        "command": "type",
+        "args": {
+          "text": "w"
+        }
+      }
+    ],
     "focusTerminal": [
       // "when": "!panelFocus"
       "workbench.action.focusPanel",
@@ -203,23 +231,6 @@
         }
       },
       "workbench.action.focusFirstEditorGroup"
-    ],
-    "fzyfind": [
-      "editor.action.clipboardCopyAction",
-      {
-        "command": "$delay",
-        "args": {
-          "delay": 100
-        }
-      },
-      "fuzzySearch.activeTextEditor",
-      {
-        "command": "$delay",
-        "args": {
-          "delay": 100
-        }
-      },
-      "editor.action.clipboardPasteAction"
     ],
     "indentSelectToBeginning": [
       "cursorEnd",
@@ -362,5 +373,8 @@
     "other": false,
     "comments": false,
     "strings": false
-  }
+  },
+  "go.formatTool": "goimports",
+  "editor.foldingStrategy": "indentation",
+  "gitlens.mode.active": "zen"
 }

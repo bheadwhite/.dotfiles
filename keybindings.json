@@ -20,10 +20,6 @@
     "command": "-workbench.action.togglePanel"
   },
   {
-    "key": "cmd+f",
-    "command": "-actions.find"
-  },
-  {
     "key": "alt+f3",
     "command": "-editor.action.dirtydiff.next",
     "when": "editorTextFocus"
@@ -53,7 +49,7 @@
   {
     "key": "enter",
     "command": "workbench.action.keepEditor",
-    "when": "editorFocus && !editorPinned && !listFocus"
+    "when": "editorFocus && !activeEditorIsNotPreview && !listFocus"
   },
   {
     "key": "shift+cmd+g",
@@ -62,6 +58,10 @@
   },
   {
     "key": "cmd+1",
+    "command": "workbench.action.focusFirstEditorGroup"
+  },
+  {
+    "key": "shift+enter",
     "command": "workbench.action.focusFirstEditorGroup"
   },
   {
@@ -346,16 +346,6 @@
 
   // #region --------------------------------------------------  VSCODE-SPECIFIC
   {
-    "key": "shift+l",
-    "command": "workbench.action.editor.nextChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
-  },
-  {
-    "key": "shift+h",
-    "command": "workbench.action.editor.previousChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
-  },
-  {
     "key": "ctrl+cmd+r",
     "command": "copyRelativeFilePath"
   },
@@ -391,12 +381,6 @@
     "key": "j",
     "command": "cursorDown",
     "when": "editorReadonly"
-  },
-  {
-    "key": "s",
-    "command": "type",
-    "args": { "text": "v" },
-    "when": "amVim.mode != 'INSERT' && !findWidgetVisible && !inQuickOpen && editorFocus && !renameInputVisible"
   },
   {
     "key": "shift+s",
@@ -461,16 +445,6 @@
     "key": "ctrl+f",
     "command": "fuzzySearch.activeTextEditor",
     "when": "amVim.mode != 'VISUAL'"
-  },
-  {
-    "key": "ctrl+shift+cmd+l",
-    "command": "editor.action.dirtydiff.next",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "ctrl+shift+cmd+h",
-    "command": "editor.action.dirtydiff.previous",
-    "when": "editorTextFocus"
   },
   {
     "key": "shift+cmd+w",
@@ -760,11 +734,6 @@
   },
   {
     "key": "space",
-    "command": "-amVim.space",
-    "when": "editorTextFocus && amVim.mode != 'INSERT'"
-  },
-  {
-    "key": "space",
     "command": "-breadcrumbs.revealFocused",
     "when": "breadcrumbsActive && breadcrumbsVisible"
   },
@@ -1007,7 +976,7 @@
   },
   {
     "key": "space",
-    "command": "findThenJump.initiate",
+    "command": "macros.selectInnerWord",
     "when": "textInputFocus && !renameInputVisible && amVim.mode == 'NORMAL' && !editorSimpleInput"
   },
   {
@@ -1054,5 +1023,77 @@
     "key": "tab",
     "command": "-tabout",
     "when": "editorTextFocus && !editorHasMultipleSelections && !inSnippetMode && !suggestWidgetVisible"
+  },
+  {
+    "key": "/",
+    "command": "fuzzySearch.activeTextEditor",
+    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "/",
+    "command": "fuzzySearch.activeTextEditorWithCurrentSelection",
+    "when": "editorTextFocus && amVim.mode == 'VISUAL' || editorTextFocus && amVim.mode == 'VISUALLINE'"
+  },
+  {
+    "key": "k",
+    "command": "cursorUp",
+    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "j",
+    "command": "cursorDown",
+    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "ctrl+cmd+c",
+    "command": "extension.coloredPrimitives",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+l cmd+l",
+    "command": "-extension.coloredPrimitives",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+cmd+c",
+    "command": "extension.coloredObject",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+l cmd+o",
+    "command": "-extension.coloredObject",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "s",
+    "command": "type",
+    "args": {
+      "text": "v"
+    },
+    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "ctrl+cmd+1",
+    "command": "-workbench.action.moveEditorToFirstGroup"
+  },
+  {
+    "key": "shift+h",
+    "command": "macros.goPrevChange",
+    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "shift+l",
+    "command": "macros.goNextChange",
+    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "alt+j",
+    "command": "editor.action.nextMatchFindAction",
+    "when": "findInputFocussed && findWidgetVisible"
+  },
+  {
+    "key": "alt+k",
+    "command": "editor.action.previousMatchFindAction",
+    "when": "findInputFocussed && findWidgetVisible"
   }
 ]
