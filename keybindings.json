@@ -560,7 +560,8 @@
   },
   {
     "key": "shift+cmd+,",
-    "command": "workbench.action.focusLeftGroup"
+    "command": "workbench.action.focusLeftGroup",
+    "when": "activeEditorGroupIndex != '1'"
   },
   {
     "key": "ctrl+cmd+.",
@@ -698,14 +699,9 @@
     "command": "copy-copy-paste.history"
   },
   {
-    "key": "cmd+`",
-    "command": "macros.focusTerminal",
-    "when": "!panelFocus"
-  },
-  {
     "key": "ctrl+shift+h",
     "command": "workbench.action.previousPanelView",
-    "when": "panelFocus"
+    "when": "panelFocus && editorId != 'vs.editor.ICodeEditor:1'"
   },
   {
     "key": "ctrl+shift+l",
@@ -813,15 +809,6 @@
     "when": "editorFocus && findInputFocussed"
   },
   {
-    "key": "cmd+`",
-    "command": "macros.unFocusTerminal",
-    "when": "panelFocus"
-  },
-  {
-    "key": "ctrl+cmd+space",
-    "command": "workbench.action.togglePanel"
-  },
-  {
     "key": "f15",
     "command": "editor.action.marker.nextInFiles",
     "when": "editorFocus"
@@ -849,7 +836,7 @@
   {
     "key": "shift+backspace",
     "command": "bracketeer.removeQuotes",
-    "when": "amVim.mode != 'INSERT'"
+    "when": "amVim.mode != 'INSERT' && textInputFocus"
   },
   {
     "key": "shift+alt+cmd+'",
@@ -1026,14 +1013,14 @@
   },
   {
     "key": "/",
-    "command": "fuzzySearch.activeTextEditor",
-    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
+    "command": "actions.find",
+    "when": "editorTextFocus && amVim.mode != 'INSERT'"
   },
-  {
-    "key": "/",
-    "command": "fuzzySearch.activeTextEditorWithCurrentSelection",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL' || editorTextFocus && amVim.mode == 'VISUALLINE'"
-  },
+  // {
+  //   "key": "/",
+  //   "command": "fuzzySearch.activeTextEditorWithCurrentSelection",
+  //   "when": "editorTextFocus && amVim.mode == 'VISUAL' || editorTextFocus && amVim.mode == 'VISUALLINE'"
+  // },
   {
     "key": "k",
     "command": "cursorUp",
@@ -1095,5 +1082,64 @@
     "key": "alt+k",
     "command": "editor.action.previousMatchFindAction",
     "when": "findInputFocussed && findWidgetVisible"
+  },
+  {
+    "key": "ctrl+`",
+    "command": "-workbench.action.terminal.toggleTerminal"
+  },
+  {
+    "key": "cmd+`",
+    "command": "workbench.action.terminal.toggleTerminal"
+  },
+  {
+    "key": "shift+cmd+r",
+    "command": "editor.action.rename",
+    "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "f2",
+    "command": "-editor.action.rename",
+    "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "escape escape",
+    "command": "-workbench.action.exitZenMode",
+    "when": "inZenMode"
+  },
+  {
+    "key": "alt+p",
+    "command": "workbench.action.showAllEditorsByMostRecentlyUsed"
+  },
+  {
+    "key": "ctrl+cmd+space",
+    "command": "workbench.action.files.revert"
+  },
+  {
+    "key": "cmd+f",
+    "command": "filesExplorer.findInFolder",
+    "when": "explorerResourceIsFolder && explorerViewletVisible && filesExplorerFocus && !inputFocus"
+  },
+  {
+    "key": "shift+alt+f",
+    "command": "-filesExplorer.findInFolder",
+    "when": "explorerResourceIsFolder && explorerViewletVisible && filesExplorerFocus && !inputFocus"
+  },
+  {
+    "key": "alt+o",
+    "command": "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
+  },
+  {
+    "key": "ctrl+tab",
+    "command": "-workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
+  },
+  {
+    "key": "shift+cmd+,",
+    "command": "macros.shiftToSideBar",
+    "when": "activeEditorGroupIndex == '1'"
+  },
+  {
+    "key": "ctrl+shift+l",
+    "command": "macros.shiftTo1",
+    "when": "sideBarFocus && sideBarVisible"
   }
 ]

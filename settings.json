@@ -11,7 +11,7 @@
   "editor.cursorSurroundingLines": 5,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  "editor.minimap.enabled": true,
+  "editor.minimap.enabled": false,
   "editor.minimap.maxColumn": 100,
   "editor.fontFamily": "Fira Code",
   "editor.fontSize": 13,
@@ -23,10 +23,11 @@
   "editor.snippetSuggestions": "bottom",
   "editor.tabSize": 2,
   "editor.wordBasedSuggestions": false,
+  "emmet.showSuggestionsAsSnippets": true,
   "explorer.openEditors.visible": 0,
-  "gitlab.instanceUrl": "https://git.tcncloud.net",
-  "gitlab.pipelineGitRemoteName": "https://git.tcncloud.net/m/neo/-/pipelines?page=1&scope=all&username=brent.whitehead",
-  "gitlab.showPipelineUpdateNotifications": true,
+  // "gitlab.instanceUrl": "https://git.tcncloud.net",
+  // "gitlab.pipelineGitRemoteName": "https://git.tcncloud.net/m/neo/-/pipelines?page=1&scope=all&username=brent.whitehead",
+  // "gitlab.showPipelineUpdateNotifications": true,
   "githd.logView.displayExpressStatus": false,
   "githd.logView.expressMode": true,
   "gitlens.codeLens.enabled": false,
@@ -37,17 +38,16 @@
   "gitlens.views.search.enabled": false,
   "go.useLanguageServer": false,
   "javascript.updateImportsOnFileMove.enabled": "always",
-  "jestRunIt.jestConfigPath": "./operator/jest.config.js",
-  "jestrunner.configPath": "./operator/jest.config.js", //tcn
+  // "jestRunIt.jestConfigPath": "./operator/jest.config.js",
+  // "jestrunner.configPath": "./operator/jest.config.js", //tcn
   "openInGitHub.defaultBranch": "master",
   "openInGitHub.defaultRemote": "origin",
   "openInGitHub.excludeCurrentRevision": false,
   "openInGithub.maxBuffer": 512000,
   "prettier.jsxBracketSameLine": true,
   "prettier.jsxSingleQuote": true,
-  "prettier.semi": false,
+  // "prettier.semi": false,
   "prettier.tabWidth": 2,
-  "activeDocumentIndicator.opacity": 75,
   "synthwave84.brightness": 0.1,
   "synthwave84.disableGlow": true,
   "scoper.highlightColor": "",
@@ -58,7 +58,7 @@
   "telemetry.enableTelemetry": false,
   "terminal.integrated.cursorBlinking": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "window.zoomLevel": 1,
+  "window.zoomLevel": 0,
   "workbench.activityBar.visible": false,
   "workbench.colorTheme": "Moonlight II Italic",
   "workbench.editor.showTabs": true,
@@ -67,7 +67,6 @@
   "workbench.sideBar.location": "left",
   "workbench.startupEditor": "newUntitledFile",
   "zenMode.hideLineNumbers": false,
-  "zenMode.hideStatusBar": false,
   "zenMode.hideTabs": false,
   "openInApplication.applications": {
     "html": ["Google Chrome"]
@@ -86,7 +85,8 @@
     "list.inactiveSelectionForeground": "#fff",
     "list.activeSelectionForeground": "#fff",
     "list.activeSelectionBackground": "#26007e",
-    "list.focusBackground": "#2e5704"
+    "list.focusBackground": "#2e5704",
+    "terminal.border": "#ff0000"
   },
   "files.exclude": {
     "**/.git/objects/**": true,
@@ -94,16 +94,13 @@
     "**/*.js": {
       "when": "$(basename).ts"
     },
-    // "**/node_modules/**": true,
     "**/tmp/**": true,
     "**/.git": true,
     "**/.svn": true,
     "**/.hg": true,
     "**/CVS": true,
     "**/.DS_Store": true,
-    // "**/node_modules": true,
     "**/bower_components": true,
-    // "**/dist/**": true,
     "report*": true,
     "**/log/**": true,
     "**/.fdk/**": true,
@@ -112,7 +109,6 @@
   "files.watcherExclude": {
     "**/.cache/**": true,
     "**/build_defs/**": true,
-    //go files
     "**/commons/**": true,
     "**/k8s/**": true,
     "**/protos/matrix/**": true,
@@ -155,6 +151,29 @@
     "**/log/**": true
   },
   "macros.list": {
+    "shiftTo1": [
+      "workbench.action.focusFirstEditorGroup",
+      "workbench.action.closeSidebar"
+    ],
+    "shiftToSideBar": [
+      "workbench.action.focusSideBar",
+      "workbench.action.focusSideBar"
+    ],
+    "copycopy": [
+      "copy-copy-paste.copy",
+      {
+        "command": "$delay",
+        "args": {
+          "delay": 10
+        }
+      },
+      {
+        "command": "type",
+        "args": {
+          "text": "y"
+        }
+      }
+    ],
     "goPrevChange": [
       "workbench.action.editor.previousChange",
       "editor.action.dirtydiff.previous"
@@ -183,15 +202,15 @@
         }
       }
     ],
-    "focusTerminal": [
-      // "when": "!panelFocus"
-      "workbench.action.focusPanel",
-      "settings.cycle.termOn"
-    ],
-    "unFocusTerminal": [
-      "workbench.action.focusFirstEditorGroup",
-      "settings.cycle.termOff"
-    ],
+    // "focusTerminal": [
+    //   // "when": "!panelFocus"
+    //   "workbench.action.focusPanel",
+    //   "settings.cycle.termOn"
+    // ],
+    // "unFocusTerminal": [
+    //   "workbench.action.focusFirstEditorGroup",
+    //   "settings.cycle.termOff"
+    // ],
     "customSwitchAppHack": ["workbench.action.terminal.focus"],
     "customFindInFiles": [
       "workbench.action.findInFiles",
@@ -249,33 +268,6 @@
     ]
   },
   "settings.cycle": [
-    {
-      "id": "termOn",
-      "overrideWorkspaceSettings": true,
-      "values": [
-        {
-          "workbench.colorCustomizations": {
-            "editor.selectionBackground": "#ffffff23",
-            "editor.rangeHighlightBackground": "#ffffff23",
-            "editorBracketMatch.background": "#f008",
-            "editorBracketMatch.border": "#f00",
-            "editor.wordHighlightStrongBackground": "#3e4998",
-            "editor.wordHighlightBackground": "#3e4998",
-            "editor.findMatchBackground": "#282c34",
-            "editor.findMatchHighlightBackground": "#06570997",
-            "editor.selectionForeground": "#99eeff",
-            "editorIndentGuide.activeBackground": "#1d76db",
-            "list.inactiveSelectionForeground": "#fff",
-            "list.activeSelectionForeground": "#fff",
-            "list.activeSelectionBackground": "#26007e",
-            "list.focusBackground": "#2e5704",
-
-            "panel.background": "#000",
-            "terminal.border": "#ff0000"
-          }
-        }
-      ]
-    },
     {
       "id": "termOff",
       "overrideWorkspaceSettings": true,
@@ -375,6 +367,7 @@
     "strings": false
   },
   "go.formatTool": "goimports",
-  "editor.foldingStrategy": "indentation",
-  "gitlens.mode.active": "zen"
+  "editor.foldingStrategy": "auto",
+  "workbench.settings.editor": "json",
+  "material-icon-theme.hidesExplorerArrows": true
 }
