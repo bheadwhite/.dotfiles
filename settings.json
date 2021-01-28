@@ -1,6 +1,7 @@
 {
   "diffEditor.renderSideBySide": true,
   "debug.javascript.usePreview": false,
+  "bookmarks.navigateThroughAllFiles": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.acceptSuggestionOnEnter": "on",
   "editor.suggestSelection": "recentlyUsed",
@@ -25,9 +26,7 @@
   "editor.wordBasedSuggestions": false,
   "emmet.showSuggestionsAsSnippets": true,
   "explorer.openEditors.visible": 0,
-  // "gitlab.instanceUrl": "https://git.tcncloud.net",
-  // "gitlab.pipelineGitRemoteName": "https://git.tcncloud.net/m/neo/-/pipelines?page=1&scope=all&username=brent.whitehead",
-  // "gitlab.showPipelineUpdateNotifications": true,
+  "gitlab.instanceUrl": "https://git.tcncloud.net",
   "githd.logView.displayExpressStatus": false,
   "githd.logView.expressMode": true,
   "gitlens.codeLens.enabled": false,
@@ -36,9 +35,9 @@
   "gitlens.views.compare.enabled": false,
   "gitlens.views.repositories.enabled": false,
   "gitlens.views.search.enabled": false,
-  "go.useLanguageServer": false,
+  "go.useLanguageServer": true,
   "javascript.updateImportsOnFileMove.enabled": "always",
-  // "jestRunIt.jestConfigPath": "./operator/jest.config.js",
+  "jestRunIt.jestConfigPath": "./operator/jest.config.js",
   // "jestrunner.configPath": "./operator/jest.config.js", //tcn
   "openInGitHub.defaultBranch": "master",
   "openInGitHub.defaultRemote": "origin",
@@ -54,20 +53,21 @@
   "scoper.braces": false,
   "scoper.squareBrackets": false,
   "scoper.parentheses": false,
-  "telemetry.enableCrashReporter": false,
+  "telemetry.enableCraskhReporter": false,
   "telemetry.enableTelemetry": false,
   "terminal.integrated.cursorBlinking": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.importModuleSpecifier": "non-relative",
   "window.zoomLevel": 0,
   "workbench.activityBar.visible": false,
   "workbench.colorTheme": "Moonlight II Italic",
-  "workbench.editor.showTabs": true,
   "workbench.iconTheme": "material-icon-theme",
   "workbench.settings.enableNaturalLanguageSearch": false,
   "workbench.sideBar.location": "left",
   "workbench.startupEditor": "newUntitledFile",
-  "zenMode.hideLineNumbers": false,
   "zenMode.hideTabs": false,
+  "zenMode.hideLineNumbers": false,
   "openInApplication.applications": {
     "html": ["Google Chrome"]
   },
@@ -90,10 +90,73 @@
   },
   "files.exclude": {
     "**/.git/objects/**": true,
+    ".plz_clean*/**": true,
+    //please out stuff
+    "plz-out/bin/**": true,
+    "plz-out/gen/**": true,
+    "plz-out/go/**": true,
+    "plz-out/google/**": true,
+    "plz-out/googleapis/**": true,
+    //unused stuff --- start
+    ".yarn": true,
+    ".gitlab": true,
+    "k8s/**": true,
+    "opctl/**": true,
+    "persist/**": true,
+    "scripts/**": true,
+    ".npmrc": true,
+    ".nvmrc": true,
+    "services/**": true,
+    "docs/**": true,
+    "config/**": true,
+    "commons/**": true,
+    "devops/**": true,
+    "dist/**": true,
+    "build_defs/**": true,
+    "test_helpers/**": true,
+    "tools/**": true,
+    "third_party/**": true,
+    "protos/api/*": false,
+    //protos
+    "protos/bb/**": true,
+    "protos/commons/**": true,
+    "protos/go/**": true,
+    "protos/java/**": true,
+    "protos/matrix/**": true,
+    "protos/p3/**": true,
+    "protos/.editorconfig/**": true,
+    "protos/.gitignore/**": true,
+    "protos/BUILD.plz": true,
+    //apps i dont work in ----------- start
+
+    //lms apps / dev-level-midnight
+    "operator/src/apps/cjs/**": true,
+    "operator/src/apps/compliance/**": true,
+    "operator/src/apps/lms/**": true,
+    "operator/src/apps/payments/**": true,
+
+    //agent apps / curious george
+    "operator/src/apps/agent/**": true,
+    "operator/src/apps/analytics/**": true,
+    "operator/src/apps/omniBroadcast/**": true,
+
+    //org apps /org of the rings
+    // "operator/src/apps/agentManager/**": true,
+    "operator/src/apps/huntgroupscripts/**": true,
+    "operator/src/apps/room303/**": true,
+
+    //wfm apps / argus
+    "operator/src/apps/wfm/**": true,
+    "operator/src/apps/manager/**": true,
+    "operator/src/apps/voiceanalytics/**": true,
+
+    // apps i dont work in ---------- end
+    //unused stuff ---end
     "**/.git/subtree-cache/**": true,
     "**/*.js": {
       "when": "$(basename).ts"
     },
+    "**/*.go": true,
     "**/tmp/**": true,
     "**/.git": true,
     "**/.svn": true,
@@ -119,6 +182,7 @@
     "**/.git/subtree-cache/**": true,
     "**/node_modules/**": true,
     "**/tmp/**": true,
+    "**/*.go": true,
     "**/.yarn/**": true,
     "**/.git": true,
     "**/.svn": true,
@@ -128,14 +192,15 @@
     "**/node_modules": true,
     "**/bower_components": true,
     "**/dist/**": true,
-    "**/log/**": true,
-    "**/logs/**": true,
+    // "**/log/**": true,
+    // "**/logs/**": true,
     "**/.fdk/**": true,
     "**/plz-out/**": true,
     "**/public/**": true
   },
   "search.exclude": {
     "**/.cache/**": true,
+    "**/*.go": true,
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
     "**/node_modules/**": true,
@@ -360,7 +425,7 @@
     //   "noItemText": "The project has no merge requests"
     // }
   ],
-  "editor.renameOnType": true,
+  "editor.linkedEditing": true,
   "editor.quickSuggestions": {
     "other": false,
     "comments": false,

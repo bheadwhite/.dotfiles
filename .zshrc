@@ -143,8 +143,8 @@ alias reset="git reset"
 alias reseth="git reset --hard"
 alias br="git branch"
 alias skunk="gcloud sql connect development-skunk -u skunk --project tcn-cloud-dev"
-alias skunkForward="kubectl port-forward service/skunkdb 8432:5432"
-alias lmsForward="kubectl port-forward service/matrix-db 8431:5432"
+alias skunkForward="kubectl port-forward service/skunkdb 8432:5432 -n='default'"
+alias matrixdbForward="kubectl port-forward service/matrix-db 8431:5432 -n='default'"
 alias k="kubectl"
 
 alias buildprotos="yarn clean && yarn build-protos"
@@ -223,10 +223,18 @@ jq-skip () {
 get-pod () {
     kubectl get pod | grep $1 | awk '{print $1}' | head -n 1
 }
+
 log-pod () {
     pod=$(get-pod $1)
     kubectl logs "$pod" "${@:2:$#-2}" 
 }
+
+forward-pod () {
+    pod=$(get-pod $1)
+    echo $pod
+    kubectl port-forward "$pod" "${@:2:$#-2}"
+}
+
 stream-pod () {
     pod=$(get-pod $1)
     kubectl logs "$pod" -f "${@:2:$#-2}"
@@ -266,21 +274,25 @@ bindkey "^U" backward-kill-line
 
 # CHANGE TO THE LOCATION OF NEO FOR SCRIPT TO WORK
 export NEO=~/go/src/git.tcncloud.net/m/neo
-export GOPATH=/Users/brent.whitehead/go
+export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
-export PATH=$PATH:$GOPATH
+export PATH=$GOBIN:$GOPATH:$PATH
 
 # k8s helpers
 lms() {
     $NEO/plz-out/bin/services/lms/lmsctl "${@:1:$#-1}"
 }
 
-
 forward-persist() {
     kubectl port-forward service/matrix-lms-persist   50090:50051
 }
 forward-lms() {
     kubectl port-forward service/matrix-lms-api 50052:50051
+}
+
+
+startWithApi(){
+    yarn start --env.namespace_apihost=http://localhost:9090
 }
 
 export EDITOR=/usr/bin/vim
@@ -348,9 +360,6 @@ kdb () {
     kubectl exec admin-0 -it env PGPASSWORD="pass.me1234" psql -- -h skunkdb -U skunk -W skunk
 }
 
-forward-persist() {
-    kubectl port-forward service/matrix-lms-persist   50090:50051
-}
 
 export NEO=/Users/brent.whitehead/projects/neo
 
@@ -381,6 +390,12 @@ lmsDb() {
 httpCosmos(){
     yarn cosmos:build && cd cosmos-static && npx http-server -p 3000
 }
+namestart(){
+    yarn start --env.namespace_apihost=http://localhost:9090
+}
+
+# kube get config
+# kubectl get configmap bb-config-conf -o yaml
 
 # portforward a namespace and run it on 9090
 # ie robby-bowler namespace
@@ -388,4 +403,36 @@ httpCosmos(){
 # kubectl port-forward -n robert-bowler matrix-api-644948f9df-jfgfv 9090:9090
 # start up neo and connect to that namespace on 9090
 # yarn start --env.namespace_apihost=http://localhost:9090
+
+
+# serve up a namespace as a backend endpoint using c.sgu
+
+# this will change your name space
+# kubectl config use-context brent-whitehead
+
+# deploy org
+# step 1: login to big john
+# iterm: ssh c.sgu
+# step 2: bring up k9s to see seperate stuff update (optional)
+# step 3: gcloud auth login on big john
+# step 4: make sure your on the correct git branch. then run `plz run k8s/local:org_push` deploys org service to your namespace
+# step 5: deploy p3-api `plz run k8s/local:p3-api_push`
+# step 6: deploy matrix api `plz run k8s/local:api_push`
+# step 7: now that they're deployed to your namespace, switch to your namespace on your local machine `kubectl config set-context --current --namespace 'brent-whitehead'`
+# step 8: login locally to gcloud
+# gcloud auth login
+# gcloud config set project tcn-cloud-dev
+# gcloud config set compute/zone us-central1-a
+# gcloud config set compute/region us-central1
+# gcloud config set container/cluster dev-1
+# gcloud auth configure-docker
+# gcloud container clusters get-credentials dev-1
+# kubectl config set-context --current --namespace=$(whoami | tr '.' '-')
+# step 9: setup the port forward: `kubectl port-forward <podname> 9090:9090`
+# step 10: yarn start with 9090 as your front end: `yarn start --env.namespace_apihost=http://localhost:9090`
+
+
+
+
+
 

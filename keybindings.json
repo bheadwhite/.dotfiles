@@ -1135,11 +1135,83 @@
   {
     "key": "shift+cmd+,",
     "command": "macros.shiftToSideBar",
-    "when": "activeEditorGroupIndex == '1'"
+    "when": "activeEditorGroupIndex == '1' && !panelFocus"
   },
   {
     "key": "ctrl+shift+l",
     "command": "macros.shiftTo1",
-    "when": "sideBarFocus && sideBarVisible"
+    "when": "sideBarFocus && sideBarVisible && !panelFocus"
+  },
+  {
+    "key": "ctrl+cmd+k ctrl+cmd+s",
+    "command": "workbench.action.openGlobalKeybindings"
+  },
+  {
+    "key": "cmd+k cmd+s",
+    "command": "-workbench.action.openGlobalKeybindings"
+  },
+  {
+    "key": "ctrl+shift+cmd+h",
+    "command": "bracket-jumper.jumpLeft",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+left",
+    "command": "-bracket-jumper.jumpLeft",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+cmd+l",
+    "command": "bracket-jumper.jumpRight",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+right",
+    "command": "-bracket-jumper.jumpRight",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+tab",
+    "command": "editor.action.smartSelect.shrink",
+    "when": "editorTextFocus && amVim.mode == 'NORMAL' || editorTextFocus && amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "ctrl+shift+left",
+    "command": "-editor.action.smartSelect.shrink",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "tab",
+    "command": "editor.action.smartSelect.expand",
+    "when": "editorTextFocus && amVim.mode == 'NORMAL' || editorTextFocus && amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "ctrl+shift+right",
+    "command": "-editor.action.smartSelect.expand",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "file-browser.open"
+  },
+  {
+    "key": "alt+h",
+    "command": "file-browser.stepOut",
+    "when": "inFileBrowser"
+  },
+  {
+    "key": "left",
+    "command": "-file-browser.stepOut",
+    "when": "inFileBrowser"
+  },
+  {
+    "key": "alt+l",
+    "command": "file-browser.stepIn",
+    "when": "inFileBrowser"
+  },
+  {
+    "key": "right",
+    "command": "-file-browser.stepIn",
+    "when": "inFileBrowser"
   }
 ]
