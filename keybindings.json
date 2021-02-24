@@ -54,7 +54,7 @@
   {
     "key": "shift+cmd+g",
     "command": "workbench.scm.focus",
-    "when": "!findWidgetVisible && !workbench.scm.visible"
+    "when": "!findWidgetVisible && !view.workbench.scm.visible"
   },
   {
     "key": "cmd+1",
@@ -383,6 +383,11 @@
     "when": "editorReadonly"
   },
   {
+    "key": "p",
+    "command": "macros.p-Paste",
+    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+  },
+  {
     "key": "shift+s",
     "command": "cursorEndSelect",
     "when": "amVim.mode != 'INSERT' && !findWidgetVisible && !inQuickOpen && editorFocus && !renameInputVisible"
@@ -398,12 +403,12 @@
     "when": "terminalFocus"
   },
   {
-    "key": "ctrl+cmd+j",
+    "key": "ctrl+shift+cmd+j",
     "command": "workbench.action.terminal.scrollDown",
     "when": "terminalFocus"
   },
   {
-    "key": "ctrl+cmd+k",
+    "key": "ctrl+shift+cmd+k",
     "command": "workbench.action.terminal.scrollUp",
     "when": "terminalFocus"
   },
@@ -744,7 +749,7 @@
     "when": "terminalFocus"
   },
   {
-    "key": "ctrl+shift+cmd+k",
+    "key": "ctrl+shift+cmd+h",
     "command": "workbench.action.terminal.scrollUpPage",
     "when": "terminalFocus"
   },
@@ -754,7 +759,7 @@
     "when": "terminalFocus"
   },
   {
-    "key": "ctrl+shift+cmd+j",
+    "key": "ctrl+shift+cmd+l",
     "command": "workbench.action.terminal.scrollDownPage",
     "when": "terminalFocus"
   },
@@ -831,7 +836,7 @@
   {
     "key": "shift+cmd+g",
     "command": "macros.customScmFocus",
-    "when": "workbench.scm.visible && !findWidgetVisible"
+    "when": "!findWidgetVisible && view.workbench.scm.visible"
   },
   {
     "key": "shift+backspace",
@@ -1151,18 +1156,8 @@
     "command": "-workbench.action.openGlobalKeybindings"
   },
   {
-    "key": "ctrl+shift+cmd+h",
-    "command": "bracket-jumper.jumpLeft",
-    "when": "editorTextFocus"
-  },
-  {
     "key": "ctrl+left",
     "command": "-bracket-jumper.jumpLeft",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "ctrl+shift+cmd+l",
-    "command": "bracket-jumper.jumpRight",
     "when": "editorTextFocus"
   },
   {
@@ -1213,5 +1208,17 @@
     "key": "right",
     "command": "-file-browser.stepIn",
     "when": "inFileBrowser"
+  },
+  {
+    "key": "ctrl+alt+cmd+j",
+    "command": "editor.action.joinLines"
+  },
+  {
+    "key": "ctrl+shift+cmd+h",
+    "command": "bracket-jumper.jumpLeft"
+  },
+  {
+    "key": "ctrl+shift+cmd+l",
+    "command": "bracket-jumper.jumpRight"
   }
 ]
