@@ -26,6 +26,9 @@
   "editor.wordBasedSuggestions": false,
   "emmet.showSuggestionsAsSnippets": true,
   "explorer.openEditors.visible": 0,
+  "quokka.compactMessageOutput": true,
+  "quokka.colorizeOutput": true,
+  "quokka.showOutputOnStart": false,
   "gitlab.instanceUrl": "https://git.tcncloud.net",
   "githd.logView.displayExpressStatus": false,
   "githd.logView.expressMode": true,
@@ -59,7 +62,7 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "javascript.preferences.importModuleSpecifier": "non-relative",
-  "window.zoomLevel": 1,
+  "window.zoomLevel": 2,
   "workbench.activityBar.visible": false,
   "workbench.colorTheme": "Moonlight II Italic",
   "workbench.iconTheme": "material-icon-theme",
@@ -128,29 +131,34 @@
     "protos/.editorconfig/**": true,
     "protos/.gitignore/**": true,
     "protos/BUILD.plz": true,
+
     //apps i dont work in --------------------------------------- start
 
-    //lms apps / dev-level-midnight
+    //                                          -- lms apps (dev-level-midnight) --
+    "operator/src/apps/lms/**": true,
     "operator/src/apps/cjs/**": true,
     "operator/src/apps/compliance/**": true,
-    "operator/src/apps/lms/**": true,
-    "operator/src/apps/payments/**": true,
+    // "operator/src/apps/payments/**": true,
 
-    //agent apps / curious george
-    "operator/src/apps/agent/**": true,
-    "operator/src/apps/analytics/**": true,
-    "operator/src/apps/omniBroadcast/**": true,
-
-    //org apps /org of the rings
+    //                                          -- org apps (OTR) --
+    "operator/src/apps/agentManager/**": true,
+    "operator/src/apps/organization/**": true,
     "operator/src/apps/huntgroupscripts/**": true,
     "operator/src/apps/room303/**": true,
 
-    //wfm apps / argus
+    //                                         -- agent apps (curious george) --
+    "operator/src/apps/agent/**": true,
+    "operator/src/apps/analytics/**": true,
+    "operator/src/apps/omniBroadcast/**": true,
+    "operator/src/apps/webphone/**": true,
+
+    //                                         -- wfm apps (argus) --
     "operator/src/apps/wfm/**": true,
     "operator/src/apps/manager/**": true,
     "operator/src/apps/voiceanalytics/**": true,
 
     // apps i dont work in ----------------------------------------- end
+
     //unused stuff ---end
     "**/.git/subtree-cache/**": true,
     "**/*.js": {
@@ -433,5 +441,6 @@
   "go.formatTool": "goimports",
   "editor.foldingStrategy": "auto",
   "workbench.settings.editor": "json",
-  "material-icon-theme.hidesExplorerArrows": true
+  "material-icon-theme.hidesExplorerArrows": true,
+  "search.searchOnType": false
 }

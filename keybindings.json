@@ -385,7 +385,7 @@
   {
     "key": "p",
     "command": "macros.p-Paste",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+    "when": "editorTextFocus && !inputFocus && (amVim.mode == 'VISUAL' || amVim.mode == 'NORMAL')"
   },
   {
     "key": "shift+s",
@@ -801,7 +801,7 @@
   {
     "key": "escape",
     "command": "workbench.action.focusFirstEditorGroup",
-    "when": "sideBarFocus && listFocus && !listHasSelectionOrFocus"
+    "when": "sideBarFocus && !listHasSelectionOrFocus"
   },
   {
     "key": "shift+cmd+g",
