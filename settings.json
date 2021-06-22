@@ -1,84 +1,96 @@
 {
-  "diffEditor.renderSideBySide": true,
-  "debug.javascript.usePreview": false,
   "bookmarks.navigateThroughAllFiles": false,
+  "breadcrumbs.filePath": "on",
+  "breadcrumbs.icons": false,
+  "breadcrumbs.symbolSortOrder": "type",
+  "debug.javascript.usePreview": false,
+  "diffEditor.renderSideBySide": true,
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.acceptSuggestionOnEnter": "on",
-  "editor.suggestSelection": "recentlyUsed",
-  "terminal.integrated.shell.osx": "/bin/zsh",
   "editor.cursorBlinking": "phase",
-  "editor.tabCompletion": "off",
   "editor.cursorSmoothCaretAnimation": true,
   "editor.cursorSurroundingLines": 5,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
-  "editor.minimap.enabled": false,
-  "editor.minimap.maxColumn": 100,
+  "editor.foldingStrategy": "auto",
   "editor.fontFamily": "Fira Code",
   "editor.fontSize": 13,
+  "editor.formatOnSave": true,
+  "editor.linkedEditing": true,
+  "editor.minimap.enabled": false,
+  "editor.minimap.maxColumn": 100,
   "editor.minimap.renderCharacters": false,
   "editor.minimap.showSlider": "always",
   "editor.minimap.size": "fill",
   "editor.multiCursorModifier": "alt",
   "editor.parameterHints.enabled": false,
   "editor.snippetSuggestions": "bottom",
+  "editor.suggestSelection": "recentlyUsed",
+  "editor.tabCompletion": "off",
   "editor.tabSize": 2,
   "editor.wordBasedSuggestions": false,
   "emmet.showSuggestionsAsSnippets": true,
+  "explorer.compactFolders": false,
   "explorer.openEditors.visible": 0,
-  "quokka.compactMessageOutput": true,
-  "quokka.colorizeOutput": true,
-  "quokka.showOutputOnStart": false,
-  "gitlab.instanceUrl": "https://git.tcncloud.net",
   "githd.logView.displayExpressStatus": false,
   "githd.logView.expressMode": true,
+  "githd.blameView.enabled": false,
+  "gitlab.instanceUrl": "https://git.tcncloud.net",
   "gitlens.codeLens.enabled": false,
   "gitlens.recentChanges.highlight.locations": ["overview", "gutter", "line"],
   "gitlens.statusBar.enabled": false,
   "gitlens.views.compare.enabled": false,
   "gitlens.views.search.enabled": false,
-  // "workbench.editor.wrapTabs": true,
-  "go.useLanguageServer": true,
+  "go.formatTool": "goimports",
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.quoteStyle": "single",
   "javascript.updateImportsOnFileMove.enabled": "always",
-  "jestRunIt.jestConfigPath": "./operator/jest.config.js",
-  // "jestrunner.configPath": "./operator/jest.config.js", //tcn
+  "material-icon-theme.hidesExplorerArrows": true,
   "openInGitHub.defaultBranch": "master",
   "openInGitHub.defaultRemote": "origin",
   "openInGitHub.excludeCurrentRevision": false,
   "openInGithub.maxBuffer": 512000,
   "prettier.jsxBracketSameLine": true,
   "prettier.jsxSingleQuote": true,
-  // "prettier.semi": false,
+  "prettier.singleQuote": true,
   "prettier.tabWidth": 2,
-  "synthwave84.brightness": 0.1,
-  "synthwave84.disableGlow": true,
-  "scoper.highlightColor": "",
+  "prettier.trailingComma": "all",
+  "prettier.useEditorConfig": false,
+  "quokka.colorizeOutput": true,
+  "quokka.compactMessageOutput": true,
+  "quokka.showOutputOnStart": false,
   "scoper.braces": false,
-  "scoper.squareBrackets": false,
+  "scoper.endColor": "#1170ff80",
+  "scoper.highlightColor": "",
   "scoper.parentheses": false,
+  "scoper.squareBrackets": false,
+  "search.searchOnType": false,
   "telemetry.enableCraskhReporter": false,
   "telemetry.enableTelemetry": false,
   "terminal.integrated.cursorBlinking": true,
-  "typescript.updateImportsOnFileMove.enabled": "always",
+  "terminal.integrated.tabs.enabled": false,
   "typescript.preferences.importModuleSpecifier": "non-relative",
-  "javascript.preferences.importModuleSpecifier": "non-relative",
-  "window.zoomLevel": 2,
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.updateImportsOnFileMove.enabled": "always",
   "workbench.activityBar.visible": false,
   "workbench.colorTheme": "Moonlight II Italic",
+  "workbench.editor.enablePreviewFromCodeNavigation": true,
+  "workbench.editor.labelFormat": "short",
   "workbench.iconTheme": "material-icon-theme",
+  "workbench.settings.editor": "json",
   "workbench.settings.enableNaturalLanguageSearch": false,
   "workbench.sideBar.location": "left",
   "workbench.startupEditor": "newUntitledFile",
-  "zenMode.hideTabs": false,
+  "zenMode.centerLayout": false,
   "zenMode.hideLineNumbers": false,
+  "zenMode.hideTabs": false,
   "openInApplication.applications": {
     "html": ["Google Chrome"]
   },
   "workbench.colorCustomizations": {
     "editor.selectionBackground": "#ffffff23",
     "editor.rangeHighlightBackground": "#ffffff23",
-    "editorBracketMatch.background": "#f008",
-    "editorBracketMatch.border": "#f00",
+    "editorBracketMatch.background": "#1170ff88",
+    "editorBracketMatch.border": "#ff8400",
     "editor.wordHighlightStrongBackground": "#3e4998",
     "editor.wordHighlightBackground": "#3e4998",
     "editor.findMatchBackground": "#282c34",
@@ -93,6 +105,8 @@
   },
   "files.exclude": {
     "**/*.go": true,
+    "**/go.mod": true,
+    "**/go.sum": true,
     "services/**": true,
     "**/.git/objects/**": true,
     ".plz_clean*/**": true,
@@ -118,7 +132,7 @@
     // "dist/**": true,
     "build_defs/**": true,
     "test_helpers/**": true,
-    "tools/**": true,
+    // "tools/**": true,
     "third_party/**": true,
     "protos/api/*": false,
     //protos
@@ -138,13 +152,16 @@
     "operator/src/apps/lms/**": true,
     "operator/src/apps/cjs/**": true,
     "operator/src/apps/compliance/**": true,
-    // "operator/src/apps/payments/**": true,
+    "operator/src/apps/payments/**": true,
+    // "operator/src/apps/business-intelligence/**": true,
+    // "operator/src/apps/integrations/**": true,
 
     //                                          -- org apps (OTR) --
-    "operator/src/apps/agentManager/**": true,
+    // "operator/src/apps/agentManager/**": true,
     "operator/src/apps/organization/**": true,
     "operator/src/apps/huntgroupscripts/**": true,
     "operator/src/apps/room303/**": true,
+    "operator/src/apps/customerSupport/**": true,
 
     //                                         -- agent apps (curious george) --
     "operator/src/apps/agent/**": true,
@@ -153,9 +170,10 @@
     "operator/src/apps/webphone/**": true,
 
     //                                         -- wfm apps (argus) --
-    "operator/src/apps/wfm/**": true,
+    // "operator/src/apps/wfm/**": true,
     "operator/src/apps/manager/**": true,
-    "operator/src/apps/voiceanalytics/**": true,
+    // "operator/src/apps/voiceanalytics/**": true,
+    // "operator/src/apps/omniagent/**": true,
 
     // apps i dont work in ----------------------------------------- end
 
@@ -274,15 +292,6 @@
         }
       }
     ],
-    // "focusTerminal": [
-    //   // "when": "!panelFocus"
-    //   "workbench.action.focusPanel",
-    //   "settings.cycle.termOn"
-    // ],
-    // "unFocusTerminal": [
-    //   "workbench.action.focusFirstEditorGroup",
-    //   "settings.cycle.termOff"
-    // ],
     "customSwitchAppHack": ["workbench.action.terminal.focus"],
     "customFindInFiles": [
       "workbench.action.findInFiles",
@@ -326,7 +335,12 @@
     "indentSelectToBeginning": [
       "cursorEnd",
       "indentation-level-movement.selectUp",
-      "cursorHomeSelect"
+      {
+        "command": "type",
+        "args": {
+          "text": "0"
+        }
+      }
     ],
     "indentSelectToEnd": [
       {
@@ -344,12 +358,15 @@
       "id": "termOff",
       "overrideWorkspaceSettings": true,
       "values": [
+        // "editorBracketMatch.background": "#f008",
         {
           "workbench.colorCustomizations": {
             "editor.selectionBackground": "#ffffff23",
             "editor.rangeHighlightBackground": "#ffffff23",
-            "editorBracketMatch.background": "#f008",
-            "editorBracketMatch.border": "#f00",
+            // "editorBracketMatch.background": "#1fe609",
+            // "editorBracketMatch.border": "#f00",
+            "editorBracketMatch.background": "#F008",
+            "editorBracketMatch.border": "#999",
             "editor.wordHighlightStrongBackground": "#3e4998",
             "editor.wordHighlightBackground": "#3e4998",
             "editor.findMatchBackground": "#282c34",
@@ -403,13 +420,6 @@
       "state": "opened",
       "noItemText": "There is no issue assigned to you."
     },
-    // {
-    //   "name": "Issues created by me",
-    //   "type": "issues",
-    //   "scope": "created_by_me",
-    //   "state": "opened",
-    //   "noItemText": "There is no issue created by you."
-    // },
     {
       "name": "Merge requests assigned to me",
       "type": "merge_requests",
@@ -417,30 +427,11 @@
       "state": "opened",
       "noItemText": "There is no MR assigned to you."
     }
-    // {
-    //   "name": "Merge requests created by me",
-    //   "type": "merge_requests",
-    //   "scope": "created_by_me",
-    //   "state": "opened",
-    //   "noItemText": "There is no MR created by you."
-    // },
-    // {
-    //   "name": "All project merge requests",
-    //   "type": "merge_requests",
-    //   "scope": "all",
-    //   "state": "opened",
-    //   "noItemText": "The project has no merge requests"
-    // }
   ],
-  "editor.linkedEditing": true,
   "editor.quickSuggestions": {
     "other": false,
     "comments": false,
     "strings": false
   },
-  "go.formatTool": "goimports",
-  "editor.foldingStrategy": "auto",
-  "workbench.settings.editor": "json",
-  "material-icon-theme.hidesExplorerArrows": true,
-  "search.searchOnType": false
+  "window.zoomLevel": 1,
 }

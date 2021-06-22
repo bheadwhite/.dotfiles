@@ -160,6 +160,8 @@ alias mvim="open -a MacVim"
 alias nvimconfig="code ~/.vim/vim.init"
 alias creport="open /Users/brent.whitehead/Projects/neo/coverage/lcov-report/index.html"
 alias buildneo="rm -rf node_modules/ && rm -rf /tools/frontend-tools/tcn-frontend-scripts/node_modules/ && yarn install"
+alias config="vim ~/.config/nvim/init.vim"
+alias vim="nvim"
 # how to log within matrix api
 # jesses check if anything is running
 alias jesse="kubectl get pods -o wide | grep -v Running"
@@ -253,6 +255,10 @@ coverP () {
     yarn test $TEST --coverage --collectCoverageFrom="**/$DIR**/*.{ts,tsx}" --coveragePathIgnorePatterns=".fixture.*" "${@:1:$#-1}"
 }
 
+coverageWatch () {
+    yarn run test $1 --coverage --collectCoverageFrom="$2" --watch
+}
+
 # lms-persist = db
 # scheduler = worker. processes the stuff.
 # lms-api = backend server. queues all the data for scheduler. all api calls end up being intercepted here.
@@ -289,6 +295,8 @@ forward-persist() {
 forward-lms() {
     kubectl port-forward service/matrix-lms-api 50052:50051
 }
+
+function killport() { lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 }
 
 
 startWithApi(){

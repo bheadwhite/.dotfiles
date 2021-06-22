@@ -82,10 +82,6 @@
     "command": "workbench.action.nextEditor"
   },
   {
-    "key": "ctrl+h",
-    "command": "workbench.action.previousEditor"
-  },
-  {
     "key": "shift+cmd+-",
     "command": "workbench.action.decreaseViewSize"
   },
@@ -496,7 +492,8 @@
   },
   {
     "key": "ctrl+o",
-    "command": "editsHistory.moveCursorToPreviousEditInSameFile"
+    "command": "editsHistory.moveCursorToPreviousEditInSameFile",
+    "when": "referenceSearchVisible"
   },
   {
     "key": "shift+cmd+u",
@@ -791,7 +788,7 @@
   {
     "key": "cmd+enter",
     "command": "workbench.files.action.refreshFilesExplorer",
-    "when": "filesExplorerFocus && explorerViewletFocus"
+    "when": "editorTextFocus || explorerViewletFocus && filesExplorerFocus"
   },
   {
     "key": "alt+space",
@@ -839,8 +836,8 @@
     "when": "!findWidgetVisible && view.workbench.scm.visible"
   },
   {
-    "key": "shift+backspace",
-    "command": "bracketeer.removeQuotes",
+    "key": "backspace",
+    "command": "",
     "when": "amVim.mode != 'INSERT' && textInputFocus"
   },
   {
@@ -903,8 +900,7 @@
   },
   {
     "key": "ctrl+cmd+o",
-    "command": "togglePeekWidgetFocus",
-    "when": "inReferenceSearchEditor || referenceSearchVisible"
+    "command": "togglePeekWidgetFocus"
   },
   {
     "key": "cmd+k f2",
@@ -1021,11 +1017,11 @@
     "command": "actions.find",
     "when": "editorTextFocus && amVim.mode != 'INSERT'"
   },
-  // {
-  //   "key": "/",
-  //   "command": "fuzzySearch.activeTextEditorWithCurrentSelection",
-  //   "when": "editorTextFocus && amVim.mode == 'VISUAL' || editorTextFocus && amVim.mode == 'VISUALLINE'"
-  // },
+  {
+    "key": "/",
+    "command": "fuzzySearch.activeTextEditorWithCurrentSelection",
+    "when": "editorTextFocus && amVim.mode == 'VISUAL' || editorTextFocus && amVim.mode == 'VISUALLINE'"
+  },
   {
     "key": "k",
     "command": "cursorUp",
@@ -1220,5 +1216,99 @@
   {
     "key": "ctrl+shift+cmd+l",
     "command": "bracket-jumper.jumpRight"
+  },
+  {
+    "key": "cmd+/",
+    "command": "editor.action.commentLine",
+    "when": "editorTextFocus && !editorReadonly && amVim.mode != 'VISUAL'"
+  },
+  {
+    "key": "cmd+/",
+    "command": "-editor.action.commentLine",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "cmd+/",
+    "command": "editor.action.blockComment",
+    "when": "editorTextFocus && !editorReadonly && amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "shift+alt+a",
+    "command": "-editor.action.blockComment",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "cmd+k cmd+f",
+    "command": "editor.toggleFold",
+    "when": "editorTextFocus && foldingEnabled"
+  },
+  {
+    "key": "cmd+k cmd+l",
+    "command": "-editor.toggleFold",
+    "when": "editorTextFocus && foldingEnabled"
+  },
+  {
+    "key": "cmd+.",
+    "command": "keyboard-quickfix.openQuickFix",
+    "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+shift+cmd+i",
+    "command": "editor.action.peekDefinition",
+    "when": "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor"
+  },
+  {
+    "key": "alt+f12",
+    "command": "-editor.action.peekDefinition",
+    "when": "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor"
+  },
+  {
+    "key": "ctrl+o",
+    "command": "navigateEditHistory.moveCursorToPreviousEdit",
+    "when": "!referenceSearchVisible"
+  },
+  {
+    "key": "ctrl+q",
+    "command": "-navigateEditHistory.moveCursorToPreviousEdit"
+  },
+  {
+    "key": "ctrl+i",
+    "command": "navigateEditHistory.moveCursorToNextEdit"
+  },
+  {
+    "key": "ctrl+cmd+o",
+    "command": "navigateEditHistory.createEditAtCursor",
+    "when": "!referenceSearchVisible"
+  },
+  {
+    "key": "shift+cmd+`",
+    "command": "surround.with.templateLiteralVariable"
+  },
+  {
+    "key": "cmd+backspace",
+    "command": "bracketeer.removeQuotes",
+    "when": "amVim.mode != 'INSERT' && editorTextFocus"
+  },
+  {
+    "key": "shift+cmd+j",
+    "command": "-extension.convertCSSinJS",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+h",
+    "command": "workbench.action.previousEditor",
+    "when": "!terminalFocus"
+  },
+  {
+    "key": "shift+cmd+[",
+    "command": "-workbench.action.previousEditor"
+  },
+  {
+    "key": "shift+ctrl+-",
+    "command": "workbench.action.decreaseViewSize"
+  },
+  {
+    "key": "shift+ctrl+=",
+    "command": "workbench.action.increaseViewSize"
   }
 ]
