@@ -138,6 +138,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias gs="git status --short"
+alias branches="git branch -l"
 alias cl="clear"
 alias reset="git reset"
 alias reseth="git reset --hard"
@@ -162,9 +163,10 @@ alias creport="open /Users/brent.whitehead/Projects/neo/coverage/lcov-report/ind
 alias buildneo="rm -rf node_modules/ && rm -rf /tools/frontend-tools/tcn-frontend-scripts/node_modules/ && yarn install"
 alias config="vim ~/.config/nvim/init.vim"
 alias vim="nvim"
+
 # how to log within matrix api
 # jesses check if anything is running
-alias jesse="kubectl get pods -o wide | grep -v Running"
+alias jesse="kubectl get pods -o wide  | grep -v Running"
 streamjesse() {
     while true; do
         clear;
@@ -283,6 +285,7 @@ export NEO=~/go/src/git.tcncloud.net/m/neo
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH=$GOBIN:$GOPATH:$PATH
+export HANGMAN_PROJECT_ID=dynamic-chiller-214322
 
 # k8s helpers
 lms() {
@@ -400,6 +403,13 @@ httpCosmos(){
 }
 namestart(){
     yarn start --env.namespace_apihost=http://localhost:9090
+}
+
+killport() { lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 }
+
+#delete local merged branches
+cleanmerged() {
+    git branch --merged | egrep -v "(^\*|master|release)" | xargs git branch -D 
 }
 
 # kube get config

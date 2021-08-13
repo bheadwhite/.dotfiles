@@ -649,7 +649,7 @@
   {
     "key": "ctrl+cmd+l",
     "command": "bookmarks.jumpToNext",
-    "when": "editorTextFocus"
+    "when": "editorTextFocus && !amVim.mode == 'VISUAL'"
   },
   {
     "key": "alt+cmd+l",
@@ -798,7 +798,7 @@
   {
     "key": "escape",
     "command": "workbench.action.focusFirstEditorGroup",
-    "when": "sideBarFocus && !listHasSelectionOrFocus"
+    "when": "sideBarFocus && !listHasSelectionOrFocus || explorerViewletFocus"
   },
   {
     "key": "shift+cmd+g",
@@ -1310,5 +1310,24 @@
   {
     "key": "shift+ctrl+=",
     "command": "workbench.action.increaseViewSize"
+  },
+  {
+    "key": "ctrl+cmd+l",
+    "command": "turboConsoleLog.displayLogMessage",
+    "when": "amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "ctrl+alt+l",
+    "command": "-turboConsoleLog.displayLogMessage"
+  },
+  {
+    "key": "shift+l",
+    "command": "workbench.action.compareEditor.nextChange",
+    "when": "isInDiffEditor"
+  },
+  {
+    "key": "shift+h",
+    "command": "workbench.action.compareEditor.previousChange",
+    "when": "isInDiffEditor"
   }
 ]

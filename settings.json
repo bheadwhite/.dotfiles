@@ -8,6 +8,7 @@
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.acceptSuggestionOnEnter": "on",
   "editor.cursorBlinking": "phase",
+  "editor.foldingImportsByDefault": true,
   "editor.cursorSmoothCaretAnimation": true,
   "editor.cursorSurroundingLines": 5,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -68,11 +69,17 @@
   "telemetry.enableTelemetry": false,
   "terminal.integrated.cursorBlinking": true,
   "terminal.integrated.tabs.enabled": false,
+  "turboConsoleLog.addSemicolonInTheEnd": false,
+  "turboConsoleLog.includeFileNameAndLineNum": false,
+  "turboConsoleLog.logMessagePrefix": "🚀",
+  "turboConsoleLog.delimiterInsideMessage": ":",
+  "turboConsoleLog.wrapLogMessage": false,
   "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.tsserver.log": "off",
   "typescript.preferences.quoteStyle": "single",
   "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.referencesCodeLens.showOnAllFunctions": true,
   "workbench.activityBar.visible": false,
-  "workbench.colorTheme": "Moonlight II Italic",
   "workbench.editor.enablePreviewFromCodeNavigation": true,
   "workbench.editor.labelFormat": "short",
   "workbench.iconTheme": "material-icon-theme",
@@ -89,6 +96,8 @@
   "workbench.colorCustomizations": {
     "editor.selectionBackground": "#ffffff23",
     "editor.rangeHighlightBackground": "#ffffff23",
+    "tab.activeBorder": "#40ff01",
+
     "editorBracketMatch.background": "#1170ff88",
     "editorBracketMatch.border": "#ff8400",
     "editor.wordHighlightStrongBackground": "#3e4998",
@@ -149,21 +158,25 @@
     //apps i dont work in --------------------------------------- start
 
     //                                          -- lms apps (dev-level-midnight) --
-    "operator/src/apps/lms/**": true,
+    // "operator/src/apps/lms/**": true,
     "operator/src/apps/cjs/**": true,
     "operator/src/apps/compliance/**": true,
     "operator/src/apps/payments/**": true,
+    // ^
+
     // "operator/src/apps/business-intelligence/**": true,
     // "operator/src/apps/integrations/**": true,
 
     //                                          -- org apps (OTR) --
     // "operator/src/apps/agentManager/**": true,
+    // V
     "operator/src/apps/organization/**": true,
     "operator/src/apps/huntgroupscripts/**": true,
     "operator/src/apps/room303/**": true,
     "operator/src/apps/customerSupport/**": true,
 
-    //                                         -- agent apps (curious george) --
+    //    V                                     -- agent apps (curious george) --
+
     "operator/src/apps/agent/**": true,
     "operator/src/apps/analytics/**": true,
     "operator/src/apps/omniBroadcast/**": true,
@@ -433,5 +446,6 @@
     "comments": false,
     "strings": false
   },
-  "window.zoomLevel": 1,
+  "security.workspace.trust.untrustedFiles": "open",
+  "workbench.colorTheme": "Moonlight II Italic"
 }
