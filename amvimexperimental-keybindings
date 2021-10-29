@@ -1,0 +1,360 @@
+// Place your key bindings in this file to override the defaults
+[
+  {
+    "key": "cmd+q",
+    "command": "-workbench.action.quit"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "workbench.action.nextEditor"
+  },
+  {
+    "key": "ctrl+h",
+    "command": "workbench.action.previousEditor"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "editor.action.moveLinesDownAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "editor.action.moveLinesUpAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "alt+j",
+    "command": "list.focusDown",
+    "when": "listFocus"
+  },
+  {
+    "key": "alt+k",
+    "command": "list.focusDown",
+    "when": "focusedView == 'workbench.scm' && !listFocus"
+  },
+  {
+    "key": "alt+j",
+    "command": "list.focusDown",
+    "when": "focusedView == 'workbench.scm' && !listFocus"
+  },
+  {
+    "key": "alt+j",
+    "command": "search.action.focusSearchList",
+    "when": "searchInputBoxFocus && searchViewletVisible && !listFocus"
+  },
+  {
+    "key": "alt+j",
+    "command": "selectNextSuggestion",
+    "when": "suggestWidgetVisible"
+  },
+  {
+    "key": "alt+j",
+    "command": "search.action.focusSearchList",
+    "when": "searchInputBoxFocus && searchViewletVisible && !listFocus"
+  },
+  {
+    "key": "alt+j",
+    "command": "workbench.action.quickOpenSelectNext",
+    "when": "inQuickOpen"
+  },
+  {
+    "key": "alt+k",
+    "command": "workbench.action.quickOpenSelectPrevious",
+    "when": "inQuickOpen"
+  },
+  {
+    "key": "alt+k",
+    "command": "search.action.focusSearchList",
+    "when": "searchInputBoxFocus && searchViewletVisible && !listFocus"
+  },
+  {
+    "key": "alt+k",
+    "command": "list.focusUp",
+    "when": "listFocus"
+  },
+  {
+    "key": "alt+k",
+    "command": "selectPrevSuggestion",
+    "when": "suggestWidgetVisible"
+  },
+  {
+    "key": "alt+h",
+    "command": "file-browser.stepOut",
+    "when": "inFileBrowser"
+  },
+  {
+    "key": "ctrl+cmd+k ctrl+cmd+s",
+    "command": "workbench.action.openGlobalKeybindings"
+  },
+  {
+    "key": "cmd+k cmd+s",
+    "command": "-workbench.action.openGlobalKeybindings"
+  },
+  {
+    "key": "alt+h",
+    "command": "list.collapse",
+    "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "alt+l",
+    "command": "list.expand",
+    "when": "listFocus && !inputFocus && !explorerResourceIsFolder || explorerResourceIsFolder"
+  },
+  {
+    "key": "alt+l",
+    "command": "explorer.openAndPassFocus",
+    "when": "listFocus && !inputFocus && !explorerResourceIsFolder"
+  },
+  {
+    "key": "alt+space",
+    "command": "editor.action.triggerSuggest",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "cmd+.",
+    "command": "keyboard-quickfix.openQuickFix",
+    "when": "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "s",
+    "command": "type",
+    "args": {
+      "text": "v"
+    },
+    "when": "amVim.mode == 'NORMAL' && editorTextFocus"
+  },
+  {
+    "key": "cmd+q",
+    "command": "editor.action.outdentLines",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "cmd+r",
+    "command": "editor.action.indentLines"
+  },
+  {
+    "key": "shift+s",
+    "command": "macros.vim.cursorEndSelect",
+    "when": "amVim.mode == 'NORMAL' && editorTextFocus"
+  },
+  {
+    "key": "ctrl+cmd+space",
+    "command": "workbench.action.files.revert"
+  },
+  {
+    "key": "shift+alt+k",
+    "command": "editor.action.copyLinesUpAction",
+    "when": "editorTextFocus && !editorReadonly && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "shift+alt+j",
+    "command": "editor.action.copyLinesDownAction",
+    "when": "editorTextFocus && !editorReadonly && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "ctrl+shift+cmd+j",
+    "command": "workbench.action.terminal.scrollDown",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+cmd+k",
+    "command": "workbench.action.terminal.scrollUp",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+cmd+h",
+    "command": "workbench.action.terminal.scrollUpPage",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+cmd+l",
+    "command": "workbench.action.terminal.scrollDownPage",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "shift+j",
+    "command": "scrollLineDown",
+    "when": "editorTextFocus && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "shift+k",
+    "command": "scrollLineUp",
+    "when": "editorTextFocus && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "shift+cmd+=",
+    "command": "workbench.action.increaseViewSize"
+  },
+  {
+    "key": "shift+cmd+-",
+    "command": "workbench.action.decreaseViewSize"
+  },
+  {
+    "key": "escape",
+    "command": "workbench.action.focusFirstEditorGroup",
+    "when": "sideBarFocus && !listHasSelectionOrFocus || explorerViewletFocus"
+  },
+  {
+    "key": "tab",
+    "command": "editor.action.smartSelect.expand",
+    "when": "editorTextFocus && amVim.mode == 'NORMAL' || editorTextFocus && amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "cmd+l",
+    "command": "type",
+    "args": {
+      "text": "$"
+    },
+    "when": "editorTextFocus && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "cmd+h",
+    "command": "cursorHome",
+    "when": "textInputFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "cmd+l",
+    "command": "cursorEnd",
+    "when": "editorTextFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "cmd+h",
+    "command": "type",
+    "args": {
+      "text": "^"
+    },
+    "when": "editorTextFocus && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "alt+l",
+    "command": "type",
+    "args": { "text": "e" },
+    "when": "textInputFocus && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "alt+h",
+    "command": "type",
+    "args": { "text": "b" },
+    "when": "textInputFocus && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "alt+l",
+    "command": "cursorWordEndRight",
+    "when": "textInputFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "alt+h",
+    "command": "maptz.camelcasenavigation.moveCamelLeftCommand",
+    "when": "textInputFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "alt+l",
+    "command": "maptz.camelcasenavigation.moveCamelRightCommand",
+    "when": "textInputFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "alt+backspace",
+    "command": "maptz.camelcasenavigation.deleteCamelLeftCommand",
+    "when": "textInputFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "alt+left",
+    "command": "-maptz.camelcasenavigation.moveCamelLeftCommand",
+    "when": "editorTextFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "cmd+`",
+    "command": "workbench.action.terminal.toggleTerminal"
+  },
+  {
+    "key": "ctrl+cmd+shift+j",
+    "command": "macros.vim.select-to-end",
+    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "ctrl+cmd+shift+k",
+    "command": "macros.vim.select-to-start",
+    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "cmd+.",
+    "command": "extension.embraceAngleBrackets",
+    "when": "amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "cmd+]",
+    "command": "extension.embraceSquareBrackets",
+    "when": "amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "cmd+shift+]",
+    "command": "extension.embraceCurlyBrackets",
+    "when": "amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "cmd+shift+'",
+    "command": "extension.embraceDoubleQuotes",
+    "when": "amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "cmd+'",
+    "command": "extension.embraceSingleQuotes",
+    "when": "amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "cmd+shift+0",
+    "command": "extension.embraceParenthesis",
+    "when": "amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "enter",
+    "command": "workbench.action.keepEditor",
+    "when": "editorFocus && !activeEditorIsNotPreview && !listFocus"
+  },
+  {
+    "key": "shift+cmd+g",
+    "command": "workbench.scm.focus",
+    "when": "!findWidgetVisible && !view.workbench.scm.visible"
+  },
+  {
+    "key": "shift+m",
+    "command": "cursorMove",
+    "args": {
+      "to": "viewPortCenter"
+    },
+    "when": "textInputFocus && !renameInputVisible && amVim.mode != 'INSERT' && !panelFocus"
+  },
+  {
+    "key": "shift+tab",
+    "command": "editor.action.smartSelect.shrink",
+    "when": "editorTextFocus && amVim.mode == 'NORMAL' || editorTextFocus && amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "cmd+n",
+    "command": "explorer.newFile",
+    "when": "explorerViewletVisible && filesExplorerFocus"
+  },
+  {
+    "key": "cmd+o",
+    "command": "editsHistory.moveCursorToNextEditInSameFile"
+  },
+  {
+    "key": "alt+o",
+    "command": "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
+  },
+  {
+    "key": "escape",
+    "command": "closeDirtyDiff",
+    "when": "dirtyDiffVisible"
+  },
+  {
+    "key": "shift+escape",
+    "command": "workbench.action.closePanel",
+    "when": "panelFocus"
+  },
+  {
+    "key": "escape",
+    "command": "workbench.action.focusFirstEditorGroup",
+    "when": "sideBarFocus && !listHasSelectionOrFocus || explorerViewletFocus"
+  }
+]
