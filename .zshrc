@@ -1,4 +1,3 @@
-
 # If you come from bash you might have to change your $PATH.
 #export PATH=$HOME/bin:/usr/local/bin:$PATH
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/Desktop/github/limelight/bin"
@@ -159,10 +158,12 @@ alias cloudservices="gcloud services list"
 alias k="kubectl"
 alias mvim="open -a MacVim"
 alias nvimconfig="code ~/.vim/vim.init"
-alias creport="open /Users/brent.whitehead/Projects/neo/coverage/lcov-report/index.html"
+alias cCommonsReport="open /Users/brent.whitehead/Projects/neo/coverage/commons/lcov-report/index.html"
+alias cOperatorReport="open /Users/brent.whitehead/Projects/neo/coverage/operator/lcov-report/index.html"
 alias buildneo="rm -rf node_modules/ && rm -rf /tools/frontend-tools/tcn-frontend-scripts/node_modules/ && yarn install"
 alias config="vim ~/.config/nvim/init.vim"
 alias vim="nvim"
+alias plzWollemiClean="plz run tools/wollemi -- symlink list --prune --broken"
 
 # how to log within matrix api
 # jesses check if anything is running
@@ -175,46 +176,6 @@ streamjesse() {
     done
 }
 
-alias recomp="touch /Users/brent.whitehead/Projects/neo/operator/src/apps/lms/AsyncAction.ts"
-
-
-alias streamfront="log-pod matrix-api -f -c matrix-api | rg -v 'room303' | rg -v 'ListNewEvent' | rg -v 'GetHistory'"
-alias streamback="stream-pod lms-api -c matrix-lms-api "
-alias streamsched="stream-pod lms-sched -c matrix-lms-scheduler"
-alias streamautocomplete="stream-pod lms-autocomplete -c matrix-lms-autocomplete "
-alias streampersist="stream-pod lms-persist -c matrix-lms-persist"
-
-alias streamfrontjq="streamfront | rg 'severity' | jq"
-alias streambackjq="streamback | jq"
-alias streamschedjq="streamsched | jq"
-
-alias streamlms="osascript \
--e 'tell application \"iTerm2\" to activate' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"n\" using {command down}' \
--e 'delay 1' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streamfrontjq\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"d\" using {command down}' \
--e 'delay 1' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streambackjq\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
--e 'delay 1' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"d\" using {command down}' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"streamschedjq\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52'
-"
-
-alias checkpush="osascript \
--e 'tell application \"iTerm2\" to activate' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"n\" using {command down}' \
--e 'delay 1' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"cd projects/neo && yarn test lms/components && yarn lint:check\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"d\" using {command down}' \
--e 'delay 1' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to keystroke \"cd projects/neo && yarn format:check\"' \
--e 'tell application \"System Events\" to tell process \"iTerm2\" to key code 52' \
-"
 
 g-add () {
     git add "**/$1/**"
@@ -244,10 +205,16 @@ stream-pod () {
     kubectl logs "$pod" -f "${@:2:$#-2}"
 }
 
-cover () {
-    yarn test $1 --coverage --collectCoverageFrom="**/*$1*/**/*.{ts,tsx}" --coveragePathIgnorePatterns=".fixture.*" "${@:2:$#-2}"
-    creport
+coverCommons () {
+    yarn commons test $1 --coverage --collectCoverageFrom="**/*$1*/**/*.{ts,tsx}" --coveragePathIgnorePatterns=".fixture.*" "${@:2:$#-2}"
+    cCommonsReport
 }
+
+coverOperator () {
+    yarn operator test $1 --coverage --collectCoverageFrom="**/*$1*/**/*.{ts,tsx}" --coveragePathIgnorePatterns=".fixture.*" "${@:2:$#-2}"
+    cOperatorreport
+}
+
 coverP () {
     echo -n "test: "
     read TEST
@@ -448,9 +415,3 @@ cleanmerged() {
 # kubectl config set-context --current --namespace=$(whoami | tr '.' '-')
 # step 9: setup the port forward: `kubectl port-forward <podname> 9090:9090`
 # step 10: yarn start with 9090 as your front end: `yarn start --env.namespace_apihost=http://localhost:9090`
-
-
-
-
-
-
