@@ -281,52 +281,37 @@
   {
     "key": "cmd+'",
     "command": "extension.embraceSingleQuotes",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+    "when": "editorTextFocus"
   },
   {
-    "key": "cmd+shift+'",
+    "key": "shift+cmd+'",
     "command": "extension.embraceDoubleQuotes",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+    "when": "editorTextFocus"
   },
   {
     "key": "cmd+]",
     "command": "extension.embraceSquareBrackets",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+    "when": "editorTextFocus"
   },
   {
     "key": "cmd+[",
     "command": "extension.embraceSquareBrackets",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+    "when": "editorTextFocus"
   },
   {
-    "key": "cmd+shift+]",
+    "key": "shift+cmd+]",
     "command": "extension.embraceCurlyBrackets",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+    "when": "editorTextFocus"
   },
   {
-    "key": "cmd+shift+[",
+    "key": "shift+cmd+[",
     "command": "extension.embraceCurlyBrackets",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
-  },
-  {
-    "key": "cmd+0",
-    "command": "extension.embraceParenthesis",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
-  },
-  {
-    "key": "cmd+9",
-    "command": "extension.embraceParenthesis",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
-  },
-  {
-    "key": "cmd+-",
-    "command": "extension.embraceParenthesis",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+    "when": "editorTextFocus"
   },
   {
     "key": "cmd+'",
     "command": "extension.embraceSingleQuotes",
-    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+    "when": "editorTextFocus"
   },
   {
     "key": "shift+alt+h",
@@ -382,10 +367,6 @@
     "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor"
   },
   {
-    "key": "cmd+k cmd+i",
-    "command": "editor.action.showDefinitionPreviewHover"
-  },
-  {
     "key": "cmd+k cmd+r",
     "command": "editor.action.goToReferences",
     "when": "editorHasReferenceProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor"
@@ -423,6 +404,11 @@
     "key": "ctrl+l",
     "command": "togglePeekWidgetFocus",
     "when": "inReferenceSearchEditor && !config.editor.stablePeek && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "enter",
+    "command": "openReference",
+    "when": "references-view.tree.canMove && referenceSearchVisible && listFocus"
   },
   {
     "key": "ctrl+h",
@@ -566,7 +552,7 @@
     "when": "editorTextFocus"
   },
   {
-    "key": "cmd+alt+r",
+    "key": "shift+cmd+r",
     "command": "editor.action.rename",
     "when": "editorTextFocus"
   },
@@ -614,5 +600,57 @@
   {
     "key": "cmd+k cmd+o",
     "command": "workbench.action.closeOtherEditors"
+  },
+  {
+    "key": "cmd+f",
+    "command": "filesExplorer.findInFolder",
+    "when": "explorerViewletFocus && listFocus"
+  },
+  {
+    "key": "cmd+-",
+    "command": "-gotoLastEdit.goBack",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+=",
+    "command": "-gotoLastEdit.goForward",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+cmd+j",
+    "command": "editor.action.insertCursorBelow",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+cmd+k",
+    "command": "editor.action.insertCursorAbove",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+cmd+up",
+    "command": "-editor.action.insertCursorAbove",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+cmd+0",
+    "command": "extension.embraceParenthesis"
+  },
+  {
+    "key": "shift+cmd+9",
+    "command": "extension.embraceParenthesis"
+  },
+  {
+    "key": "cmd+k cmd+d",
+    "command": "editor.action.moveSelectionToPreviousFindMatch"
+  },
+  {
+    "key": "cmd+e",
+    "command": "-file-switch.quickSwitch",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "c",
+    "command": "macros.cDeleteText",
+    "when": "amVim.mode == 'VISUAL' && editorTextFocus || amVim.mode == 'VISUAL LINE' && editorTextFocus"
   }
 ]
