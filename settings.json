@@ -1,21 +1,29 @@
 {
-  "bookmarks.navigateThroughAllFiles": false,
-  "breadcrumbs.filePath": "on",
+  "amVim.useSystemClipboard": true,
   "breadcrumbs.icons": false,
-  "breadcrumbs.symbolSortOrder": "type",
-  "debug.javascript.usePreview": true,
-  "diffEditor.renderSideBySide": true,
+  "breadcrumbs.symbolSortOrder": "position",
+  "clipboard-manager.snippet.enabled": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.acceptSuggestionOnEnter": "on",
+  "editor.accessibilitySupport": "off",
+  "editor.bracketPairColorization.enabled": true,
   "editor.cursorBlinking": "phase",
-  "editor.foldingImportsByDefault": true,
   "editor.cursorSmoothCaretAnimation": true,
   "editor.cursorSurroundingLines": 5,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.foldingStrategy": "auto",
-  "editor.fontFamily": "Fira Code",
+  "editor.definitionLinkOpensInPeek": false,
+  "editor.fontFamily": "Hack Nerd Font",
   "editor.fontSize": 13,
   "editor.formatOnSave": true,
+  "editor.gotoLocation.alternativeDefinitionCommand": "editor.action.referenceSearch.trigger",
+  "editor.find.cursorMoveOnType": true,
+  "editor.guides.bracketPairs": true,
+  "editor.guides.bracketPairsHorizontal": false,
+  "editor.guides.highlightActiveBracketPair": true,
+  "editor.guides.highlightActiveIndentation": true,
+  "editor.inlineSuggest.enabled": true,
+  "editor.lineDecorationsWidth": 0,
+  "editor.lineNumbersMinChars": 0,
   "editor.linkedEditing": true,
   "editor.minimap.enabled": false,
   "editor.minimap.maxColumn": 100,
@@ -32,252 +40,121 @@
   "emmet.showSuggestionsAsSnippets": true,
   "explorer.compactFolders": false,
   "explorer.openEditors.visible": 0,
-  "githd.logView.displayExpressStatus": false,
-  "githd.logView.expressMode": true,
-  "githd.blameView.enabled": false,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.openDiffOnClick": true,
   "gitlab.instanceUrl": "https://git.tcncloud.net",
-  "gitlens.codeLens.enabled": false,
-  "gitlens.recentChanges.highlight.locations": ["overview", "gutter", "line"],
   "gitlens.statusBar.enabled": false,
-  "gitlens.views.compare.enabled": false,
-  "gitlens.views.search.enabled": false,
-  "go.formatTool": "goimports",
+  "http.systemCertificates": true,
   "javascript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.jsxAttributeCompletionStyle": "auto",
   "javascript.preferences.quoteStyle": "single",
   "javascript.updateImportsOnFileMove.enabled": "always",
-  "jestrunner.configPath": "./operator/jest.config.js",
-  "material-icon-theme.hidesExplorerArrows": true,
-  "openInGitHub.defaultBranch": "master",
-  "openInGitHub.defaultRemote": "origin",
-  "openInGitHub.excludeCurrentRevision": false,
-  "openInGithub.maxBuffer": 512000,
-  "prettier.jsxBracketSameLine": true,
-  "prettier.jsxSingleQuote": true,
-  "prettier.singleQuote": true,
-  "prettier.tabWidth": 2,
-  "prettier.trailingComma": "all",
-  "prettier.useEditorConfig": false,
-  "quokka.colorizeOutput": true,
-  "quokka.compactMessageOutput": true,
-  "quokka.showOutputOnStart": false,
-  "scoper.braces": false,
-  "scoper.endColor": "#1170ff80",
-  "scoper.highlightColor": "",
-  "scoper.parentheses": false,
-  "scoper.squareBrackets": false,
+  "problems.sortOrder": "position",
+  "screencastMode.onlyKeyboardShortcuts": true,
   "search.searchOnType": false,
+  "security.workspace.trust.untrustedFiles": "open",
   "telemetry.enableCraskhReporter": false,
-  "telemetry.enableTelemetry": false,
+  "telemetry.telemetryLevel": "off",
   "terminal.integrated.cursorBlinking": true,
   "terminal.integrated.tabs.enabled": false,
-  "turboConsoleLog.addSemicolonInTheEnd": false,
-  "turboConsoleLog.includeFileNameAndLineNum": false,
-  "turboConsoleLog.logMessagePrefix": "🚀",
-  "turboConsoleLog.delimiterInsideMessage": ":",
-  "turboConsoleLog.wrapLogMessage": false,
   "typescript.preferences.importModuleSpecifier": "non-relative",
-  "typescript.tsserver.log": "off",
+  "typescript.preferences.jsxAttributeCompletionStyle": "auto",
   "typescript.preferences.quoteStyle": "single",
-  "typescript.updateImportsOnFileMove.enabled": "always",
   "typescript.referencesCodeLens.showOnAllFunctions": true,
+  "typescript.tsserver.log": "off",
+  "typescript.updateImportsOnFileMove.enabled": "always",
   "workbench.activityBar.visible": false,
+  "workbench.colorTheme": "gruvboxConcoctis dark medium",
   "workbench.editor.enablePreviewFromCodeNavigation": true,
   "workbench.editor.labelFormat": "short",
-  "workbench.iconTheme": "material-icon-theme",
+  "workbench.iconTheme": "eq-material-theme-icons-darker",
+  "workbench.list.automaticKeyboardNavigation": false,
+  "workbench.panel.defaultLocation": "right",
+  "workbench.panel.opensMaximized": "never",
   "workbench.settings.editor": "json",
   "workbench.settings.enableNaturalLanguageSearch": false,
   "workbench.sideBar.location": "left",
-  "workbench.startupEditor": "newUntitledFile",
+  "workbench.startupEditor": "none",
   "zenMode.centerLayout": false,
   "zenMode.hideLineNumbers": false,
   "zenMode.hideTabs": false,
-  "openInApplication.applications": {
-    "html": ["Google Chrome"]
-  },
+  // "editor.glyphMargin": false,
   "workbench.colorCustomizations": {
+    // background
+    // main background
+    "panel.background": "#1a2b33",
+    "editor.background": "#1a2b33",
+    "editorInlayHint.parameterBackground": "#1a2b33",
+    "editorInlayHint.background": "#1a2b33",
+    "editorHoverWidget.background": "#1a2b33",
+    "editor.foldBackground": "#1a2b33",
+    "editorWidget.background": "#1a2b33",
+    "editorGutter.background": "#1a2b33",
+    "editorSuggestWidget.background": "#1a2b33",
+    "editorGroup.emptyBackground": "#1a2b33",
+    "editorGroupHeader.tabsBackground": "#1a2b33",
+    "editorPane.background": "#1a2b33",
+    "peekViewEditor.background": "#1a2b33",
+    "peekViewEditorGutter.background": "#1a2b33",
+    "tab.inactiveBackground": "#1a2b33",
+    "tab.unfocusedActiveBackground": "#1a2b33",
+    "tab.unfocusedInactiveBackground": "#1a2b33",
+    "sideBarSectionHeader.background": "#1a2b33",
+    "breadcrumbPicker.background": "#1a2b33",
+    "menu.background": "#1a2b33",
+    "badge.background": "#1a2b33",
+    "button.background": "#1a2b33",
+    "banner.background": "#1a2b33",
+    "welcomePage.tileBackground": "#1a2b33",
+    "welcomePage.background": "#1a2b33",
+    // secondary color
+    "breadcrumb.background": "#10232b",
+    "terminal.background": "#10232b",
+    "sideBar.background": "#10232b",
+    "titleBar.activeBackground": "#10232b",
+
+    //terminal text color
+    "terminal.foreground": "#d1d1d1",
+
+    //gruvbox concoctis hard theme colors
+    // green : #8a984d
+    // blue : #6dada0
+    // orange : #cb723a
+    // pink/violet: #925a69
+    // sunset : #c6504d
+    // light orange : #dca245
+
+    "tab.activeBackground": "#11303d",
+    "tab.activeForeground": "#a6b0ca",
+    "editorSuggestWidget.selectedBackground": "#455558",
+    //end background
     "editor.selectionBackground": "#ffffff23",
     "editor.rangeHighlightBackground": "#ffffff23",
+    "editorLineNumber.activeForeground": "#c5c9ce",
+    "editorLineNumber.foreground": "#46887d",
+    "editorBracketHighlight.foreground6": "#8a984d",
+    "editorBracketHighlight.foreground5": "#6dada0",
+    "editorBracketHighlight.foreground4": "#cb723a",
+    "editorBracketHighlight.foreground3": "#925a69",
+    "editorBracketHighlight.foreground2": "#c6504d",
+    "editorBracketHighlight.foreground1": "#dca245",
     "tab.activeBorder": "#40ff01",
-
     "editorBracketMatch.background": "#1170ff88",
     "editorBracketMatch.border": "#ff8400",
     "editor.wordHighlightStrongBackground": "#3e4998",
     "editor.wordHighlightBackground": "#3e4998",
-    "editor.findMatchBackground": "#282c34",
-    "editor.findMatchHighlightBackground": "#06570997",
+    "editor.findMatchBackground": "#56055e",
+    "editor.findMatchHighlightBackground": "#a7508d97",
     "editor.selectionForeground": "#99eeff",
     "editorIndentGuide.activeBackground": "#1d76db",
     "list.inactiveSelectionForeground": "#fff",
     "list.activeSelectionForeground": "#fff",
     "list.activeSelectionBackground": "#26007e",
-    "list.focusBackground": "#2e5704",
+    "list.focusBackground": "#455558",
     "terminal.border": "#ff0000"
   },
-  "files.exclude": {
-    "**/*.go": true,
-    "**/go.mod": true,
-    "**/go.sum": true,
-    "services/**": true,
-    "**/.git/objects/**": true,
-    ".plz_clean*/**": true,
-    //please out stuff
-    "plz-out/bin/**": true,
-    "plz-out/gen/**": true,
-    "plz-out/go/**": true,
-    "plz-out/google/**": true,
-    "plz-out/googleapis/**": true,
-    //unused stuff --- start
-    ".yarn": true,
-    ".gitlab": true,
-    "k8s/**": true,
-    "opctl/**": true,
-    "persist/**": true,
-    "scripts/**": true,
-    ".npmrc": true,
-    ".nvmrc": true,
-    "docs/**": true,
-    "config/**": true,
-    "commons/**": true,
-    "devops/**": true,
-    // "dist/**": true,
-    "build_defs/**": true,
-    "test_helpers/**": true,
-    // "tools/**": true,
-    "third_party/**": true,
-    "protos/api/*": false,
-    //protos
-    "protos/bb/**": true,
-    "protos/commons/**": true,
-    "protos/go/**": true,
-    "protos/java/**": true,
-    "protos/matrix/**": true,
-    "protos/p3/**": true,
-    "protos/.editorconfig/**": true,
-    "protos/.gitignore/**": true,
-    "protos/BUILD.plz": true,
-
-    //apps i dont work in --------------------------------------- start
-
-    //                                          -- lms apps (dev-level-midnight) --
-    // "operator/src/apps/lms/**": true,
-    "operator/src/apps/cjs/**": true,
-    "operator/src/apps/compliance/**": true,
-    "operator/src/apps/payments/**": true,
-    // ^
-
-    // "operator/src/apps/business-intelligence/**": true,
-    // "operator/src/apps/integrations/**": true,
-
-    //                                          -- org apps (OTR) --
-    // "operator/src/apps/agentManager/**": true,
-    // V
-    "operator/src/apps/organization/**": true,
-    "operator/src/apps/huntgroupscripts/**": true,
-    "operator/src/apps/room303/**": true,
-    "operator/src/apps/customerSupport/**": true,
-
-    //    V                                     -- agent apps (curious george) --
-
-    "operator/src/apps/agent/**": true,
-    "operator/src/apps/analytics/**": true,
-    "operator/src/apps/omniBroadcast/**": true,
-    "operator/src/apps/webphone/**": true,
-
-    //                                         -- wfm apps (argus) --
-    // "operator/src/apps/wfm/**": true,
-    "operator/src/apps/manager/**": true,
-    // "operator/src/apps/voiceanalytics/**": true,
-    // "operator/src/apps/omniagent/**": true,
-
-    // apps i dont work in ----------------------------------------- end
-
-    //unused stuff ---end
-    "**/.git/subtree-cache/**": true,
-    "**/*.js": {
-      "when": "$(basename).ts"
-    },
-    "**/tmp/**": true,
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/bower_components": true,
-    "report*": true,
-    "**/log/**": true,
-    "**/.fdk/**": true,
-    "**/.cache/**": true
-  },
-  "files.watcherExclude": {
-    "**/.cache/**": true,
-    "**/build_defs/**": true,
-    "**/commons/**": true,
-    "**/protos/matrix/**": true,
-    "**/protos/p3/**": true,
-    "**/.git/objects/**": true,
-    "**/opctl/**": true,
-    "**/services/**": true,
-    "**/.git/subtree-cache/**": true,
-    "**/node_modules/**": true,
-    "**/tmp/**": true,
-    "**/*.go": true,
-    "**/.yarn/**": true,
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/node_modules": true,
-    "**/bower_components": true,
-    // "**/dist/**": true,
-    // "**/log/**": true,
-    // "**/logs/**": true,
-    "**/.fdk/**": true,
-    "**/plz-out/**": true,
-    "**/public/**": true
-  },
-  "search.exclude": {
-    "**/.cache/**": true,
-    "**/*.go": true,
-    "**/.git/objects/**": true,
-    "**/.git/subtree-cache/**": true,
-    "**/node_modules/**": true,
-    "**/tmp/**": true,
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/node_modules": true,
-    "**/bower_components": true,
-    "**/dist/**": true,
-    "**/log/**": true
-  },
   "macros.list": {
-    "shiftTo1": [
-      "workbench.action.focusFirstEditorGroup",
-      "workbench.action.closeSidebar"
-    ],
-    "shiftToSideBar": [
-      "workbench.action.focusSideBar",
-      "workbench.action.focusSideBar"
-    ],
-    "copycopy": [
-      "copy-copy-paste.copy",
-      {
-        "command": "$delay",
-        "args": {
-          "delay": 10
-        }
-      },
-      {
-        "command": "type",
-        "args": {
-          "text": "y"
-        }
-      }
-    ],
-    "p-Paste": ["editor.action.clipboardPasteAction"],
     "goPrevChange": [
       "workbench.action.editor.previousChange",
       "editor.action.dirtydiff.previous"
@@ -286,27 +163,6 @@
       "workbench.action.editor.nextChange",
       "editor.action.dirtydiff.next"
     ],
-    "selectInnerWord": [
-      {
-        "command": "type",
-        "args": {
-          "text": "v"
-        }
-      },
-      {
-        "command": "type",
-        "args": {
-          "text": "i"
-        }
-      },
-      {
-        "command": "type",
-        "args": {
-          "text": "w"
-        }
-      }
-    ],
-    "customSwitchAppHack": ["workbench.action.terminal.focus"],
     "customFindInFiles": [
       "workbench.action.findInFiles",
       {
@@ -317,13 +173,8 @@
       },
       "list.focusDown"
     ],
-    "customScmFocus": [
-      "workbench.action.focusSideBar",
-      "list.focusDown",
-      "list.focusUp"
-    ],
-    "customY": [
-      "copy-copy-paste.copy",
+    "cDeleteText": [
+      "deleteInsideWord",
       {
         "command": "$delay",
         "args": {
@@ -333,18 +184,9 @@
       {
         "command": "type",
         "args": {
-          "text": "y"
+          "text": "i"
         }
       }
-    ],
-    "customJ": [
-      {
-        "command": "type",
-        "args": {
-          "text": ""
-        }
-      },
-      "workbench.action.focusFirstEditorGroup"
     ],
     "indentSelectToBeginning": [
       "cursorEnd",
@@ -356,6 +198,22 @@
         }
       }
     ],
+    "focusFind": [
+      {
+        "command": "type",
+        "args": {
+          "text": "i"
+        }
+      },
+      {
+        "command": "$delay",
+        "args": {
+          "delay": 10
+        }
+      },
+      "actions.find"
+    ],
+
     "indentSelectToEnd": [
       {
         "command": "type",
@@ -365,37 +223,22 @@
       },
       "indentation-level-movement.selectDown",
       "cursorEndSelect"
+    ],
+    "gitViewFile": [
+      "list.selectAndPreserveFocus",
+      {
+        "command": "$delay",
+        "args": {
+          "delay": 50
+        }
+      },
+      "workbench.action.focusFirstEditorGroup"
+    ],
+    "resetTree": [
+      "workbench.files.action.collapseExplorerFolders",
+      "workbench.files.action.refreshFilesExplorer"
     ]
   },
-  "settings.cycle": [
-    {
-      "id": "termOff",
-      "overrideWorkspaceSettings": true,
-      "values": [
-        // "editorBracketMatch.background": "#f008",
-        {
-          "workbench.colorCustomizations": {
-            "editor.selectionBackground": "#ffffff23",
-            "editor.rangeHighlightBackground": "#ffffff23",
-            // "editorBracketMatch.background": "#1fe609",
-            // "editorBracketMatch.border": "#f00",
-            "editorBracketMatch.background": "#F008",
-            "editorBracketMatch.border": "#999",
-            "editor.wordHighlightStrongBackground": "#3e4998",
-            "editor.wordHighlightBackground": "#3e4998",
-            "editor.findMatchBackground": "#282c34",
-            "editor.findMatchHighlightBackground": "#06570997",
-            "editor.selectionForeground": "#99eeff",
-            "editorIndentGuide.activeBackground": "#1d76db",
-            "list.inactiveSelectionForeground": "#fff",
-            "list.activeSelectionForeground": "#fff",
-            "list.activeSelectionBackground": "#26007e",
-            "list.focusBackground": "#2e5704"
-          }
-        }
-      ]
-    }
-  ],
   "emmet.includeLanguages": {
     "javascript": "javascriptreact",
     "typescript": "typescriptreact",
@@ -442,11 +285,6 @@
       "noItemText": "There is no MR assigned to you."
     }
   ],
-  "editor.quickSuggestions": {
-    "other": false,
-    "comments": false,
-    "strings": false
-  },
-  "security.workspace.trust.untrustedFiles": "open",
-  "workbench.colorTheme": "Moonlight II Italic"
+  "gitlens.codeLens.recentChange.enabled": false,
+  "gitlens.codeLens.authors.enabled": false
 }

@@ -1,6 +1,6 @@
 # If you come from bash you might have to change your $PATH.
 #export PATH=$HOME/bin:/usr/local/bin:$PATH
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/Desktop/github/limelight/bin"
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/Desktop/github/limelight/bin:$HOME/bin"
 
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/brent.whitehead/.oh-my-zsh"
@@ -148,22 +148,20 @@ alias matrixdbForward="kubectl port-forward service/matrix-db 8431:5432 -n='defa
 alias k="kubectl"
 
 alias buildprotos="yarn clean && yarn build-protos"
-alias zshrc="code ~/.zshrc"
-alias nvimrc="code ~/.vim/vim.init"
+alias zshrc="vim ~/.zshrc"
 alias getpods="kubectl get pods"
 alias prettyPodLogs="kubectl logs <pod> -f | jq"
 alias deadLogTales="kubectl logs <pod> -p"
 alias reload="source ~/.zshrc"
 alias cloudservices="gcloud services list"
 alias k="kubectl"
-alias mvim="open -a MacVim"
-alias nvimconfig="code ~/.vim/vim.init"
 alias cCommonsReport="open /Users/brent.whitehead/Projects/neo/coverage/commons/lcov-report/index.html"
 alias cOperatorReport="open /Users/brent.whitehead/Projects/neo/coverage/operator/lcov-report/index.html"
 alias buildneo="rm -rf node_modules/ && rm -rf /tools/frontend-tools/tcn-frontend-scripts/node_modules/ && yarn install"
 alias config="vim ~/.config/nvim/init.vim"
-alias vim="nvim"
+alias vim="~/nvim-osx64/bin/nvim"
 alias plzWollemiClean="plz run tools/wollemi -- symlink list --prune --broken"
+alias runTop="top -o cpu -O +rsize -s 5 -n 20"
 
 # how to log within matrix api
 # jesses check if anything is running
@@ -191,7 +189,7 @@ get-pod () {
 
 log-pod () {
     pod=$(get-pod $1)
-    kubectl logs "$pod" "${@:2:$#-2}" 
+    kubectl logs "$pod" "${@:2:$#-2}"
 }
 
 forward-pod () {
@@ -376,7 +374,7 @@ killport() { lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9 }
 
 #delete local merged branches
 cleanmerged() {
-    git branch --merged | egrep -v "(^\*|master|release)" | xargs git branch -D 
+    git branch --merged | egrep -v "(^\*|master|release)" | xargs git branch -D
 }
 
 # kube get config
