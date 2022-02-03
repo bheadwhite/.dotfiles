@@ -1,6 +1,5 @@
 karabiner: Change cops_lock key to command+control+option+shift (Post escape key when pressed alone)
 better touch tool: assign keyboard shortcut to vscode - shfit+ctl+h => shift+cmd+,
 macOs keyboard shortcuts: Visual Studio Code -
-                              Hide Visual Studio Code - reassign to something else
+Hide Visual Studio Code - reassign to something else
 limelight focus app border: https://github.com/koekeishiya/limelight
-                              
