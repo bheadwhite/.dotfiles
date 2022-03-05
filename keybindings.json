@@ -143,7 +143,12 @@
   {
     "key": "shift+l",
     "command": "macros.goNextChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
+    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "shift+l",
+    "command": "workbench.action.editor.nextChange",
+    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode == 'NORMAL'"
   },
   {
     "key": "shift+l",
@@ -221,14 +226,14 @@
     "when": "amVim.mode != 'INSERT' && !findWidgetVisible && !inQuickOpen && editorFocus && !renameInputVisible || (!inputFocus || !findWidgetVisible && inputFocus)"
   },
   {
-    "key": "shift+l",
-    "command": "macros.goNextChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
+    "key": "shift+h",
+    "command": "macros.goPrevChange",
+    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL'"
   },
   {
     "key": "shift+h",
-    "command": "macros.goPrevChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
+    "command": "workbench.action.editor.previousChange",
+    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode == 'NORMAL'"
   },
   {
     "key": "shift+cmd+e",
@@ -741,16 +746,6 @@
     "when": "inlineSuggestionVisible && amVim.mode == 'INSERT'"
   },
   {
-    "key": "alt+l",
-    "command": "editor.action.inlineSuggest.commit",
-    "when": "editorTextFocus && inlineSuggestionVisible && amVim.mode == 'INSERT'"
-  },
-  {
-    "key": "ctrl+enter",
-    "command": "editor.action.inlineSuggest.commit",
-    "when": "editorTextFocus && inlineSuggestionVisible && amVim.mode == 'INSERT'"
-  },
-  {
     "key": "ctrl+space",
     "command": "editor.action.triggerSuggest",
     "when": "editorTextFocus && !inlineSuggestionVisible && amVim.mode == 'INSERT'"
@@ -759,5 +754,40 @@
     "key": "ctrl+l",
     "command": "editor.action.inlineSuggest.commit",
     "when": "editorTextFocus && inlineSuggestionVisible && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "alt+l",
+    "command": "editor.action.inlineSuggest.commit",
+    "when": "editorTextFocus && inlineSuggestionVisible && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "editor.action.inlineSuggest.commit",
+    "when": "editorTextFocus && inlineSuggestionVisible && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "alt+l",
+    "command": "editor.action.inlineSuggest.commit",
+    "when": "editorTextFocus && inlineSuggestionVisible && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "shift+enter",
+    "command": "editor.action.inlineSuggest.commit",
+    "when": "editorTextFocus && inlineSuggestionVisible && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "alt+enter",
+    "command": "macros.newLine",
+    "when": "editorTextFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "alt+h",
+    "command": "workbench.action.closeQuickOpen",
+    "when": "inQuickOpen"
+  },
+  {
+    "key": "alt+cmd+backspace",
+    "command": "editor.action.deleteLines",
+    "when": "editorTextFocus"
   }
 ]

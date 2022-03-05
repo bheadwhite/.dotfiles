@@ -13,7 +13,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.definitionLinkOpensInPeek": false,
   "editor.fontFamily": "Fira Code",
-  "editor.fontSize": 14,
+  "editor.fontSize": 15,
   "editor.formatOnSave": true,
   "editor.gotoLocation.alternativeDefinitionCommand": "editor.action.referenceSearch.trigger",
   "editor.find.cursorMoveOnType": true,
@@ -21,6 +21,7 @@
   "editor.guides.bracketPairsHorizontal": false,
   "editor.guides.highlightActiveBracketPair": true,
   "editor.guides.highlightActiveIndentation": true,
+  "editor.inlayHints.enabled": true,
   "editor.inlineSuggest.enabled": true,
   "editor.lineDecorationsWidth": 0,
   "editor.lineNumbersMinChars": 0,
@@ -146,6 +147,9 @@
     "editor.wordHighlightBackground": "#3e4998",
     "editor.findMatchBackground": "#56055e",
     "editor.findMatchHighlightBackground": "#a7508d97",
+    "editorOverviewRuler.findMatchForeground": "#ff90de97",
+    "editorOverviewRuler.bracketMatchForeground": "#a7508d97",
+    "editorOverviewRuler.selectionHighlightForeground": "#a7508d97",
     "editor.selectionForeground": "#99eeff",
     "editorIndentGuide.activeBackground": "#1d76db",
     "list.inactiveSelectionForeground": "#fff",
@@ -155,6 +159,14 @@
     "terminal.border": "#ff0000"
   },
   "macros.list": {
+    "newLine": [
+      {
+        "command": "type",
+        "args": {
+          "text": "\n"
+        }
+      }
+    ],
     "goPrevChange": [
       "workbench.action.editor.previousChange",
       "editor.action.dirtydiff.previous"
@@ -163,16 +175,7 @@
       "workbench.action.editor.nextChange",
       "editor.action.dirtydiff.next"
     ],
-    "customFindInFiles": [
-      "workbench.action.findInFiles",
-      {
-        "command": "$delay",
-        "args": {
-          "delay": 10
-        }
-      },
-      "list.focusDown"
-    ],
+    "customFindInFiles": ["workbench.action.findInFiles", "list.focusDown"],
     "cDeleteText": [
       "deleteInsideWord",
       {
@@ -213,7 +216,6 @@
       },
       "actions.find"
     ],
-
     "indentSelectToEnd": [
       {
         "command": "type",
@@ -286,5 +288,10 @@
     }
   ],
   "gitlens.codeLens.recentChange.enabled": false,
-  "gitlens.codeLens.authors.enabled": false
+  "gitlens.codeLens.authors.enabled": false,
+  "liveshare.audio.joinCallBehavior": "accept",
+  "editor.unicodeHighlight.allowedCharacters": {
+    "–": true
+  },
+  "window.zoomLevel": -1
 }
