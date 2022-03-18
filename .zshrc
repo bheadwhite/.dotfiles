@@ -162,6 +162,8 @@ alias config="vim ~/.config/nvim/init.vim"
 alias vim="~/nvim-osx64/bin/nvim"
 alias plzWollemiClean="plz run tools/wollemi -- symlink list --prune --broken"
 alias runTop="top -o cpu -O +rsize -s 5 -n 20"
+alias getbbconfig="kubectl describe configmap bb-config-conf | code -"
+alias mv="git mv"
 
 # how to log within matrix api
 # jesses check if anything is running
@@ -360,7 +362,7 @@ chromebug(){
 }
 
 lmsDb() {
-    kubectl exec admin-0 -it psql -- -hmatrix-db -Ulms
+    kubectl exec admin-0 -it psql -- -h matrix-db -U lms
 }
 
 httpCosmos(){

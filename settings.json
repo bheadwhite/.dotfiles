@@ -13,7 +13,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.definitionLinkOpensInPeek": false,
   "editor.fontFamily": "Fira Code",
-  "editor.fontSize": 15,
+  "editor.fontSize": 14,
   "editor.formatOnSave": true,
   "editor.gotoLocation.alternativeDefinitionCommand": "editor.action.referenceSearch.trigger",
   "editor.find.cursorMoveOnType": true,
@@ -292,6 +292,5 @@
   "liveshare.audio.joinCallBehavior": "accept",
   "editor.unicodeHighlight.allowedCharacters": {
     "–": true
-  },
-  "window.zoomLevel": -1
+  }
 }
