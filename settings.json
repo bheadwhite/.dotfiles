@@ -78,12 +78,12 @@
   "workbench.sideBar.location": "left",
   "workbench.startupEditor": "none",
   "zenMode.centerLayout": false,
-  "zenMode.hideLineNumbers": false,
-  "zenMode.hideTabs": false,
-  // "editor.glyphMargin": false,
+  "editor.glyphMargin": false,
   "workbench.colorCustomizations": {
     // background
+
     // main background
+
     "badge.background": "#1a2b33",
     "banner.background": "#1a2b33",
     "breadcrumbPicker.background": "#1a2b33",
