@@ -80,7 +80,6 @@
   "zenMode.centerLayout": false,
   "editor.glyphMargin": false,
   "workbench.colorCustomizations": {
-    // hello world
     // main background
     "badge.background": "#1a2b33",
     "banner.background": "#1a2b33",
