@@ -289,5 +289,6 @@
   "liveshare.audio.joinCallBehavior": "accept",
   "editor.unicodeHighlight.allowedCharacters": {
     "–": true
-  }
+  },
+  "terminal.integrated.enableMultiLinePasteWarning": false
 }
