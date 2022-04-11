@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # If you come from bash you might have to change your $PATH.
 #export PATH=$HOME/bin:/usr/local/bin:$PATH
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/Desktop/github/limelight/bin:$HOME/bin"
@@ -158,8 +165,6 @@ alias k="kubectl"
 alias cCommonsReport="open /Users/brent.whitehead/Projects/neo/coverage/commons/lcov-report/index.html"
 alias cOperatorReport="open /Users/brent.whitehead/Projects/neo/coverage/operator/lcov-report/index.html"
 alias buildneo="rm -rf node_modules/ && rm -rf /tools/frontend-tools/tcn-frontend-scripts/node_modules/ && yarn install"
-alias config="vim ~/.config/nvim/init.vim"
-alias vim="~/nvim-osx64/bin/nvim"
 alias plzWollemiClean="plz run tools/wollemi -- symlink list --prune --broken"
 alias runTop="top -o cpu -O +rsize -s 5 -n 20"
 alias getbbconfig="kubectl describe configmap bb-config-conf | code -"
@@ -212,7 +217,7 @@ coverCommons () {
 
 coverOperator () {
     yarn operator test $1 --coverage --collectCoverageFrom="**/*$1*/**/*.{ts,tsx}" --coveragePathIgnorePatterns=".fixture.*" "${@:2:$#-2}"
-    cOperatorreport
+    cOperatorReport
 }
 
 coverP () {
@@ -416,3 +421,4 @@ cleanmerged() {
 # kubectl config set-context --current --namespace=$(whoami | tr '.' '-')
 # step 9: setup the port forward: `kubectl port-forward <podname> 9090:9090`
 # step 10: yarn start with 9090 as your front end: `yarn start --env.namespace_apihost=http://localhost:9090`
+eval "$(/opt/homebrew/bin/brew shellenv)"

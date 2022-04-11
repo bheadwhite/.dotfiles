@@ -802,5 +802,9 @@
   {
     "key": "shift+cmd+b",
     "command": "workbench.action.toggleAuxiliaryBar"
+  },
+  {
+    "key": "shift+cmd+e",
+    "command": "workbench.explorer.fileView.focus"
   }
 ]
