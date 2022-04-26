@@ -103,7 +103,7 @@
   {
     "key": "shift+cmd+g",
     "command": "workbench.scm.focus",
-    "when": "!findWidgetVisible"
+    "when": "!findInputFocussed"
   },
   {
     "key": "enter",
@@ -223,7 +223,7 @@
   {
     "key": "shift+s",
     "command": "cursorEndSelect",
-    "when": "amVim.mode != 'INSERT' && !findWidgetVisible && !inQuickOpen && editorFocus && !renameInputVisible || (!inputFocus || !findWidgetVisible && inputFocus)"
+    "when": "amVim.mode != 'INSERT' && !findInputFocussed && !inQuickOpen && editorFocus && !renameInputVisible || (!inputFocus || !findWidgetVisible && inputFocus)"
   },
   {
     "key": "shift+h",
@@ -814,12 +814,7 @@
   },
   {
     "key": "cmd+f",
-    "command": "actions.find",
-    "when": "editorTextFocus && !findWidgetVisible"
-  },
-  {
-    "key": "cmd+f",
     "command": "closeFindWidget",
-    "when": "findWidgetVisible"
+    "when": "findWidgetVisible && findInputFocussed"
   }
 ]
