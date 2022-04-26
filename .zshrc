@@ -211,12 +211,12 @@ stream-pod () {
 }
 
 coverCommons () {
-    yarn commons test $1 --coverage --collectCoverageFrom="**/*$1*/**/*.{ts,tsx}" --coveragePathIgnorePatterns=".fixture.*" "${@:2:$#-2}"
+    yarn commons test $1 --coverage --collectCoverageFrom="**/*$1*/**/*.ts" --coveragePathIgnorePatterns=".fixture.*" "${@:2:$#-2}"
     cCommonsReport
 }
 
 coverOperator () {
-    yarn operator test $1 --coverage --collectCoverageFrom="**/*$1*/**/*.{ts,tsx}" --coveragePathIgnorePatterns=".fixture.*" "${@:2:$#-2}"
+    yarn operator test $1 --coverage --collectCoverageFrom="**/*$1*/**/*.ts" --coveragePathIgnorePatterns=".fixture.*" "${@:2:$#-2}"
     cOperatorReport
 }
 

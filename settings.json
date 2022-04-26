@@ -16,7 +16,7 @@
   "editor.fontFamily": "Fira Code",
   "editor.fontSize": 14,
   "editor.formatOnSave": true,
-  // "editor.glyphMargin": false,
+  "editor.glyphMargin": false,
   "editor.gotoLocation.alternativeDefinitionCommand": "editor.action.referenceSearch.trigger",
   "editor.guides.bracketPairs": true,
   "editor.guides.bracketPairsHorizontal": false,
@@ -297,5 +297,6 @@
   "editor.unicodeHighlight.allowedCharacters": {
     "–": true
   },
-  "terminal.integrated.enableMultiLinePasteWarning": false
+  "terminal.integrated.enableMultiLinePasteWarning": false,
+  "taskmarks.enableLabel": true
 }

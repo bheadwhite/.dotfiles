@@ -138,22 +138,22 @@
   {
     "key": "shift+h",
     "command": "workbench.action.compareEditor.previousChange",
-    "when": "isInDiffEditor && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
+    "when": "isInDiffEditor && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
   },
   {
     "key": "shift+l",
     "command": "macros.goNextChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL'"
+    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL'"
   },
   {
     "key": "shift+l",
     "command": "workbench.action.editor.nextChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode == 'NORMAL'"
+    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'NORMAL'"
   },
   {
     "key": "shift+l",
     "command": "workbench.action.compareEditor.nextChange",
-    "when": "isInDiffEditor && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
+    "when": "isInDiffEditor && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
   },
   {
     "key": "shift+k",
@@ -228,12 +228,12 @@
   {
     "key": "shift+h",
     "command": "macros.goPrevChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL'"
+    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL'"
   },
   {
     "key": "shift+h",
     "command": "workbench.action.editor.previousChange",
-    "when": "editorFocus && !findWidgetVisible && !inQuickOpen && !renameInputVisible && amVim.mode == 'NORMAL'"
+    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'NORMAL'"
   },
   {
     "key": "shift+cmd+e",
@@ -640,34 +640,34 @@
   },
   {
     "key": "ctrl+alt+l",
-    "command": "taskmark.nextMark",
+    "command": "taskmarks.nextMark",
     "when": "editorTextFocus"
   },
   {
     "key": "ctrl+alt+h",
-    "command": "taskmark.previousMark",
+    "command": "taskmarks.previousMark",
     "when": "editorTextFocus"
   },
   {
     "key": "alt+a",
-    "command": "taskmark.selectTask"
+    "command": "taskmarks.selectTask"
   },
   {
     "key": "alt+p",
-    "command": "taskmark.selectMarkFromList"
+    "command": "taskmarks.selectMarkFromList"
   },
   {
     "key": "alt+m",
-    "command": "taskmark.toggleMark",
+    "command": "taskmarks.toggleMark",
     "when": "editorTextFocus"
   },
   {
     "key": "shift+alt+d",
-    "command": "taskmark.deleteTask"
+    "command": "taskmarks.deleteTask"
   },
   {
     "key": "shift+f13",
-    "command": "taskmark.createTask"
+    "command": "taskmarks.createTask"
   },
   {
     "key": "shift+alt+space",
@@ -698,6 +698,11 @@
     "key": "escape",
     "command": "amVim.escape",
     "when": "findWidgetVisible && !findInputFocussed && editorTextFocus && !inlineSuggestionVisible"
+  },
+  {
+    "key": "escape",
+    "command": "workbench.action.focusPreviousGroup",
+    "when": "findInputFocussed && findWidgetVisible"
   },
   {
     "key": "ctrl+shift+,",
@@ -806,5 +811,15 @@
   {
     "key": "shift+cmd+e",
     "command": "workbench.explorer.fileView.focus"
+  },
+  {
+    "key": "cmd+f",
+    "command": "actions.find",
+    "when": "editorTextFocus && !findWidgetVisible"
+  },
+  {
+    "key": "cmd+f",
+    "command": "closeFindWidget",
+    "when": "findWidgetVisible"
   }
 ]
