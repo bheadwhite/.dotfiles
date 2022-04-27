@@ -12,6 +12,7 @@
   "editor.cursorSurroundingLines": 5,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.definitionLinkOpensInPeek": false,
+  "editor.find.autoFindInSelection": "multiline",
   "editor.find.cursorMoveOnType": true,
   "editor.fontFamily": "Fira Code",
   "editor.fontSize": 14,
