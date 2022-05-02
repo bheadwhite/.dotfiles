@@ -162,7 +162,7 @@
   },
   {
     "key": "escape",
-    "command": "workbench.action.focusFirstEditorGroup",
+    "command": "workbench.action.focusActiveEditorGroup",
     "when": "sideBarFocus && !inputFocus"
   },
   {
@@ -416,7 +416,7 @@
     "when": "references-view.tree.canMove && referenceSearchVisible"
   },
   {
-    "key": "escape",
+    "key": "shift+escape",
     "command": "closeReferenceSearch",
     "when": "inReferenceSearchEditor && !config.editor.stablePeek && amVim.mode == 'NORMAL'"
   },
@@ -701,7 +701,7 @@
   },
   {
     "key": "escape",
-    "command": "workbench.action.focusPreviousGroup",
+    "command": "workbench.action.focusActiveEditorGroup",
     "when": "findInputFocussed && findWidgetVisible"
   },
   {
@@ -816,5 +816,13 @@
     "key": "cmd+f",
     "command": "closeFindWidget",
     "when": "findWidgetVisible && findInputFocussed"
+  },
+  {
+    "key": "cmd+shift+k cmd+shift+s",
+    "command": "workbench.action.openGlobalKeybindings"
+  },
+  {
+    "key": "cmd+k cmd+s",
+    "command": "-workbench.action.openGlobalKeybindings"
   }
 ]
