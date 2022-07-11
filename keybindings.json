@@ -143,7 +143,7 @@
   {
     "key": "shift+l",
     "command": "macros.goNextChange",
-    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL'"
+    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL LINE'"
   },
   {
     "key": "shift+l",
@@ -205,7 +205,7 @@
     "args": {
       "text": "e"
     },
-    "when": "editorTextFocus && amVim.mode != 'INSERT"
+    "when": "editorTextFocus && amVim.mode != 'INSERT'"
   },
   {
     "key": "alt+l",
@@ -218,7 +218,7 @@
     "args": {
       "text": "v"
     },
-    "when": "editorTextFocus && amVim.mode == 'NORMAL' || (!inputFocus || !findWidgetVisible && inputFocus)"
+    "when": "editorTextFocus && amVim.mode == 'NORMAL' && !jumpy2.jump-mode || (!inputFocus || !findWidgetVisible && inputFocus) && !jumpy2.jump-mode"
   },
   {
     "key": "shift+s",
@@ -228,7 +228,7 @@
   {
     "key": "shift+h",
     "command": "macros.goPrevChange",
-    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL'"
+    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL LINE'"
   },
   {
     "key": "shift+h",
@@ -476,7 +476,7 @@
     "when": "terminalFocus"
   },
   {
-    "key": "alt+shift+j",
+    "key": "shift+alt+j",
     "command": "workbench.action.terminal.scrollDownPage",
     "when": "terminalFocus"
   },
@@ -516,12 +516,12 @@
   {
     "key": "k",
     "command": "cursorUp",
-    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
+    "when": "editorTextFocus && amVim.mode == 'NORMAL' && !jumpy2.jump-mode"
   },
   {
     "key": "j",
     "command": "cursorDown",
-    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
+    "when": "editorTextFocus && amVim.mode == 'NORMAL' && !jumpy2.jump-mode"
   },
   {
     "key": "alt+d alt+s",
@@ -554,6 +554,11 @@
   {
     "key": "cmd+n",
     "command": "explorer.newFile",
+    "when": "filesExplorerFocus"
+  },
+  {
+    "key": "cmd+enter",
+    "command": "workbench.files.action.refreshFilesExplorer",
     "when": "filesExplorerFocus"
   },
   {
@@ -620,7 +625,7 @@
   {
     "key": "c",
     "command": "macros.cDeleteText",
-    "when": "amVim.mode == 'VISUAL' && editorTextFocus || amVim.mode == 'VISUAL LINE' && editorTextFocus"
+    "when": "(amVim.mode == 'VISUAL' && editorTextFocus || amVim.mode == 'VISUAL LINE' && editorTextFocus) && !jumpy2.jump-mode"
   },
   {
     "key": "cmd+j",
@@ -678,6 +683,16 @@
     "key": "shift+j",
     "command": "scrollLineDown",
     "when": "listFocus || editorTextFocus && !listFocus && amVim.mode != 'INSERT'"
+  },
+  {
+    "key": "shift+k",
+    "command": "macros.fastCursorUp",
+    "when": "editorTextFocus && !listFocus && amVim.mode == 'NORMAL' || listFocus"
+  },
+  {
+    "key": "shift+j",
+    "command": "macros.fastCursorDown",
+    "when": "listFocus || editorTextFocus && !listFocus && amVim.mode == 'NORMAL'"
   },
   {
     "key": "alt+enter",
@@ -786,7 +801,7 @@
   },
   {
     "key": "alt+h",
-    "command": "workbench.action.closeQuickOpen",
+    "command": "macros.closeQuickOpen",
     "when": "inQuickOpen"
   },
   {
@@ -824,5 +839,43 @@
   {
     "key": "cmd+k cmd+s",
     "command": "-workbench.action.openGlobalKeybindings"
+  },
+  {
+    "key": "shift+h",
+    "command": "-jumpy2.H",
+    "when": "editorTextFocus && jumpy2.jump-mode"
+  },
+  {
+    "key": "alt+`",
+    "command": "workbench.action.switchWindow"
+  },
+  {
+    "key": "cmd+z",
+    "command": "-undo"
+  },
+  {
+    "key": "escape",
+    "command": "jumpy2.exit",
+    "when": "editorTextFocus && jumpy2.jump-mode"
+  },
+  {
+    "key": "shift+enter",
+    "command": "jumpy2.toggle",
+    "when": "editorTextFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "shift+enter",
+    "command": "-jumpy2.toggle",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+enter",
+    "command": "-jumpy2.exit",
+    "when": "editorTextFocus && jumpy2.jump-mode"
+  },
+  {
+    "key": "space",
+    "command": "jumpy2.toggle",
+    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
   }
 ]

@@ -152,7 +152,6 @@ alias br="git branch"
 alias skunk="gcloud sql connect development-skunk -u skunk --project tcn-cloud-dev"
 alias skunkForward="kubectl port-forward service/skunkdb 8432:5432 -n='default'"
 alias matrixdbForward="kubectl port-forward service/matrix-db 8431:5432 -n='default'"
-alias k="kubectl"
 
 alias buildprotos="yarn clean && yarn build-protos"
 alias zshrc="vim ~/.zshrc"
@@ -162,13 +161,13 @@ alias deadLogTales="kubectl logs <pod> -p"
 alias reload="source ~/.zshrc"
 alias cloudservices="gcloud services list"
 alias k="kubectl"
+alias vim="nvim"
 alias cCommonsReport="open /Users/brent.whitehead/Projects/neo/coverage/commons/lcov-report/index.html"
 alias cOperatorReport="open /Users/brent.whitehead/Projects/neo/coverage/operator/lcov-report/index.html"
 alias buildneo="rm -rf node_modules/ && rm -rf /tools/frontend-tools/tcn-frontend-scripts/node_modules/ && yarn install"
 alias plzWollemiClean="plz run tools/wollemi -- symlink list --prune --broken"
 alias runTop="top -o cpu -O +rsize -s 5 -n 20"
 alias getbbconfig="kubectl describe configmap bb-config-conf | code -"
-alias mv="git mv"
 
 # how to log within matrix api
 # jesses check if anything is running
@@ -253,10 +252,11 @@ bindkey "^U" backward-kill-line
 
 
 # CHANGE TO THE LOCATION OF NEO FOR SCRIPT TO WORK
+export PLZPATH=/opt/homebrew/bin
 export NEO=~/go/src/git.tcncloud.net/m/neo
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
-export PATH=$GOBIN:$GOPATH:$PATH
+export PATH=$GOBIN:$GOPATH:$PLZPATH/usr:$PATH:~/.nvm/versions/node/v14.19.3/bin/
 export HANGMAN_PROJECT_ID=dynamic-chiller-214322
 
 # k8s helpers

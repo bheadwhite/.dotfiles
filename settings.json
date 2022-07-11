@@ -3,6 +3,11 @@
   "breadcrumbs.icons": false,
   "breadcrumbs.symbolSortOrder": "position",
   "clipboard-manager.snippet.enabled": false,
+  "clipboard-manager.moveToTop": false,
+  "clipboard-manager.onlyWindowFocused": false,
+  "clipboard-manager.avoidDuplicates": true,
+  "clipboard-manager.maxClips": 500,
+  "clipboard-manager.saveTo": "~/vscode_things/clipboard_manager_clips.json",
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.acceptSuggestionOnEnter": "on",
   "editor.accessibilitySupport": "off",
@@ -23,10 +28,8 @@
   "editor.guides.bracketPairsHorizontal": false,
   "editor.guides.highlightActiveBracketPair": true,
   "editor.guides.highlightActiveIndentation": true,
-  "editor.inlayHints.enabled": true,
+  "editor.inlayHints.enabled": "on",
   "editor.inlineSuggest.enabled": true,
-  "editor.lineDecorationsWidth": 0,
-  "editor.lineNumbersMinChars": 0,
   "editor.linkedEditing": true,
   "editor.minimap.enabled": false,
   "editor.minimap.maxColumn": 100,
@@ -36,12 +39,14 @@
   "editor.multiCursorModifier": "alt",
   "editor.parameterHints.enabled": false,
   "editor.snippetSuggestions": "bottom",
+  "editor.suggest.localityBonus": true,
   "editor.suggest.showSnippets": false,
   "editor.suggestOnTriggerCharacters": false,
   "editor.suggestSelection": "recentlyUsed",
   "editor.tabCompletion": "off",
   "editor.tabSize": 2,
   "editor.wordBasedSuggestions": false,
+  "editor.wordBasedSuggestionsMode": "currentDocument",
   "emmet.showSuggestionsAsSnippets": true,
   "explorer.compactFolders": false,
   "explorer.openEditors.visible": 0,
@@ -50,13 +55,11 @@
   "git.openDiffOnClick": true,
   "gitlab.instanceUrl": "https://git.tcncloud.net",
   "gitlens.statusBar.enabled": false,
-  "editor.suggest.localityBonus": true,
-  "editor.wordBasedSuggestionsMode": "currentDocument",
   "http.systemCertificates": true,
-  "javascript.suggest.names": false,
   "javascript.preferences.importModuleSpecifier": "non-relative",
   "javascript.preferences.jsxAttributeCompletionStyle": "auto",
   "javascript.preferences.quoteStyle": "single",
+  "javascript.suggest.names": false,
   "javascript.updateImportsOnFileMove.enabled": "always",
   "problems.sortOrder": "position",
   "screencastMode.onlyKeyboardShortcuts": true,
@@ -71,6 +74,7 @@
   "typescript.referencesCodeLens.showOnAllFunctions": true,
   "typescript.tsserver.log": "off",
   "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.suggest.classMemberSnippets.enabled": false,
   "workbench.activityBar.visible": false,
   "workbench.colorTheme": "gruvboxConcoctis dark medium",
   "workbench.editor.enablePreviewFromCodeNavigation": true,
@@ -119,9 +123,9 @@
     "breadcrumb.background": "#10232b",
     "terminal.background": "#10232b",
     "sideBar.background": "#10232b",
-    "titleBar.activeBackground": "#10232b",
     //tertiary color
     "list.hoverBackground": "#1d3843",
+    "titleBar.activeBackground": "#1d3843",
 
     //terminal text color
     "terminal.foreground": "#d1d1d1",
@@ -133,6 +137,8 @@
     // pink/violet: #925a69
     // sunset : #c6504d
     // light orange : #dca245
+
+    "titleBar.inactiveBackground": "#455558",
 
     "tab.activeBackground": "#11303d",
     "tab.activeForeground": "#a6b0ca",
@@ -167,6 +173,24 @@
     "terminal.border": "#ff0000"
   },
   "macros.list": {
+    "fastCursorDown": [
+      {
+        "command": "type",
+        "args": {
+          "text": "5"
+        }
+      },
+      "amVim.down"
+    ],
+    "fastCursorUp": [
+      {
+        "command": "type",
+        "args": {
+          "text": "5"
+        }
+      },
+      "amVim.up"
+    ],
     "newLine": [
       {
         "command": "type",
@@ -174,6 +198,10 @@
           "text": "\n"
         }
       }
+    ],
+    "closeQuickOpen": [
+      "workbench.action.closeQuickOpen",
+      "workbench.action.focusActiveEditorGroup"
     ],
     "goPrevChange": [
       "workbench.action.editor.previousChange",
@@ -302,5 +330,85 @@
     "–": true
   },
   "terminal.integrated.enableMultiLinePasteWarning": false,
-  "taskmarks.enableLabel": true
+  "taskmarks.enableLabel": true,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "text.html.markdown.journal.task.open.bullet",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.open.marker",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.open.keyword",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.open.text",
+        "settings": {}
+      },
+      {
+        "scope": "text.html.markdown.journal.task.completed.keyword",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.completed.marker",
+        "settings": {
+          "foreground": "#AAAAAA"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.completed.text",
+        "settings": {
+          "foreground": "#AAAAAA"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.completed.bullet",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.memo.keyword",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.memo.bullet",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.scope",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.link.keyword",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.link.bullet",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      }
+    ]
+  }
 }
