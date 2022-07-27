@@ -3,7 +3,7 @@
   "breadcrumbs.icons": false,
   "breadcrumbs.symbolSortOrder": "position",
   "clipboard-manager.snippet.enabled": false,
-  "clipboard-manager.moveToTop": false,
+  "clipboard-manager.moveToTop": true,
   "clipboard-manager.onlyWindowFocused": false,
   "clipboard-manager.avoidDuplicates": true,
   "clipboard-manager.maxClips": 500,

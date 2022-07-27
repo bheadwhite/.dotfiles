@@ -877,5 +877,19 @@
     "key": "space",
     "command": "jumpy2.toggle",
     "when": "editorTextFocus && amVim.mode == 'NORMAL'"
+  },
+  {
+    "key": "shift+cmd+f",
+    "command": "workbench.action.findInFiles",
+    "when": "!hasSearchResult | activeViewlet != 'workbench.view.search'"
+  },
+  {
+    "key": "shift+cmd+f",
+    "command": "-workbench.action.findInFiles"
+  },
+  {
+    "key": "shift+cmd+f",
+    "command": "workbench.action.focusSideBar",
+    "when": "hasSearchResult && activeViewlet == 'workbench.view.search'"
   }
 ]
