@@ -17,6 +17,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.definitionLinkOpensInPeek": false,
   "editor.find.autoFindInSelection": "multiline",
+  "git.mergeEditor": false,
   "editor.find.cursorMoveOnType": true,
   "editor.fontFamily": "Fira Code",
   "editor.fontSize": 14,
@@ -252,6 +253,7 @@
       },
       "actions.find"
     ],
+    "openSCM": ["list.select"],
     "indentSelectToEnd": [
       {
         "command": "type",

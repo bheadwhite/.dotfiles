@@ -58,7 +58,18 @@
   },
   {
     "key": "cmd+`",
-    "command": "workbench.action.terminal.toggleTerminal"
+    "command": "workbench.action.focusPanel",
+    "when": "!panelFocus"
+  },
+  {
+    "key": "cmd+`",
+    "command": "terminal.focus",
+    "when": "panelFocus && !terminalFocus"
+  },
+  {
+    "key": "cmd+`",
+    "command": "workbench.action.togglePanel",
+    "when": "panelFocus && terminalFocus"
   },
   {
     "key": "shift+alt+j",
@@ -355,11 +366,6 @@
     "key": "alt+enter",
     "command": "list.selectAndPreserveFocus",
     "when": "listFocus"
-  },
-  {
-    "key": "alt+enter",
-    "command": "explorer.openAndPassFocus",
-    "when": "focusedView == 'workbench.scm'"
   },
   {
     "key": "escape",
@@ -726,7 +732,8 @@
   },
   {
     "key": "ctrl+shift+,",
-    "command": "workbench.action.moveEditorToLeftGroup"
+    "command": "workbench.action.moveEditorToLeftGroup",
+    "when": "editorTextFocus"
   },
   {
     "key": "ctrl+o",
@@ -751,12 +758,27 @@
     "when": "terminalFocus"
   },
   {
-    "key": "ctrl+h",
+    "key": "ctrl+,",
     "command": "workbench.action.terminal.focusPreviousPane",
     "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
   },
   {
+    "key": "ctrl+h",
+    "command": "workbench.action.previousPanelView",
+    "when": "panelFocus"
+  },
+  {
     "key": "ctrl+l",
+    "command": "workbench.action.nextPanelView",
+    "when": "panelFocus"
+  },
+  {
+    "key": "ctrl+shift+l",
+    "command": "workbench.action.nextPanelView",
+    "when": "panelFocus"
+  },
+  {
+    "key": "ctrl+.",
     "command": "workbench.action.terminal.focusNextPane",
     "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
   },
@@ -920,5 +942,9 @@
   {
     "key": "alt+shift+;",
     "command": "vscode-harpoon.editGlobalEditors"
+  },
+  {
+    "key": "ctrl+alt+p",
+    "command": "workbench.panel.markers.view.focus"
   }
 ]
