@@ -138,17 +138,17 @@
   {
     "key": "shift+h",
     "command": "workbench.action.compareEditor.previousChange",
-    "when": "isInDiffEditor && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT'"
+    "when": "isInDiffEditor && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode != 'INSERT' || dirtyDiffVisible && amVim.mode == 'NORMAL'"
   },
   {
     "key": "shift+l",
     "command": "macros.goNextChange",
-    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL LINE'"
+    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL LINE' || dirtyDiffVisible && amVim.mode == 'NORMAL'"
   },
   {
     "key": "shift+l",
     "command": "workbench.action.editor.nextChange",
-    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'NORMAL'"
+    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'NORMAL' && !dirtyDiffVisible"
   },
   {
     "key": "shift+l",
@@ -228,12 +228,12 @@
   {
     "key": "shift+h",
     "command": "macros.goPrevChange",
-    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL LINE'"
+    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'VISUAL LINE' || dirtyDiffVisible && amVim.mode == 'NORMAL'"
   },
   {
     "key": "shift+h",
     "command": "workbench.action.editor.previousChange",
-    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'NORMAL'"
+    "when": "editorFocus && !findInputFocussed && !inQuickOpen && !renameInputVisible && amVim.mode == 'NORMAL' && !dirtyDiffVisible"
   },
   {
     "key": "shift+cmd+e",
@@ -355,6 +355,11 @@
     "key": "alt+enter",
     "command": "list.selectAndPreserveFocus",
     "when": "listFocus"
+  },
+  {
+    "key": "alt+enter",
+    "command": "explorer.openAndPassFocus",
+    "when": "focusedView == 'workbench.scm'"
   },
   {
     "key": "escape",
@@ -891,5 +896,29 @@
     "key": "shift+cmd+f",
     "command": "workbench.action.focusSideBar",
     "when": "hasSearchResult && activeViewlet == 'workbench.view.search'"
+  },
+  {
+    "key": "alt+p",
+    "command": "vscode-harpoon.editorQuickPick"
+  },
+  {
+    "key": "alt+shift+p",
+    "command": "vscode-harpoon.editorGlobalQuickPick"
+  },
+  {
+    "key": "alt+a",
+    "command": "vscode-harpoon.addEditor"
+  },
+  {
+    "key": "alt+shift+a",
+    "command": "vscode-harpoon.addGlobalEditor"
+  },
+  {
+    "key": "alt+;",
+    "command": "vscode-harpoon.editEditors"
+  },
+  {
+    "key": "alt+shift+;",
+    "command": "vscode-harpoon.editGlobalEditors"
   }
 ]
