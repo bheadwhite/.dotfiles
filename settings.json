@@ -7,6 +7,8 @@
   "clipboard-manager.onlyWindowFocused": false,
   "clipboard-manager.avoidDuplicates": true,
   "clipboard-manager.maxClips": 500,
+  "diffEditor.renderSideBySide": false,
+  "diffEditor.renderIndicators": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.acceptSuggestionOnEnter": "on",
   "editor.accessibilitySupport": "off",
@@ -174,6 +176,7 @@
     "terminal.border": "#ff0000"
   },
   "macros.list": {
+    "openScmFile": ["git.openFile", "git.closeAllDiffEditors"],
     "fastCursorDown": [
       {
         "command": "type",

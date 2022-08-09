@@ -707,8 +707,13 @@
   },
   {
     "key": "alt+enter",
-    "command": "git.openFile",
+    "command": "macros.openScmFile",
     "when": "activeEditor == 'workbench.editors.textDiffEditor' && editorTextFocus"
+  },
+  {
+    "key": "alt+enter",
+    "command": "list.select",
+    "when": "focusedView == 'workbench.scm'"
   },
   {
     "key": "alt+l",
