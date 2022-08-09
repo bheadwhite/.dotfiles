@@ -711,6 +711,11 @@
     "when": "activeEditor == 'workbench.editors.textDiffEditor' && editorTextFocus"
   },
   {
+    "key": "shift+escape",
+    "command": "macros.openScmFile",
+    "when": "activeEditor == 'workbench.editors.textDiffEditor' && editorTextFocus"
+  },
+  {
     "key": "alt+enter",
     "command": "list.select",
     "when": "focusedView == 'workbench.scm'"
