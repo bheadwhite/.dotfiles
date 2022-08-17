@@ -174,7 +174,7 @@
   {
     "key": "escape",
     "command": "workbench.action.focusActiveEditorGroup",
-    "when": "sideBarFocus && !inputFocus"
+    "when": "sideBarFocus && !inputFocus || panelFocus"
   },
   {
     "key": "alt+j",
@@ -229,7 +229,7 @@
     "args": {
       "text": "v"
     },
-    "when": "editorTextFocus && amVim.mode == 'NORMAL' && !jumpy2.jump-mode || (!inputFocus || !findWidgetVisible && inputFocus) && !jumpy2.jump-mode"
+    "when": "editorTextFocus && amVim.mode == 'NORMAL'  || (!inputFocus || !findWidgetVisible && inputFocus)"
   },
   {
     "key": "shift+s",
@@ -527,12 +527,12 @@
   {
     "key": "k",
     "command": "cursorUp",
-    "when": "editorTextFocus && amVim.mode == 'NORMAL' && !jumpy2.jump-mode"
+    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
   },
   {
     "key": "j",
     "command": "cursorDown",
-    "when": "editorTextFocus && amVim.mode == 'NORMAL' && !jumpy2.jump-mode"
+    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
   },
   {
     "key": "alt+d alt+s",
@@ -636,7 +636,7 @@
   {
     "key": "c",
     "command": "macros.cDeleteText",
-    "when": "(amVim.mode == 'VISUAL' && editorTextFocus || amVim.mode == 'VISUAL LINE' && editorTextFocus) && !jumpy2.jump-mode"
+    "when": "amVim.mode == 'VISUAL' && editorTextFocus || amVim.mode == 'VISUAL LINE' && editorTextFocus"
   },
   {
     "key": "cmd+j",
@@ -956,5 +956,35 @@
   {
     "key": "ctrl+alt+p",
     "command": "workbench.panel.markers.view.focus"
+  },
+  {
+    "key": "shift+escape",
+    "command": "search.action.focusQueryEditorWidget",
+    "when": "inSearchEditor && !inReferenceSearchEditor"
+  },
+  {
+    "key": "alt+j",
+    "command": "search.action.focusNextSearchResult",
+    "when": "inSearchEditor && searchInputBoxFocus || inSearchEditor"
+  },
+  {
+    "key": "alt+k",
+    "command": "search.action.focusPreviousSearchResult",
+    "when": "inSearchEditor && searchInputBoxFocus || inSearchEditor"
+  },
+  {
+    "key": "shift+cmd+i",
+    "command": "editor.action.revealDefinitionAside",
+    "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor"
+  },
+  {
+    "key": "escape",
+    "command": "togglePeekWidgetFocus",
+    "when": "referenceSearchVisible && editorTextFocus"
+  },
+  {
+    "key": "cmd+w",
+    "command": "-workbench.action.closeWindow",
+    "when": "!editorIsOpen && !multipleEditorGroups"
   }
 ]

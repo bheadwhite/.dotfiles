@@ -9,9 +9,11 @@
   "clipboard-manager.maxClips": 500,
   "diffEditor.renderSideBySide": false,
   "diffEditor.renderIndicators": false,
+  "typescript.preferences.useAliasesForRenames": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.acceptSuggestionOnEnter": "on",
   "editor.accessibilitySupport": "off",
+  "terminal.integrated.fontSize": 14,
   "editor.bracketPairColorization.enabled": true,
   "editor.cursorBlinking": "phase",
   "editor.cursorSmoothCaretAnimation": true,
@@ -172,8 +174,7 @@
     "list.inactiveSelectionForeground": "#fff",
     "list.activeSelectionForeground": "#fff",
     "list.activeSelectionBackground": "#26007e",
-    "list.focusBackground": "#455558",
-    "terminal.border": "#ff0000"
+    "list.focusBackground": "#455558"
   },
   "macros.list": {
     "openScmFile": ["git.openFile", "git.closeAllDiffEditors"],
