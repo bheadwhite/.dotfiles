@@ -158,8 +158,8 @@
     //end background
     "editor.selectionBackground": "#ffffff23",
     "editor.rangeHighlightBackground": "#ffffff23",
-    "gitDecoration.modifiedResourceForeground": "#1488c2",
-    "gitDecoration.untrackedResourceForeground": "#709043",
+    "gitDecoration.modifiedResourceForeground": "#249740",
+    "gitDecoration.untrackedResourceForeground": "#ff8400",
     "editorLineNumber.activeForeground": "#c5c9ce",
     "editorLineNumber.foreground": "#46887d",
     "editorBracketHighlight.foreground6": "#8a984d",
