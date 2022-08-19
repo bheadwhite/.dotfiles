@@ -697,12 +697,12 @@
   },
   {
     "key": "shift+k",
-    "command": "macros.fastCursorUp",
+    "command": "macros.cursorJumpUp",
     "when": "editorTextFocus && !listFocus && amVim.mode == 'NORMAL' || listFocus"
   },
   {
     "key": "shift+j",
-    "command": "macros.fastCursorDown",
+    "command": "macros.cursorJumpDown",
     "when": "listFocus || editorTextFocus && !listFocus && amVim.mode == 'NORMAL'"
   },
   {
@@ -986,5 +986,14 @@
     "key": "cmd+w",
     "command": "-workbench.action.closeWindow",
     "when": "!editorIsOpen && !multipleEditorGroups"
+  },
+  {
+    "key": "ctrl+w",
+    "command": "-amVim.ctrl+w",
+    "when": "amVim.configuration.shouldBindCtrlCommands && editorTextFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "shift+cmd+i",
+    "command": "references-view.tree.focus"
   }
 ]
