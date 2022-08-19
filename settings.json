@@ -245,6 +245,21 @@
         }
       }
     ],
+    "visualLineMoveDown": [
+      "amVim.down",
+      {
+        "command": "type",
+        "args": {
+          "text": "v"
+        }
+      },
+      {
+        "command": "type",
+        "args": {
+          "text": "0"
+        }
+      }
+    ],
     "indentSelectToEnd": [
       {
         "command": "type",

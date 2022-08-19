@@ -535,6 +535,11 @@
     "when": "editorTextFocus && amVim.mode == 'NORMAL'"
   },
   {
+    "key": "j",
+    "command": "macros.visualLineMoveDown",
+    "when": "editorTextFocus && amVim.mode == 'VISUAL LINE'"
+  },
+  {
     "key": "alt+d alt+s",
     "command": "extension.partialDiff.markSection1"
   },
