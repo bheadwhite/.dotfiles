@@ -2,11 +2,13 @@
 [
   {
     "key": "ctrl+l",
-    "command": "workbench.action.nextEditor"
+    "command": "workbench.action.nextEditor",
+    "when": "!activeEditorIsLastInGroup"
   },
   {
     "key": "ctrl+h",
-    "command": "workbench.action.previousEditor"
+    "command": "workbench.action.previousEditor",
+    "when": "!activeEditorIsFirstInGroup"
   },
   {
     "key": "cmd+.",
@@ -198,12 +200,12 @@
   {
     "key": "cmd+l",
     "command": "cursorEnd",
-    "when": "editorTextFocus"
+    "when": "editorTextFocus && amVim.mode != 'VISUAL'"
   },
   {
     "key": "cmd+h",
     "command": "cursorHome",
-    "when": "editorTextFocus"
+    "when": "editorTextFocus && amVim.mode != 'VISUAL'"
   },
   {
     "key": "alt+h",
@@ -883,42 +885,12 @@
     "command": "-workbench.action.openGlobalKeybindings"
   },
   {
-    "key": "shift+h",
-    "command": "-jumpy2.H",
-    "when": "editorTextFocus && jumpy2.jump-mode"
-  },
-  {
     "key": "alt+`",
     "command": "workbench.action.switchWindow"
   },
   {
     "key": "cmd+z",
     "command": "-undo"
-  },
-  {
-    "key": "escape",
-    "command": "jumpy2.exit",
-    "when": "editorTextFocus && jumpy2.jump-mode"
-  },
-  {
-    "key": "shift+enter",
-    "command": "jumpy2.toggle",
-    "when": "editorTextFocus && amVim.mode == 'INSERT'"
-  },
-  {
-    "key": "shift+enter",
-    "command": "-jumpy2.toggle",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "shift+enter",
-    "command": "-jumpy2.exit",
-    "when": "editorTextFocus && jumpy2.jump-mode"
-  },
-  {
-    "key": "space",
-    "command": "jumpy2.toggle",
-    "when": "editorTextFocus && amVim.mode == 'NORMAL'"
   },
   {
     "key": "shift+cmd+f",
@@ -1000,5 +972,26 @@
   {
     "key": "shift+cmd+i",
     "command": "references-view.tree.focus"
+  },
+  {
+    "key": "cmd+l",
+    "command": "type",
+    "args": {
+      "text": "$"
+    },
+    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "cmd+h",
+    "command": "type",
+    "args": {
+      "text": "0"
+    },
+    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+  },
+  {
+    "key": "ctrl+h",
+    "command": "-deleteLeft",
+    "when": "textInputFocus"
   }
 ]
