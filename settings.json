@@ -41,7 +41,7 @@
   "editor.multiCursorModifier": "alt",
   "editor.parameterHints.enabled": false,
   "editor.scrollbar.verticalScrollbarSize": 12,
-  "editor.smoothScrolling": true,
+  "editor.smoothScrolling": false,
   "editor.snippetSuggestions": "bottom",
   "editor.suggest.localityBonus": true,
   "editor.suggest.showSnippets": false,
@@ -52,6 +52,10 @@
   "editor.wordBasedSuggestions": false,
   "editor.wordBasedSuggestionsMode": "currentDocument",
   "emmet.showSuggestionsAsSnippets": true,
+  "everforest.darkContrast": "hard",
+  "everforest.darkCursor": "yellow",
+  "everforest.darkSelection": "aqua",
+  "everforest.italicKeywords": true,
   "explorer.compactFolders": false,
   "explorer.openEditors.visible": 0,
   "git.autofetch": true,
@@ -86,7 +90,7 @@
   "typescript.tsserver.log": "off",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "workbench.activityBar.visible": false,
-  "workbench.colorTheme": "gruvboxConcoctis dark medium",
+  "workbench.colorTheme": "Everforest Dark",
   "workbench.editor.enablePreviewFromCodeNavigation": true,
   "workbench.editor.labelFormat": "short",
   "workbench.iconTheme": "eq-material-theme-icons-darker",
@@ -100,95 +104,6 @@
   "zenMode.centerLayout": false,
   "editor.unicodeHighlight.allowedCharacters": {
     "–": true
-  },
-  "workbench.colorCustomizations": {
-    // main background
-    "badge.background": "#1a2b33",
-    "banner.background": "#1a2b33",
-    "breadcrumbPicker.background": "#1a2b33",
-    "button.background": "#1a2b33",
-    "editor.background": "#1a2b33",
-    "editor.foldBackground": "#1a2b33",
-    "editorGroup.emptyBackground": "#1a2b33",
-    "editorGroupHeader.tabsBackground": "#1a2b33",
-    "editorGutter.background": "#1a2b33",
-    "editorHoverWidget.background": "#1a2b33",
-    "editorInlayHint.background": "#1a2b33",
-    "editorInlayHint.parameterBackground": "#1a2b33",
-    "editorPane.background": "#1a2b33",
-    "editorSuggestWidget.background": "#1a2b33",
-    "editorWidget.background": "#1a2b33",
-    "menu.background": "#1a2b33",
-    "panel.background": "#1a2b33",
-    "peekViewEditor.background": "#1a2b33",
-    "peekViewEditorGutter.background": "#1a2b33",
-    "sideBarSectionHeader.background": "#1a2b33",
-    "tab.inactiveBackground": "#19272d",
-    "tab.unfocusedActiveBackground": "#1a2b33",
-    "tab.unfocusedInactiveBackground": "#1a2b33",
-    "welcomePage.background": "#1a2b33",
-    "welcomePage.tileBackground": "#1a2b33",
-    "button.foreground": "#a6a4a7",
-    "button.hoverBackground": "#1c3e49",
-    // secondary color
-    "notifications.background": "#10232b",
-    "notificationToast.border": "#10232b",
-    "breadcrumb.background": "#10232b",
-    "terminal.background": "#10232b",
-    "sideBar.background": "#10232b",
-    //tertiary color
-    "list.hoverBackground": "#1d3843",
-    "titleBar.activeBackground": "#1d3843",
-
-    //terminal text color
-    "terminal.foreground": "#d1d1d1",
-
-    //gruvbox concoctis hard theme colors
-    // green : #8a984d
-    // blue : #6dada0
-    // orange : #cb723a
-    // pink/violet: #925a69
-    // sunset : #c6504d
-    // light orange : #dca245
-
-    "titleBar.inactiveBackground": "#455558",
-
-    "tab.activeBackground": "#11303d",
-    "tab.activeForeground": "#b7becd",
-    "tab.inactiveForeground": "#7d93a9",
-
-    "tab.unfocusedActiveForeground": "#635f5b",
-    "tab.unfocusedInactiveForeground": "#635f5b",
-    "editorCursor.foreground": "#ffffff",
-    "editorSuggestWidget.selectedBackground": "#455558",
-    //end background
-    "editor.selectionBackground": "#ffffff23",
-    "editor.rangeHighlightBackground": "#ffffff23",
-    "gitDecoration.modifiedResourceForeground": "#8a984d",
-    "gitDecoration.untrackedResourceForeground": "#ff8400",
-    "editorLineNumber.activeForeground": "#c5c9ce",
-    "editorLineNumber.foreground": "#46887d",
-    "editorBracketHighlight.foreground6": "#8a984d",
-    "editorBracketHighlight.foreground5": "#6dada0",
-    "editorBracketHighlight.foreground4": "#cb723a",
-    "editorBracketHighlight.foreground3": "#925a69",
-    "editorBracketHighlight.foreground2": "#c6504d",
-    "editorBracketHighlight.foreground1": "#dca245",
-    "editorBracketMatch.background": "#1170ff88",
-    "editorBracketMatch.border": "#ff8400",
-    "editor.wordHighlightStrongBackground": "#3e4998",
-    "editor.wordHighlightBackground": "#3e4998",
-    "editor.findMatchBackground": "#56055e",
-    "editor.findMatchHighlightBackground": "#a7508d97",
-    "editorOverviewRuler.findMatchForeground": "#ff90de97",
-    "editorOverviewRuler.bracketMatchForeground": "#a7508d97",
-    "editorOverviewRuler.selectionHighlightForeground": "#a7508d97",
-    "editor.selectionForeground": "#99eeff",
-    "editorIndentGuide.activeBackground": "#1d76db",
-    "list.inactiveSelectionForeground": "#fff",
-    "list.activeSelectionForeground": "#fff",
-    "list.activeSelectionBackground": "#26007e",
-    "list.focusBackground": "#455558"
   },
   "macros.list": {
     "openScmFile": ["git.openFile", "git.closeAllDiffEditors"],
@@ -242,21 +157,6 @@
         "command": "type",
         "args": {
           "text": "i"
-        }
-      }
-    ],
-    "visualLineMoveDown": [
-      "amVim.down",
-      {
-        "command": "type",
-        "args": {
-          "text": "v"
-        }
-      },
-      {
-        "command": "type",
-        "args": {
-          "text": "0"
         }
       }
     ],
@@ -314,5 +214,43 @@
       "remote": true,
       "stash": true
     }
+  },
+  "workbench.colorCustomizations": {
+    // everforest colors
+    //   'red': "#e67e80"
+    //   'orange': "#e69875"
+    //   'yellow': "#dbbc7f"
+    //   'green': "#a7c080"
+    //   'aqua': "#83c092"
+    //   'blue': "#7fbbb3"
+    //   'purple': "#d699b6"
+    //   'light grey0': "#7a8478"
+    //   'lighter grey1': "#859289"
+    //   'lightest grey2': "#9da9a0"
+
+    "editorBracketHighlight.foreground1": "#7fbbb3", //blue
+    "editorBracketHighlight.foreground2": "#e69875", //orange
+    "editorBracketHighlight.foreground3": "#dbbc7f", //yellow
+    "editorBracketHighlight.foreground4": "#a7c080", //green
+    "editorBracketHighlight.foreground5": "#83c092", //aqua
+    "editorBracketHighlight.foreground6": "#e67e80", //red
+
+    "tab.activeBorderTop": "#ffffff",
+
+    "editorLineNumber.activeForeground": "#c0fa2d",
+
+    "tab.unfocusedActiveBackground": "#2b3338",
+    "tab.unfocusedActiveBorder": "#2b3338",
+    "tab.activeBackground": "#2b3338",
+    "tab.activeBorder": "#2b3338",
+
+    "tab.unfocusedInactiveBackground": "#131f1f",
+    "tab.unfocusedActiveBorderTop": "#131f1f",
+    "tab.inactiveBackground": "#131f1f",
+    "sideBar.border": "#131f1f",
+    "panel.border": "#131f1f",
+    "tab.border": "#131f1f",
+
+    "titleBar.activeBackground": "#000000"
   }
 }
