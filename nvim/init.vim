@@ -9,7 +9,7 @@ lua require("utils")
 
 let mapleader = " "
 
-colorscheme gruvbox-material
+colorscheme everforest
 highlight Normal guibg=none
 
 " move lines

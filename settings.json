@@ -18,7 +18,6 @@
   "editor.cursorSurroundingLines": 5,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.definitionLinkOpensInPeek": false,
-  "editor.experimental.stickyScroll.enabled": true,
   "editor.find.autoFindInSelection": "multiline",
   "editor.find.cursorMoveOnType": true,
   "editor.fontFamily": "Fira Code",
@@ -54,8 +53,7 @@
   "emmet.showSuggestionsAsSnippets": true,
   "everforest.darkContrast": "hard",
   "everforest.darkCursor": "yellow",
-  "everforest.darkSelection": "aqua",
-  "everforest.italicKeywords": true,
+  "everforest.darkSelection": "red",
   "explorer.compactFolders": false,
   "explorer.openEditors.visible": 0,
   "git.autofetch": true,
@@ -236,13 +234,13 @@
     "editorBracketHighlight.foreground6": "#e67e80", //red
 
     "tab.activeBorderTop": "#ffffff",
+    "tab.activeBorder": "#ffffff",
 
     "editorLineNumber.activeForeground": "#c0fa2d",
 
     "tab.unfocusedActiveBackground": "#2b3338",
     "tab.unfocusedActiveBorder": "#2b3338",
     "tab.activeBackground": "#2b3338",
-    "tab.activeBorder": "#2b3338",
 
     "tab.unfocusedInactiveBackground": "#131f1f",
     "tab.unfocusedActiveBorderTop": "#131f1f",
@@ -252,5 +250,86 @@
     "tab.border": "#131f1f",
 
     "titleBar.activeBackground": "#000000"
+  },
+  "editor.stickyScroll.enabled": true,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "text.html.markdown.journal.task.open.bullet",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.open.marker",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.open.keyword",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.open.text",
+        "settings": {}
+      },
+      {
+        "scope": "text.html.markdown.journal.task.completed.keyword",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.completed.marker",
+        "settings": {
+          "foreground": "#AAAAAA"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.completed.text",
+        "settings": {
+          "foreground": "#AAAAAA"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.task.completed.bullet",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.memo.keyword",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.memo.bullet",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.scope",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.link.keyword",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "scope": "text.html.markdown.journal.link.bullet",
+        "settings": {
+          "foreground": "#FFFF00"
+        }
+      }
+    ]
   }
 }

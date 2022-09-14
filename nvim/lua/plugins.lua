@@ -96,6 +96,7 @@ return require('packer').startup(function(use)
   -- themes
   use {"gruvbox-community/gruvbox"}
   use {"sainnhe/gruvbox-material"}
+  use {"sainnhe/everforest"}
 
   if packer_bootstrap then
     require('packer').sync()
