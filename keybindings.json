@@ -210,13 +210,21 @@
   {
     "key": "alt+h",
     "command": "cursorWordStartLeft",
-    "when": "editorTextFocus"
+    "when": "editorTextFocus && amVim.mode == 'INSERT'"
+  },
+  {
+    "key": "alt+h",
+    "command": "type",
+    "args": {
+      "text": "B"
+    },
+    "when": "editorTextFocus && amVim.mode != 'INSERT'"
   },
   {
     "key": "alt+l",
     "command": "type",
     "args": {
-      "text": "e"
+      "text": "W"
     },
     "when": "editorTextFocus && amVim.mode != 'INSERT'"
   },
@@ -988,5 +996,29 @@
     "key": "ctrl+h",
     "command": "-deleteLeft",
     "when": "textInputFocus"
+  },
+  {
+    "key": "cmd+o",
+    "command": "file-browser.open"
+  },
+  {
+    "key": "shift+cmd+k shift+cmd+u",
+    "command": "git.revertSelectedRanges"
+  },
+  {
+    "key": "shift+alt+cmd+space",
+    "command": "fileFocusTree.focus"
+  },
+  {
+    "key": "cmd+k cmd+w",
+    "command": "-workbench.action.closeAllEditors"
+  },
+  {
+    "key": "cmd+k cmd+w",
+    "command": "workbench.action.closeEditorsInGroup"
+  },
+  {
+    "key": "cmd+k w",
+    "command": "-workbench.action.closeEditorsInGroup"
   }
 ]
