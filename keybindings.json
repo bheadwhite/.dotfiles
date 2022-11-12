@@ -144,6 +144,11 @@
     "when": "editorTextFocus && !editorReadonly"
   },
   {
+    "key": "p",
+    "command": "editor.action.clipboardPasteAction",
+    "when": "editorTextFocus && amVim.mode == 'VISUAL'"
+  },
+  {
     "key": "ctrl+k",
     "command": "editor.action.moveLinesUpAction",
     "when": "editorTextFocus && !editorReadonly"
@@ -176,7 +181,12 @@
   {
     "key": "escape",
     "command": "workbench.action.focusActiveEditorGroup",
-    "when": "sideBarFocus && !inputFocus || panelFocus"
+    "when": "sideBarFocus && !inputFocus"
+  },
+  {
+    "key": "shift+escape",
+    "command": "workbench.action.focusActiveEditorGroup",
+    "when": "panelFocus"
   },
   {
     "key": "alt+j",
@@ -216,7 +226,7 @@
     "key": "alt+h",
     "command": "type",
     "args": {
-      "text": "B"
+      "text": "b"
     },
     "when": "editorTextFocus && amVim.mode != 'INSERT'"
   },
@@ -224,7 +234,7 @@
     "key": "alt+l",
     "command": "type",
     "args": {
-      "text": "W"
+      "text": "w"
     },
     "when": "editorTextFocus && amVim.mode != 'INSERT'"
   },
