@@ -52,20 +52,20 @@ return packer.startup(function(use)
     "JoosepAlviste/nvim-ts-context-commentstring"
   }
 
-
-  use { "kyazdani42/nvim-web-devicons" }
-  use { "kyazdani42/nvim-tree.lua" }
-  use { "akinsho/bufferline.nvim" }
-	use { "moll/vim-bbye" }
-  use { "nvim-lualine/lualine.nvim" }
-  use { "akinsho/toggleterm.nvim" }
-  use { "ahmedkhalf/project.nvim" }
-  use { "lewis6991/impatient.nvim" }
-  use { "lukas-reineke/indent-blankline.nvim" }
-  use { "goolord/alpha-nvim" }
-	use { "folke/which-key.nvim" }
+  use "kyazdani42/nvim-web-devicons"
+  use "kyazdani42/nvim-tree.lua"
+  use "akinsho/bufferline.nvim"
+	use "moll/vim-bbye"
+  use "nvim-lualine/lualine.nvim"
+  use "akinsho/toggleterm.nvim"
+  use "ahmedkhalf/project.nvim"
+  use "lewis6991/impatient.nvim"
+  use "lukas-reineke/indent-blankline.nvim"
+  use "goolord/alpha-nvim"
+	use "folke/which-key.nvim"
   use 'booperlv/nvim-gomove'
   use 'abecodes/tabout.nvim'
+  use 'terryma/vim-expand-region'
 
 	-- Colorschemes
   use {

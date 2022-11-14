@@ -16,6 +16,7 @@ require "bdub.autocommands"
 require "bdub.impatient"
 require "bdub.autopairs"
 require "bdub.cmp"
+require 'bdub.expand_region'
 require "bdub.lualine"
 require "bdub.project"
 require "bdub.gomove"
