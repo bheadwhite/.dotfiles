@@ -6,4 +6,4 @@ end
 require "bdub.lsp.mason"
 require("bdub.lsp.handlers").setup()
 require "bdub.lsp.null-ls"
-require "bdub.lsp.tsserver"
+require "bdub.lsp.typescript"
