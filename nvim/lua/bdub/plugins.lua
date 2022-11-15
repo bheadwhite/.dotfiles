@@ -66,6 +66,9 @@ return packer.startup(function(use)
   use 'booperlv/nvim-gomove'
   use 'abecodes/tabout.nvim'
   use 'terryma/vim-expand-region'
+  use 'ThePrimeagen/harpoon'
+  use 'mbbill/undotree'
+
 
 	-- Colorschemes
   use {

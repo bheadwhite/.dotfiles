@@ -6,7 +6,6 @@ local opts = { noremap = true, silent = true }
 local keymap = vim.api.nvim_set_keymap
 
 --Remap space as leader key
-keymap("", "<Space>", "<Nop>", opts)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
@@ -43,8 +42,7 @@ keymap("v", ">", ">gv", opts)
 -- keep put register consistent for visual puts
 keymap("v", "p", '"_dP', opts)
 
-keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-keymap("n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+keymap("n", "<D-right>", "$", opts)
 
 -- Terminal --
 -- Better terminal navigation
