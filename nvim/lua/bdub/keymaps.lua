@@ -43,6 +43,8 @@ keymap("v", ">", ">gv", opts)
 keymap("v", "p", '"_dP', opts)
 
 keymap("n", "<D-right>", "$", opts)
+keymap("n", "<M-S-l>", "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", opts)
+keymap("n", "<M-S-h>", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", opts)
 
 -- Terminal --
 -- Better terminal navigation

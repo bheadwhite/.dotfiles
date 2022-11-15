@@ -5,107 +5,19 @@ end
 
 bufferline.setup {
   options = {
-    numbers = "ordinal",
-    indicator_icon = nil,
-    modified_icon = "●",
-    max_name_length = 30,
+    max_name_length = 35,
     max_prefix_length = 30,
-    tab_size = 25,
+    tab_size = 30,
     diagnostics = "nvim_lsp",
-    diagnostics_update_in_insert = false,
-    offsets = { { filetype = "NvimTree", text = "", padding = 1 } },
-    show_buffer_icons = true,
-    show_buffer_close_icons = false,
+    diagnostics_update_in_insert = true,
     show_close_icon = false,
-    show_tab_indicators = true,
-    persist_buffer_sort = true,
-    separator_style = "thick",
+    show_buffer_close_icons = false,
+    -- offsets = { { filetype = "NvimTree", text = "", padding = 1 } },
+    -- show_buffer_close_icons = false,
+    -- show_close_icon = false,
+    -- persist_buffer_sort = true,
+    -- separator_style = "thick",
     enforce_regular_tabs = true,
     always_show_bufferline = true,
-  },
-  highlights = {
-    fill = {
-      fg = { attribute = "fg", highlight = "#ff0000" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-    },
-    background = {
-      fg = { attribute = "fg", highlight = "TabLine" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-    },
-    numbers = {
-      fg = { attribute = "fg", highlight = "Normal" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-    },
-    numbers_visible = {
-      fg = { attribute = "fg", highlight = "TabLine" } ,
-      bg = { attribute = "bg", highlight = "TabLine" } ,
-    },
-    numbers_selected = {
-      fg = { attribute = "fg", highlight = "Normal" } ,
-      bg = { attribute = "bg", highlight = "Normal" } ,
-    },
-    buffer_visible = {
-      fg = { attribute = "fg", highlight = "TabLine" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-    },
-    close_button = {
-      fg = { attribute = "fg", highlight = "TabLine" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-    },
-    close_button_visible = {
-      fg = { attribute = "fg", highlight = "TabLine" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-    },
-    tab_selected = {
-      fg = { attribute = "fg", highlight = "Normal" },
-      bg = { attribute = "bg", highlight = "Normal" },
-    },
-    tab = {
-      fg = { attribute = "fg", highlight = "TabLine" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-    },
-    tab_close = {
-      fg = { attribute = "fg", highlight = "TabLineSel" },
-      bg = { attribute = "bg", highlight = "Normal" },
-    },
-    duplicate_selected = {
-      fg = { attribute = "fg", highlight = "TabLineSel" },
-      bg = { attribute = "bg", highlight = "TabLineSel" },
-      underline = true,
-    },
-    duplicate_visible = {
-      fg = { attribute = "fg", highlight = "TabLine" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-      underline = true,
-    },
-    duplicate = {
-      fg = { attribute = "fg", highlight = "TabLine" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-      underline = true,
-    },
-    modified = {
-      fg = { attribute = "fg", highlight = "TabLine" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-    },
-    modified_selected = {
-      fg = { attribute = "fg", highlight = "Normal" },
-      bg = { attribute = "bg", highlight = "Normal" },
-    },
-    modified_visible = {
-      fg = { attribute = "fg", highlight = "TabLine" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-    },
-    separator = {
-      fg = { attribute = "bg", highlight = "TabLine" },
-      bg = { attribute = "bg", highlight = "TabLine" },
-    },
-    separator_selected = {
-      fg = { attribute = "bg", highlight = "Normal" },
-      bg = { attribute = "bg", highlight = "Normal" },
-    },
-    indicator_selected = {
-      fg = { attribute = "fg", highlight = "LspDiagnosticsDefaultHint" },
-      bg = { attribute = "bg", highlight = "Normal" },
-    },
   },
 }

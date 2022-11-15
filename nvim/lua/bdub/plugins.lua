@@ -40,75 +40,72 @@ packer.init({
 
 -- Install your plugins here
 return packer.startup(function(use)
+	use({ "wbthomason/packer.nvim" }) -- Have packer manage itself
+	use({ "nvim-lua/plenary.nvim" }) -- Useful lua functions used by lots of plugins
+	use({ "nvim-treesitter/nvim-treesitter" })
+	use({ "windwp/nvim-autopairs" }) -- Autopairs, integrates with both cmp and treesitter
+	use("szw/vim-maximizer")
 
-  use { "wbthomason/packer.nvim" } -- Have packer manage itself
-  use { "nvim-lua/plenary.nvim" } -- Useful lua functions used by lots of plugins
-	use { "nvim-treesitter/nvim-treesitter" }
-  use { "windwp/nvim-autopairs" } -- Autopairs, integrates with both cmp and treesitter
-  use 'szw/vim-maximizer'
+	use({
+		"numToStr/Comment.nvim",
+		"JoosepAlviste/nvim-ts-context-commentstring",
+	})
 
-  use {
-    "numToStr/Comment.nvim",
-    "JoosepAlviste/nvim-ts-context-commentstring"
-  }
-
-  use "kyazdani42/nvim-web-devicons"
-  use "kyazdani42/nvim-tree.lua"
-  use "akinsho/bufferline.nvim"
-	use "moll/vim-bbye"
-  use "nvim-lualine/lualine.nvim"
-  use "akinsho/toggleterm.nvim"
-  use "ahmedkhalf/project.nvim"
-  use "lewis6991/impatient.nvim"
-  use "lukas-reineke/indent-blankline.nvim"
-  use "goolord/alpha-nvim"
-	use "folke/which-key.nvim"
-  use 'booperlv/nvim-gomove'
-  use 'abecodes/tabout.nvim'
-  use 'terryma/vim-expand-region'
-  use 'ThePrimeagen/harpoon'
-  use 'mbbill/undotree'
-
+	use("kyazdani42/nvim-web-devicons")
+	use("kyazdani42/nvim-tree.lua")
+	use("akinsho/bufferline.nvim")
+	use("moll/vim-bbye")
+	use("nvim-lualine/lualine.nvim")
+	use("akinsho/toggleterm.nvim")
+	use("ahmedkhalf/project.nvim")
+	use("lewis6991/impatient.nvim")
+	use("lukas-reineke/indent-blankline.nvim")
+	use("goolord/alpha-nvim")
+	use("folke/which-key.nvim")
+	use("booperlv/nvim-gomove")
+	use("abecodes/tabout.nvim")
+	use("terryma/vim-expand-region")
+	use("ThePrimeagen/harpoon")
+	use("mbbill/undotree")
 
 	-- Colorschemes
-  use {
-    "folke/tokyonight.nvim",
-    "lunarvim/darkplus.nvim",
-    "sainnhe/everforest"
-  }
+	use({
+		"folke/tokyonight.nvim",
+		"lunarvim/darkplus.nvim",
+		"sainnhe/everforest",
+	})
 
-	-- Cmp 
-  use {
-    "hrsh7th/nvim-cmp",
-    "hrsh7th/cmp-buffer",
-    "hrsh7th/cmp-path", 
-    "saadparwaiz1/cmp_luasnip",
-    "hrsh7th/cmp-nvim-lsp",
-    "hrsh7th/cmp-nvim-lua"
-  }
+	-- Cmp
+	use({
+		"hrsh7th/nvim-cmp",
+		"hrsh7th/cmp-buffer",
+		"hrsh7th/cmp-path",
+		"saadparwaiz1/cmp_luasnip",
+		"hrsh7th/cmp-nvim-lsp",
+		"hrsh7th/cmp-nvim-lua",
+	})
 
 	-- Snippets
-  use {
-    "L3MON4D3/LuaSnip",
-    "rafamadriz/friendly-snippets"
-  }
+	use({
+		"L3MON4D3/LuaSnip",
+		"rafamadriz/friendly-snippets",
+	})
 
 	-- LSP
-  use {
-      "neovim/nvim-lspconfig",
-      "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim"
-  }
+	use({
+		"neovim/nvim-lspconfig",
+		"williamboman/mason.nvim",
+		"williamboman/mason-lspconfig.nvim",
+	})
 
-	use { "jose-elias-alvarez/null-ls.nvim" } -- for formatters and linters
-  use { "RRethy/vim-illuminate" }
-
+	use({ "jose-elias-alvarez/null-ls.nvim" }) -- for formatters and linters
+	use({ "RRethy/vim-illuminate" })
 
 	-- Telescope
-	use { "nvim-telescope/telescope.nvim" }
+	use({ "nvim-telescope/telescope.nvim" })
 
 	-- Git
-	use { "lewis6991/gitsigns.nvim" }
+	use({ "lewis6991/gitsigns.nvim" })
 
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins

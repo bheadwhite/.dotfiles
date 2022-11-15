@@ -5,7 +5,6 @@ if not status_cmp_ok then
 	return
 end
 
-
 M.capabilities = vim.lsp.protocol.make_client_capabilities()
 M.capabilities.textDocument.completion.completionItem.snippetSupport = true
 M.capabilities = cmp_nvim_lsp.default_capabilities(M.capabilities)
@@ -53,21 +52,19 @@ M.setup = function()
 end
 
 local function lsp_keymaps(bufnr)
-	local opts = { noremap = true, silent = true }
-	local keymap = vim.api.nvim_buf_set_keymap
+	-- local opts = { noremap = true, silent = true }
+	-- local keymap = vim.api.nvim_buf_set_keymap
 
-	keymap(bufnr, "n", "<leader>lD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-	keymap(bufnr, "n", "<leader>ld", "<cmd>lua require'telescope.builtin'.lsp_definitions()<cr>", opts)
-	keymap(bufnr, "n", "<leader>i", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-	keymap(bufnr, "n", "<leader>li", "<cmd>lua require'telescope.builtin'.lsp_implementations()<cr>", opts)
-	keymap(bufnr, "n", "<leader>lr", "<cmd>lua require'telescope.builtin'.lsp_references()<cr>", opts)
-	keymap(bufnr, "n", "<leader>le", "<cmd>lua require'telescope.builtin'.diagnostics()<cr>", opts)
-	keymap(bufnr, "n", "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
-	keymap(bufnr, "n", "<leader>lj", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", opts)
-	keymap(bufnr, "n", "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", opts)
-  keymap(bufnr, "n", "<leader>ls", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-	keymap(bufnr, "n", "<leader>lR", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
-	keymap(bufnr, "n", "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<CR>", opts)
+	-- keymap(bufnr, "n", "<leader>lD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
+	-- keymap(bufnr, "n", "<leader>ld", "<cmd>lua require'telescope.builtin'.lsp_definitions()<cr>", opts)
+	-- keymap(bufnr, "n", "<leader>lr", "<cmd>lua require'telescope.builtin'.lsp_references()<cr>", opts)
+	-- keymap(bufnr, "n", "<leader>le", "<cmd>lua require'telescope.builtin'.diagnostics()<cr>", opts)
+	-- keymap(bufnr, "n", "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
+	-- keymap(bufnr, "n", "<leader>lj", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", opts)
+	-- keymap(bufnr, "n", "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", opts)
+	--  keymap(bufnr, "n", "<leader>ls", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
+	-- keymap(bufnr, "n", "<leader>lR", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
+	-- keymap(bufnr, "n", "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<CR>", opts)
 end
 
 M.on_attach = function(client, bufnr)
@@ -83,9 +80,8 @@ M.on_attach = function(client, bufnr)
 
 	local illuminate_ok, illuminate = pcall(require, "illuminate")
 	if illuminate_ok then
-    illuminate.on_attach(client)
+		illuminate.on_attach(client)
 	end
-
 end
 
 return M
