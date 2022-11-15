@@ -24,8 +24,8 @@ vim.cmd([[
 ]])
 
 -- Use a protected call so we don't error out on first use
-local status_ok, packer = pcall(require, "packer")
-if not status_ok then
+local packer_ok, packer = pcall(require, "packer")
+if not packer_ok then
 	return
 end
 
@@ -102,7 +102,6 @@ return packer.startup(function(use)
 
 	use { "jose-elias-alvarez/null-ls.nvim" } -- for formatters and linters
   use { "RRethy/vim-illuminate" }
-  use 'jose-elias-alvarez/typescript.nvim' -- typescript lsp server config and function exposure
 
 
 	-- Telescope
