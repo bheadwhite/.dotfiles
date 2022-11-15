@@ -80,10 +80,8 @@ local opts = {
 
 local mappings = {
   ["a"] = { "<cmd>Alpha<cr>", "Alpha" },
-  ["b"] = {
-    "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_dropdown{previewer = false})<cr>",
-    "Buffers",
-  },
+  ["b"] = { "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_dropdown{previewer = false})<cr>", "Buffers", },
+  ["i"] = { "<cmd>lua vim.lsp.buf.hover()<CR>", "hover"},
   ["e"] = { "<cmd>NvimTreeToggle<cr>", "Explorer" },
   ["w"] = { "<cmd>w!<CR>", "Save" },
   ["q"] = { "<cmd>q!<CR>", "Quit" },
@@ -101,7 +99,11 @@ local mappings = {
     S = { "<cmd>PackerStatus<cr>", "Status" },
     u = { "<cmd>PackerUpdate<cr>", "Update" },
   },
-
+  k = {
+    name = "harpoon",
+    k = { "<cmd>lua require'harpoon'.toggle_quick_menu()<cr>", "menu"},
+    a = { "<cmd>lua require'harpoon.mark'.add_file()<cr>", "add file"}
+  },
   g = {
     name = "Git",
     g = { "<cmd>lua _LAZYGIT_TOGGLE()<CR>", "Lazygit" },
@@ -112,38 +114,35 @@ local mappings = {
     r = { "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", "Reset Hunk" },
     R = { "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", "Reset Buffer" },
     s = { "<cmd>lua require 'gitsigns'.stage_hunk()<cr>", "Stage Hunk" },
-    S = {
-          "<cmd>lua require'telescope.builtin'.git_status()<cr>", "git status"
-    },
-    u = {
-      "<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>",
-      "Undo Stage Hunk",
-    },
+    S = { "<cmd>lua require 'telescope.builtin'.git_status()<cr>", "git status" },
+    u = { "<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>", "Undo Stage Hunk", },
     o = { "<cmd>Telescope git_status<cr>", "Open changed file" },
     b = { "<cmd>Telescope git_branches<cr>", "Checkout branch" },
     c = { "<cmd>Telescope git_commits<cr>", "Checkout commit" },
-    d = {
-      "<cmd>Gitsigns diffthis HEAD<cr>",
-      "Diff",
-    },
+    d = { "<cmd>Gitsigns diffthis HEAD<cr>", "Diff", },
   },
-
   l = {
     name = "LSP",
+    d = { "<cmd>lua require'telescope.builtin'.lsp_definitions()<cr>", "definition" },
+    D = { "<cmd>lua vim.lsp.buf.declaration()<CR>", "declaration"},
+    r = { "<cmd>lua require'telescope.builtin'.lsp_references()<cr>", "references" },
+    t = { "<cmd>lua require'telescope.builtin'.lsp_type_definitions()<cr>", "type" },
+    i = { "<cmd>lua require'telescope.builtin'.lsp_implementations()<cr>", "implementions" },
+    s = { "<cmd>lua vim.lsp.buf.signature_help()<CR>", "signature help"},
+    S = { "<cmd>lua require'telescope.builtin'.lsp_document_symbols()<cr>", "symbols"},
+    e = { "<cmd>lua require'telescope.builtin'.diagnostics()<cr>", "diagnostics", },
+    k = { "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", "prev diagnostic"},
+    j = { "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", "next diagnostic"},
     a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
-    w = { "<cmd>Telescope diagnostics<cr>", "Workspace Diagnostics", },
-    f = { "<cmd>lua vim.lsp.buf.format{async=true}<cr>", "Format" },
-    j = { "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", "Next Diagnostic", },
-    k = { "<cmd>lua vim.lsp.diagnostic.goto_prev()<cr>", "Prev Diagnostic", },
     l = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
-    q = { "<cmd>lua vim.lsp.diagnostic.set_loclist()<cr>", "Quickfix" },
+    q = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
+    R = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
+  },
+  L = {
+    name = "LSP config",
+    f = { "<cmd>lua vim.lsp.buf.format{async=true}<cr>", "Format" },
     s = { "<cmd>Telescope lsp_document_symbols<cr>", "Document Symbols" },
     S = { "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", "Workspace Symbols", },
-    r = { "<cmd>lua require'telescope.builtin'.lsp_references()<cr>", "Go To References" },
-    R = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
-    d = { "<cmd>lua require'telescope.builtin'.lsp_definitions()<cr>", "Go To Definitions" },
-    i = { "<cmd>lua require'telescope.builtin'.lsp_implementations()<cr>", "Go To Implementions" },
-    t = { "<cmd>lua require'telescope.builtin'.lsp_type_definitions()<cr>", "Go To Type" }
   },
   s = {
     name = "Search",
