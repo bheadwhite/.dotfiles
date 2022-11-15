@@ -1,7 +1,17 @@
-local opts = { noremap = true, silent = true }
+local harpoon_ok, harpoon = pcall(require, "harpoon")
+if not harpoon_ok then
+  return
+end
 
--- local term_opts = { silent = true }
+harpoon.setup({
+  menu = {
+    width = vim.api.nvim_win_get_width(0) - 4
+  }
+})
 
--- Shorten function name
-local keymap = vim.api.nvim_set_keymap
-keymap("n", "", ":MaximizerToggle<CR>", opts)
+
+vim.cmd [[
+  augroup _harpoon
+    autocmd FileType harpoon setlocal wrap
+  augroup end
+]]

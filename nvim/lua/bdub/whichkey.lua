@@ -87,7 +87,7 @@ local mappings = {
   ["q"] = { "<cmd>q!<CR>", "Quit" },
   ["c"] = { "<cmd>Bdelete!<CR>", "Close Buffer" },
   ["h"] = { "<cmd>nohlsearch<CR>", "No Highlight" },
-  ["f"] = { "<cmd>lua require'telescope.builtin'.git_files()<cr>", "Find files" },
+  ["f"] = { "<cmd>lua require'telescope.builtin'.find_files()<cr>", "Find files" },
   ["F"] = { "<cmd>Telescope live_grep theme=ivy<cr>", "Find Text" },
   ["P"] = { "<cmd>lua require('telescope').extensions.projects.projects()<cr>", "Projects" },
 
@@ -101,7 +101,7 @@ local mappings = {
   },
   k = {
     name = "harpoon",
-    k = { "<cmd>lua require'harpoon'.toggle_quick_menu()<cr>", "menu"},
+    k = { "<cmd>lua require'harpoon.ui'.toggle_quick_menu()<cr>", "menu"},
     a = { "<cmd>lua require'harpoon.mark'.add_file()<cr>", "add file"}
   },
   g = {
