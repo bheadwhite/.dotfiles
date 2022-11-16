@@ -67,6 +67,7 @@ return packer.startup(function(use)
 	use("terryma/vim-expand-region")
 	use("ThePrimeagen/harpoon")
 	use("mbbill/undotree")
+	use("github/copilot.vim")
 
 	-- Colorschemes
 	use({

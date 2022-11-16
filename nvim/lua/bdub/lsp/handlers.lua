@@ -52,12 +52,12 @@ M.setup = function()
 end
 
 local function lsp_keymaps(bufnr)
-	-- local opts = { noremap = true, silent = true }
-	-- local keymap = vim.api.nvim_buf_set_keymap
+	local opts = { noremap = true, silent = true }
+	local keymap = vim.api.nvim_buf_set_keymap
 
 	-- keymap(bufnr, "n", "<leader>lD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
 	-- keymap(bufnr, "n", "<leader>ld", "<cmd>lua require'telescope.builtin'.lsp_definitions()<cr>", opts)
-	-- keymap(bufnr, "n", "<leader>lr", "<cmd>lua require'telescope.builtin'.lsp_references()<cr>", opts)
+	keymap(bufnr, "n", "<leader>r", "<cmd>lua require'telescope.builtin'.lsp_references()<cr>", opts)
 	-- keymap(bufnr, "n", "<leader>le", "<cmd>lua require'telescope.builtin'.diagnostics()<cr>", opts)
 	-- keymap(bufnr, "n", "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
 	-- keymap(bufnr, "n", "<leader>lj", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", opts)

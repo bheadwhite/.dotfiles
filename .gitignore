@@ -39,6 +39,7 @@ luac.out
 *.i*86
 *.x86_64
 *.hex
+**pack*
 
 
-plugin/packer_compiled.lua
+nvim/plugin/packer_compiled.lua
