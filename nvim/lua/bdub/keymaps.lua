@@ -18,10 +18,10 @@ vim.g.maplocalleader = " "
 --   command_mode = "c",
 
 -- Better window navigation
-keymap("n", "<C-,>", "<C-w>h", opts)
-keymap("n", "<C-S-j>", "<C-w>j", opts)
-keymap("n", "<C-S-k>", "<C-w>k", opts)
-keymap("n", "<C-.>", "<C-w>l", opts)
+keymap("n", "<C-h>", "<C-w>h", opts)
+keymap("n", "<C-j>", "<C-w>j", opts)
+keymap("n", "<C-k>", "<C-w>k", opts)
+keymap("n", "<C-l>", "<C-w>l", opts)
 
 -- Resize with arrows
 keymap("n", "<C-Up>", ":resize -2<CR>", opts)
@@ -29,9 +29,17 @@ keymap("n", "<C-Down>", ":resize +2<CR>", opts)
 keymap("n", "<C-Left>", ":vertical resize -2<CR>", opts)
 keymap("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 
+keymap("", "<M-.>", "$", opts)
+keymap("", "<M-,>", "^", opts)
+
 -- Navigate buffers
-keymap("n", "<C-l>", ":bnext<CR>", opts)
-keymap("n", "<C-h>", ":bprevious<CR>", opts)
+keymap("n", "<C-,>", ":bp<CR>", opts)
+keymap("n", "<C-.>", ":bn<CR>", opts)
+
+--hover
+keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+keymap("n", "L", "<cmd>lua require 'gitsigns'.next_hunk({preview = true})<cr>", opts)
+keymap("n", "H", "<cmd>lua require 'gitsigns'.prev_hunk({preview = true})<cr>", opts)
 
 -- Stay in indent mode
 keymap("v", "<", "<gv", opts)

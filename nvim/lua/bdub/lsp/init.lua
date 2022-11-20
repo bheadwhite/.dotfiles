@@ -4,5 +4,5 @@ if not status_ok then
 end
 
 require "bdub.lsp.mason"
-require "bdub.lsp.handlers".setup()
+require("bdub.lsp.handlers").setup()
 require "bdub.lsp.null-ls"

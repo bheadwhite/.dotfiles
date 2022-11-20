@@ -33,4 +33,14 @@ vim.cmd [[
     autocmd!
     autocmd BufWritePre * lua vim.lsp.buf.formatting_sync()
   augroup end
+
+  augroup _yank_highlight
+  " Cool highlighting courtesy of @clason
+  au!
+  au TextYankPost * lua vim.highlight.on_yank {
+    \ higroup = "Substitute",
+    \ timeout = 150,
+    \ on_macro = true
+    \ }
+  augroup end
 ]]
