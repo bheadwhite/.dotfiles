@@ -1,4 +1,5 @@
 local M = {}
+local ts_utils = require "nvim-lsp-ts-utils"
 
 local status_cmp_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 if not status_cmp_ok then
@@ -82,6 +83,10 @@ end
 M.on_attach = function(client, bufnr)
   if client.name == "tsserver" then
     client.server_capabilities.documentFormattingProvider = false
+    ts_utils.setup {
+      import_all_timeout = 5000,
+    }
+    ts_utils.setup_client(client)
   end
 
   if client.name == "sumneko_lua" then

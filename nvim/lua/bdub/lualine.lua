@@ -37,12 +37,6 @@ local filetype = {
   icon = nil,
 }
 
-local branch = {
-  "branch",
-  icons_enabled = true,
-  icon = "",
-}
-
 local location = {
   "location",
   padding = 0,
@@ -62,6 +56,16 @@ local spaces = function()
   return "spaces: " .. vim.api.nvim_buf_get_option(0, "shiftwidth")
 end
 
+local full_path = function()
+  return vim.fn.expand "%:h" .. "/"
+end
+
+local function get_branch()
+  require("lualine.components.branch.git_branch").init()
+  local branch = require("lualine.components.branch.git_branch").get_branch()
+  return string.sub(branch, 1, 40)
+end
+
 lualine.setup {
   options = {
     icons_enabled = true,
@@ -72,7 +76,7 @@ lualine.setup {
     always_divide_middle = true,
   },
   sections = {
-    lualine_a = { branch, diagnostics },
+    lualine_a = { get_branch, diagnostics },
     lualine_b = { mode },
     lualine_c = {},
     -- lualine_x = { "encoding", "fileformat", "filetype" },
@@ -92,8 +96,13 @@ lualine.setup {
     lualine_a = {
       {
         "filename",
+        fmt = full_path,
         path = 1,
         color = { fg = "#fffff", bg = "" },
+      },
+      {
+        "filename",
+        modified = true,
         show_modified_status = true,
         symbols = {
           modified = " ●", -- Text to show when the buffer is modified

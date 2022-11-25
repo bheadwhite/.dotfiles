@@ -14,7 +14,6 @@ if fn.empty(fn.glob(install_path)) > 0 then
   print "Installing packer close and reopen Neovim..."
   vim.cmd [[packadd packer.nvim]]
 end
-
 -- Autocommand that reloads neovim whenever you save the plugins.lua file
 vim.cmd [[
   augroup packer_user_config
@@ -54,14 +53,11 @@ return packer.startup(function(use)
 
   use "kyazdani42/nvim-web-devicons"
   use "kyazdani42/nvim-tree.lua"
-  -- use("akinsho/bufferline.nvim")
   use "moll/vim-bbye"
   use "nvim-lualine/lualine.nvim"
   use "akinsho/toggleterm.nvim"
-  -- use("ahmedkhalf/project.nvim")
   use "lewis6991/impatient.nvim"
   use "lukas-reineke/indent-blankline.nvim"
-  use "goolord/alpha-nvim"
   use "folke/which-key.nvim"
   use "booperlv/nvim-gomove"
   use "abecodes/tabout.nvim"
@@ -97,6 +93,7 @@ return packer.startup(function(use)
   use {
     "neovim/nvim-lspconfig",
     "williamboman/mason.nvim",
+    "jose-elias-alvarez/nvim-lsp-ts-utils",
     "williamboman/mason-lspconfig.nvim",
   }
 
@@ -107,7 +104,6 @@ return packer.startup(function(use)
   -- Telescope
   use {
     "nvim-telescope/telescope.nvim",
-    "nvim-lua/popup.nvim",
     "nvim-telescope/telescope-ui-select.nvim",
     "nvim-telescope/telescope-live-grep-args.nvim",
     {
