@@ -43,8 +43,12 @@ keymap("v", "p", '"_dP', options)
 keymap("n", "<M-S-h>", "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", options)
 keymap("n", "<M-S-l>", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", options)
 
+keymap("n", "<C-M-r>", "<cmd>lua require'bdub.commands.file_path'.get_operator_file_path()<cr>", options)
+
+keymap("", "<C-M-p>", ":Telescope neoclip<cr>", options)
+
 --rename
-keymap("n", "<C-M-r>", "<cmd>lua vim.lsp.buf.rename()<cr>", options)
+keymap("n", "<C-M-n>", "<cmd>lua vim.lsp.buf.rename()<cr>", options)
 
 -- yank til the end of the line
 keymap("n", "S", "vg_", options)

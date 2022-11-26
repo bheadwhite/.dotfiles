@@ -57,7 +57,7 @@ local spaces = function()
 end
 
 local full_path = function()
-  return vim.fn.expand "%:h" .. "/"
+  return vim.fn.expand "%:.:h" .. "/"
 end
 
 local function get_branch()
@@ -78,7 +78,7 @@ lualine.setup {
   sections = {
     lualine_a = { get_branch, diagnostics },
     lualine_b = { mode },
-    lualine_c = {},
+    lualine_c = { "lsp_progress" },
     -- lualine_x = { "encoding", "fileformat", "filetype" },
     lualine_x = { diff, spaces, "encoding", filetype },
     lualine_y = { location },

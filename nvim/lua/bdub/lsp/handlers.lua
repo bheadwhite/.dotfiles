@@ -59,18 +59,19 @@ local function lsp_keymaps(bufnr)
   local opts = { noremap = true, silent = true }
   local keymap = vim.api.nvim_buf_set_keymap
 
-  -- keymap(bufnr, "n", "<leader>lD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-  -- keymap(bufnr, "n", "<leader>ld", "<cmd>lua require'telescope.builtin'.lsp_definitions()<cr>", opts)
-  keymap(bufnr, "n", "<leader>r", "<cmd>lua require'telescope.builtin'.lsp_references()<cr>", opts)
-  -- keymap(bufnr, "n", "<leader>Et", "<cmd>lua require'lsp-selection-range'.trigger().<cr>", opts)
-  -- keymap(bufnr, "n", "<leader>Ee", "<cmd>lua require'lsp-selection-range'.expand().<cr>", opts)
-  -- keymap(bufnr, "n", "<leader>le", "<cmd>lua require'telescope.builtin'.diagnostics()<cr>", opts)
-  -- keymap(bufnr, "n", "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
-  -- keymap(bufnr, "n", "<leader>lj", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", opts)
-  -- keymap(bufnr, "n", "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>", opts)
-  --  keymap(bufnr, "n", "<leader>ls", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-  -- keymap(bufnr, "n", "<leader>lR", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)
-  -- keymap(bufnr, "n", "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<CR>", opts)
+  keymap(
+    bufnr,
+    "n",
+    "gt",
+    "<cmd>lua require'telescope.builtin'.lsp_type_definitions({jumpt_type = 'vsplit'})<cr>",
+    opts
+  )
+  keymap(bufnr, "n", "gr", "<cmd>lua require'telescope.builtin'.lsp_references()<cr>", opts)
+  keymap(bufnr, "n", "gR", "<cmd>lua require'telescope.builtin'.lsp_references({jump_type = 'vsplit'})<cr>", opts)
+  keymap(bufnr, "n", "gH", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
+  keymap(bufnr, "n", "gh", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+  keymap(bufnr, "n", "gi", "<cmd>lua require'telescope.builtin'.lsp_definitions()<cr>", opts)
+  keymap(bufnr, "n", "gI", "<cmd>lua require'telescope.builtin'.lsp_definitions({jump_type = 'vsplit'})<cr>", opts)
 end
 
 local function lsp_highlights(client)

@@ -66,6 +66,20 @@ return packer.startup(function(use)
   use "github/copilot.vim"
   use "tpope/vim-surround"
 
+  use "f-person/git-blame.nvim"
+  use "arkav/lualine-lsp-progress"
+
+  use {
+    "AckslD/nvim-neoclip.lua",
+    requires = {
+      -- you'll need at least one of these
+      { "nvim-telescope/telescope.nvim" },
+      -- {'ibhagwan/fzf-lua'},
+    },
+    config = function()
+      require("neoclip").setup {}
+    end,
+  }
   -- Colorschemes
   use {
     "folke/tokyonight.nvim",
@@ -105,7 +119,6 @@ return packer.startup(function(use)
   use {
     "nvim-telescope/telescope.nvim",
     "nvim-telescope/telescope-ui-select.nvim",
-    "nvim-telescope/telescope-live-grep-args.nvim",
     {
       "nvim-telescope/telescope-fzf-native.nvim",
       run = "make",

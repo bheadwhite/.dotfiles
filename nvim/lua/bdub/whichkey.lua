@@ -4,7 +4,7 @@ if not status_ok then
 end
 
 local mappings = {
-  a = { "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", "search args" },
+  a = { "<cmd>l require('telescope').extensions.live_grep_args.live_grep_args()<CR>", "search args" },
   b = {
     "<cmd>lua require('telescope.builtin').buffers(require('telescope.themes').get_dropdown{previewer = false})<cr>",
     "Buffers",
@@ -12,25 +12,13 @@ local mappings = {
   c = { "<cmd>Bdelete!<CR>", "Close Buffer" },
   e = { "<cmd>NvimTreeToggle<cr>", "Explorer" },
   f = { "<cmd>lua require'telescope.builtin'.find_files()<cr>", "Find files" },
-  x = { "<cmd>lua require'nvim-lsp-ts-utils'.rename_file()<cr>", "rename file" },
+  r = { "<cmd>lua require'nvim-lsp-ts-utils'.rename_file()<cr>", "rename file" },
   F = { "<cmd>lua require('telescope.builtin').live_grep()<CR>", "Find Text" },
   h = { "<cmd>nohlsearch<CR>", "No Highlight" },
-  H = { "<cmd>lua vim.lsp.buf.hover()<CR>", "hover" },
-  i = { "<cmd>lua require'telescope.builtin'.lsp_definitions()<cr>", "go to definitions" },
-  I = {
-    { "<cmd>lua require'telescope.builtin'.lsp_definitions({jump_type = 'vsplit'})<cr>", "go to split definition" },
-  },
   o = { "<cmd>%bd|e#|bd#<cr>", "close all but this one" },
   p = { "<cmd>Telescope oldfiles<cr>", "recent" },
-  n = { "<cmd>lua require'bdub.commands.file_path'.get_operator_file_path()<cr>", "copy operator path" },
   N = { "<cmd>lua require'bdub.commands.file_path'.get_file_path()<cr>", "copy file path" },
-  d = { "<cmd>q!<CR>", "Quit" },
-  r = { "<cmd>lua require'telescope.builtin'.lsp_references()<cr>", "go to references" },
-  R = {
-    "<cmd>lua require'telescope.builtin'.lsp_references({jump_type = 'vsplit'})<cr>",
-    "jump to definition (vsplit)",
-  },
-  t = { "<cmd>lua require'telescope.builtin'.lsp_type_definitions()<cr><cmd>", "go to type definition" },
+  q = { "<cmd>q!<CR>", "Quit" },
   u = { "<cmd>UndotreeToggle<cr>", "undo tree" },
   ["."] = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
   w = { "<cmd>w!<CR>", "Save" },
@@ -50,6 +38,21 @@ local mappings = {
     j = { "<cmd>lua require'harpoon.ui'.nav_next()<cr>", "go next" },
     a = { "<cmd>lua require'harpoon.mark'.add_file()<cr>", "add file" },
   },
+  d = {
+    name = "+DiffView",
+    d = { "<cmd>DiffviewOpen<cr>", "Open diffview" },
+    o = { "<cmd>lua require 'diffview.config'.actions.conflict_choose('ours')<cr>", "choose ours" },
+    t = { "<cmd>lua require 'diffview.config'.actions.conflict_choose('theirs')<cr>", "choose theirs" },
+    b = { "<cmd>lua require 'diffview.config'.actions.conflict_choose('base')<cr>", "choose base" },
+    q = { "<cmd>DiffviewClose<cr>", "close diff view" },
+    a = { "<cmd>lua require 'diffview.config'.actions.conflict_choose('all')<cr>", "choose all" },
+    r = { "<cmd>lua require 'diffview.config'.actions.restore_entry()<cr>", "restore entry" },
+    s = {
+      "<cmd>lua require 'diffview.config'.actions.toggle_stage_entry()<cr>",
+      "toggle_stage_entry",
+    },
+    x = { "<cmd>lua require'diffview.config'.actions.conflict_choose('none')<cr>", "choose none" },
+  },
   g = {
     name = "Git",
     l = { "<cmd>lua require 'gitsigns'.blame_line()<cr>", "Blame" },
@@ -59,23 +62,9 @@ local mappings = {
     p = { "<cmd>lua require 'gitsigns'.preview_hunk()<cr>", "preview hunk" },
     S = { "<cmd>lua require 'telescope.builtin'.git_status()<cr>", "git status" },
     u = { "<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>", "Undo Stage Hunk" },
-    o = { "<cmd>DiffviewOpen<cr>", "Open diff view" },
+    d = { "<cmd>DiffviewOpen<cr>", "Open diff view" },
     b = { "<cmd>Telescope git_branches<cr>", "Checkout branch" },
     c = { "<cmd>DiffviewClose<cr>", "close diff view" },
-    d = {
-      name = "+DiffView",
-      d = { "<cmd>DiffviewOpen<cr>", "Open diffview" },
-      o = { "<cmd>lua require'diffview.config'.actions.conflict_choose('ours')<cr>", "choose ours" },
-      t = { "<cmd>lua require'diffview.config'.actions.conflict_choose('theirs')<cr>", "choose theirs" },
-      b = { "<cmd>lua require'diffview.config'.actions.conflict_choose('base')<cr>", "choose base" },
-      a = { "<cmd>lua require'diffview.config'.actions.conflict_choose('all')<cr>", "choose all" },
-      r = { "<cmd>lRa require'diffview.config'.actions.restore_entry()<cr>", "restore entry" },
-      s = {
-        "<cmd>lua require'diffview.config'.actions.toggle_stage_entry()<cr>",
-        "toggle_stage_entry",
-      },
-      x = { "<cmd>lua require'diffview.config'.actions.conflict_choose('none')<cr>", "choose none" },
-    },
     D = { "<cmd>Gitsigns diffthis HEAD<cr>", "Diff" },
   },
   l = {
@@ -105,6 +94,14 @@ local mappings = {
   },
   s = {
     name = "Search",
+    f = {
+      "<cmd>lua require 'bdub.commands.search'.find_files_within_directories()<CR>",
+      "find files within directories",
+    },
+    F = {
+      "<cmd>lua require 'bdub.commands.search'.grep_files_within_directories()<CR>",
+      "grep files within direcotries",
+    },
     b = { "<cmd>Telescope git_branches<cr>", "Checkout branch" },
     c = { "<cmd>Telescope colorscheme<cr>", "Colorscheme" },
     h = { "<cmd>Telescope help_tags<cr>", "Find Help" },
