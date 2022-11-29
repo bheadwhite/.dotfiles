@@ -17,9 +17,10 @@ configs.setup {
   incremental_selection = {
     enable = true,
     keymaps = {
-      init_selection = "<s-Tab>", -- maps in normal mode to init the node/scope selection
-      node_incremental = "<Tab>", -- increment to the upper named parent
-      node_decremental = "<s-Tab>", -- decrement to the previous node
+      init_selection = "<C-M-S-j>", -- maps in normal mode to init the node/scope selection
+      node_incremental = "<C-M-S-j>", -- increment to the upper named parent
+      scope_incremental = "<Tab>",
+      node_decremental = "<C-M-S-k>", -- decrement to the previous node
     },
   },
 }
