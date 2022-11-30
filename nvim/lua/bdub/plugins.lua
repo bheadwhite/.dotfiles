@@ -69,12 +69,19 @@ return packer.startup(function(use)
   use "f-person/git-blame.nvim"
   use "arkav/lualine-lsp-progress"
 
+  -- Telescope
+  use {
+    "nvim-telescope/telescope.nvim",
+    "nvim-telescope/telescope-ui-select.nvim",
+    {
+      "nvim-telescope/telescope-fzf-native.nvim",
+      run = "make",
+    },
+  }
   use {
     "AckslD/nvim-neoclip.lua",
     requires = {
-      -- you'll need at least one of these
       { "nvim-telescope/telescope.nvim" },
-      -- {'ibhagwan/fzf-lua'},
     },
     config = function()
       require("neoclip").setup {}
@@ -114,13 +121,6 @@ return packer.startup(function(use)
   use { "jose-elias-alvarez/null-ls.nvim" } -- for formatters and linters
   use { "RRethy/vim-illuminate" }
   use "nvim-lua/popup.nvim"
-
-  -- Telescope
-  use {
-    "nvim-telescope/telescope.nvim",
-    "nvim-telescope/telescope-ui-select.nvim",
-  }
-  use {'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build' }
 
   -- Git
   use { "lewis6991/gitsigns.nvim" }

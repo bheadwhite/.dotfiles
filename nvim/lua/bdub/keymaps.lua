@@ -2,7 +2,6 @@ local options = { noremap = true, silent = true }
 local keymap = vim.api.nvim_set_keymap
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
-
 -- Modes
 --   normal_mode = "n",
 --   insert_mode = "i",
@@ -45,7 +44,8 @@ keymap("n", "<M-S-l>", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>", opti
 
 keymap("n", "<C-M-r>", "<cmd>lua require'bdub.commands.file_path'.get_operator_file_path()<cr>", options)
 
-keymap("", "<C-M-p>", ":Telescope neoclip<cr>", options)
+keymap("n", "<C-M-p>", ":Telescope neoclip<cr>", options)
+keymap("i", "<C-M-p>", "<c-o>:Telescope neoclip<cr>", options)
 
 --rename
 keymap("n", "<C-M-n>", "<cmd>lua vim.lsp.buf.rename()<cr>", options)
