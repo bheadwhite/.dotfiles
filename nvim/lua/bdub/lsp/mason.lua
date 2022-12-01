@@ -48,9 +48,5 @@ for _, server in pairs(servers) do
     opts = vim.tbl_deep_extend("force", conf_opts, opts)
   end
 
-  if server == "tsserver" then
-    opts.init_options = require("bdub.lsp.tsserver").init_options
-  end
-
   lspconfig[server].setup(opts)
 end

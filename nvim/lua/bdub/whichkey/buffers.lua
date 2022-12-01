@@ -7,7 +7,7 @@ local exports = {
   zoom = { ":MaximizerToggle<CR>", "Zoom" },
   rename_file = { "<cmd>lua require 'nvim-lsp-ts-utils'.rename_file()<cr>", "Rename File" },
   toggle_tree = { "<cmd>NvimTreeToggle<cr>", "Explorer" },
-  quit = { "<cmd>q!", "Quit" },
+  quit = { "<cmd>q!<cr>", "Quit" },
 }
 
 return exports
