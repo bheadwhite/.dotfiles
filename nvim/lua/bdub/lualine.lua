@@ -56,7 +56,7 @@ local spaces = function()
   return "spaces: " .. vim.api.nvim_buf_get_option(0, "shiftwidth")
 end
 
-local full_path = function()
+local full_path_minus_filename = function()
   return vim.fn.expand "%:.:h" .. "/"
 end
 
@@ -87,7 +87,7 @@ lualine.setup {
   inactive_sections = {
     lualine_a = {},
     lualine_b = {},
-    lualine_c = { "filename" },
+    lualine_c = { { "filename", path = 1 } },
     lualine_x = { "location" },
     lualine_y = {},
     lualine_z = {},
@@ -96,7 +96,7 @@ lualine.setup {
     lualine_a = {
       {
         "filename",
-        fmt = full_path,
+        fmt = full_path_minus_filename,
         path = 1,
         color = { fg = "#fffff", bg = "" },
       },

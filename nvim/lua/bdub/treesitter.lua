@@ -13,14 +13,16 @@ configs.setup {
   autopairs = {
     enable = true,
   },
+  autotag = {
+    enable = true,
+  },
   indent = { enable = true, disable = { "python", "css" } },
   incremental_selection = {
     enable = true,
     keymaps = {
-      init_selection = "<C-M-S-j>", -- maps in normal mode to init the node/scope selection
-      node_incremental = "<C-M-S-j>", -- increment to the upper named parent
-      scope_incremental = "<Tab>",
-      node_decremental = "<C-M-S-k>", -- decrement to the previous node
+      init_selection = "<C-M-o>", -- maps in normal mode to init the node/scope selection
+      node_incremental = "<C-M-o>", -- increment to the upper named parent
+      node_decremental = "<C-M-,>", -- decrement to the previous node
     },
   },
 }

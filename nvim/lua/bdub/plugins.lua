@@ -45,6 +45,15 @@ return packer.startup(function(use)
   use { "windwp/nvim-autopairs" } -- Autopairs, integrates with both cmp and treesitter
   use "szw/vim-maximizer"
   use "sindrets/diffview.nvim"
+  use "nvim-treesitter/nvim-treesitter-context"
+  use "windwp/nvim-ts-autotag"
+  use "tpope/vim-dadbod"
+  use {
+    "kristijanhusak/vim-dadbod-ui",
+    config = function()
+      vim.g.db_ui_auto_execute_table_helpers = 1
+    end,
+  }
 
   use {
     "numToStr/Comment.nvim",

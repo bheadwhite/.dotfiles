@@ -55,6 +55,18 @@ M.setup = function()
   })
 end
 
+local function preview_location_callback(_, result)
+  if result == nil or vim.tbl_isempty(result) then
+    return nil
+  end
+  vim.lsp.util.preview_location(result[1])
+end
+
+function PeekDefinition()
+  local params = vim.lsp.util.make_position_params()
+  return vim.lsp.buf_request(0, "textDocument/definition", params, preview_location_callback)
+end
+
 local function lsp_keymaps(bufnr)
   local opts = { noremap = true, silent = true }
   local keymap = vim.api.nvim_buf_set_keymap
@@ -67,6 +79,7 @@ local function lsp_keymaps(bufnr)
   keymap(bufnr, "n", "gr", comands.telescope .. ".lsp_references()<cr>", opts)
   keymap(bufnr, "n", "gR", comands.telescope .. ".lsp_references({jump_type = 'vsplit'})<cr>", opts)
   keymap(bufnr, "n", "gi", comands.telescope .. ".lsp_definitions()<cr>", opts)
+  keymap(bufnr, "n", "gp", "<cmd>lua PeekDefinition()<cr>", opts)
   keymap(bufnr, "n", "gI", comands.telescope .. ".lsp_definitions({jump_type = 'vsplit'})<cr>", opts)
   keymap(bufnr, "n", "gH", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   keymap(bufnr, "n", "gh", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
@@ -82,6 +95,7 @@ end
 M.on_attach = function(client, bufnr)
   if client.name == "tsserver" then
     client.server_capabilities.documentFormattingProvider = false
+
     ts_utils.setup {
       import_all_timeout = 5000,
     }

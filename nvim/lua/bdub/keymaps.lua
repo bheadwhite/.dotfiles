@@ -11,10 +11,10 @@ vim.g.maplocalleader = " "
 --   command_mode = "c",
 
 -- Better window navigation
-keymap("n", "<Left>", "<C-w>h", options)
-keymap("n", "<Down>", "<C-w>j", options)
-keymap("n", "<Up>", "<C-w>k", options)
-keymap("n", "<Right>", "<C-w>l", options)
+keymap("n", "<C-M-S-h>", "<C-w>h", options)
+keymap("n", "<C-M-S-j>", "<C-w>j", options)
+keymap("n", "<C-M-S-k>", "<C-w>k", options)
+keymap("n", "<C-M-S-l>", "<C-w>l", options)
 
 -- Resize with arrows
 keymap("n", "<C-Up>", ":resize -2<CR>", options)
@@ -49,6 +49,10 @@ keymap("i", "<C-M-p>", "<c-o>:Telescope neoclip<cr>", options)
 
 --rename
 keymap("n", "<C-M-n>", "<cmd>lua vim.lsp.buf.rename()<cr>", options)
+
+--block navigation
+keymap("", "J", "}", options)
+keymap("", "K", "{", options)
 
 -- yank til the end of the line
 keymap("n", "S", "vg_", options)
