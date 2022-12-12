@@ -74,13 +74,19 @@ local function lsp_keymaps(bufnr)
     telescope = "<cmd>lua require 'telescope.builtin'",
   }
 
-  keymap(bufnr, "n", "gt", comands.telescope .. ".lsp_type_definitions()<cr>", opts)
-  keymap(bufnr, "n", "gT", comands.telescope .. ".lsp_type_definitions({jump_type = 'vsplit'})<cr>", opts)
-  keymap(bufnr, "n", "gr", comands.telescope .. ".lsp_references()<cr>", opts)
-  keymap(bufnr, "n", "gR", comands.telescope .. ".lsp_references({jump_type = 'vsplit'})<cr>", opts)
+  keymap(bufnr, "n", "gt", comands.telescope .. ".lsp_type_definitions({show_line = false})<cr>", opts)
+  keymap(
+    bufnr,
+    "n",
+    "gT",
+    comands.telescope .. ".lsp_type_definitions({jump_type = 'vsplit', show_line = false})<cr>",
+    opts
+  )
+  keymap(bufnr, "n", "gr", comands.telescope .. ".lsp_references({show_line = false})<cr>", opts)
+  keymap(bufnr, "n", "gR", comands.telescope .. ".lsp_references({jump_type = 'vsplit', show_line = false})<cr>", opts)
   keymap(bufnr, "n", "gi", comands.telescope .. ".lsp_definitions()<cr>", opts)
-  keymap(bufnr, "n", "gp", "<cmd>lua PeekDefinition()<cr>", opts)
   keymap(bufnr, "n", "gI", comands.telescope .. ".lsp_definitions({jump_type = 'vsplit'})<cr>", opts)
+  keymap(bufnr, "n", "gp", "<cmd>lua PeekDefinition()<cr>", opts)
   keymap(bufnr, "n", "gH", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   keymap(bufnr, "n", "gh", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 end

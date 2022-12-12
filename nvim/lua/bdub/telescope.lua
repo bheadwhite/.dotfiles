@@ -5,17 +5,47 @@ end
 
 local actions = require "telescope.actions"
 
+local operator_path_display = function(opts, file_path) -- absolute path
+  if not string.find(file_path, "^/Users/brent.whitehead/") then
+    return file_path
+  end
+
+  local relative_path = string.gsub(file_path, "/Users/brent.whitehead(.*)", "~%1")
+
+  if string.find(relative_path, "ui/operator/src") then
+    local result = string.gsub(relative_path, ".*/?ui/operator/src/(.*)", "operator/%1")
+    print(result)
+    return result
+  elseif string.find(relative_path, "Projects/neo/commons/ui") then
+    local result = string.gsub(relative_path, ".*/?(commons/)ui/(.*)", "%1%2")
+    print(result)
+    return result
+  end
+
+  print("relative " .. relative_path)
+
+  return relative_path
+end
+
 telescope.setup {
+  pickers = {
+    buffers = {
+      path_display = { "tail" },
+    },
+    find_files = {
+      path_display = operator_path_display,
+    },
+  },
   defaults = {
     prompt_prefix = " ",
     selection_caret = " ",
     layout_strategy = "horizontal",
-    dynamic_preview_title = true,
-    path_display = { "tail" },
-    -- layout_config = {
-    --   width = 0.8,
-    --   height = 0.8,
-    --   preview_width = 0.7, }, extensions = {
+    path_display = operator_path_display,
+    layout_config = {
+      width = 0.95,
+      height = 0.8,
+      preview_width = 0.35,
+    },
     fzf = {
       fuzzy = true,
       override_generic_sorter = true,
