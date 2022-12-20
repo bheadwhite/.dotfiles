@@ -22,8 +22,6 @@ local operator_path_display = function(opts, file_path) -- absolute path
     return result
   end
 
-  print("relative " .. relative_path)
-
   return relative_path
 end
 
@@ -32,19 +30,16 @@ telescope.setup {
     buffers = {
       path_display = { "tail" },
     },
-    find_files = {
-      path_display = operator_path_display,
-    },
   },
   defaults = {
     prompt_prefix = " ",
     selection_caret = " ",
-    layout_strategy = "horizontal",
+    layout_strategy = "vertical",
     path_display = operator_path_display,
+
     layout_config = {
-      width = 0.95,
-      height = 0.8,
-      preview_width = 0.35,
+      height = 0.9,
+      preview_cutoff = 60,
     },
     fzf = {
       fuzzy = true,

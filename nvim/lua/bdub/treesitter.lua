@@ -22,7 +22,7 @@ configs.setup {
     keymaps = {
       init_selection = "<C-M-o>", -- maps in normal mode to init the node/scope selection
       node_incremental = "<C-M-o>", -- increment to the upper named parent
-      node_decremental = "<C-M-,>", -- decrement to the previous node
+      node_decremental = "<C-M-i>", -- decrement to the previous node
     },
   },
 }

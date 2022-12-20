@@ -38,6 +38,10 @@ local mappings = {
   w = buffers_keymaps.write,
   z = buffers_keymaps.zoom,
   o = buffers_keymaps.close_all_but_this_one,
+  t = {
+    "<cmd>lua require'bdub.commands.test_neo'.run_coverage_on_dir()<CR>",
+    "run coverage",
+  },
   e = buffers_keymaps.toggle_tree,
   r = buffers_keymaps.rename_file,
   q = buffers_keymaps.quit,

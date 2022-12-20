@@ -16,8 +16,6 @@ end
 
 local function get_dir_results_from_picker(picker)
   local selected_entry = action_state.get_selected_entry()
-  print(vim.inspect(selected_entry))
-
   local selected = { selected_entry[1] }
 
   for _, entry in ipairs(picker:get_multi_selection()) do

@@ -48,6 +48,7 @@ return packer.startup(function(use)
   use "nvim-treesitter/nvim-treesitter-context"
   use "windwp/nvim-ts-autotag"
   use "tpope/vim-dadbod"
+  use "hrsh7th/cmp-nvim-lsp-signature-help"
   use {
     "kristijanhusak/vim-dadbod-ui",
     config = function()
@@ -98,7 +99,6 @@ return packer.startup(function(use)
   }
   -- Colorschemes
   use {
-    "folke/tokyonight.nvim",
     "lunarvim/darkplus.nvim",
     "sainnhe/everforest",
   }

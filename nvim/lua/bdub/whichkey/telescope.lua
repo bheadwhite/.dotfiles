@@ -4,10 +4,7 @@ local exports = {
     "<cmd>lua require 'telescope.builtin'.buffers(require('telescope.themes').get_dropdown{previewer = false})<cr>",
     "Buffers",
   },
-  find_files = {
-    "<cmd>lua require 'telescope.builtin'.find_files()<CR>",
-    "Find Files",
-  },
+  find_files = { "<cmd>lua require 'telescope.builtin'.find_files()<CR>", "Find Files" },
   live_grep = { "<cmd>lua require 'telescope.builtin'.live_grep()<CR>", "Grep Files" },
   recent_files = { "<cmd>Telescope oldfiles<cr>", "Recent Files" },
   lsp_implementations = { "<cmd>lua require 'telescope.builtin'.lsp_implementations()<cr>", "implementions" },
