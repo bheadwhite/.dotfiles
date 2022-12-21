@@ -1,8 +1,8 @@
-require("theprimeagen.set")
-require("theprimeagen.remap")
+require("bdub.set")
+require("bdub.remap")
 
 local augroup = vim.api.nvim_create_augroup
-local ThePrimeagenGroup = augroup('ThePrimeagen', {})
+local bdubsGroup = augroup('bdub', {})
 
 local autocmd = vim.api.nvim_create_autocmd
 local yank_group = augroup('HighlightYank', {})
@@ -11,6 +11,7 @@ function R(name)
     require("plenary.reload").reload_module(name)
 end
 
+--
 autocmd('TextYankPost', {
     group = yank_group,
     pattern = '*',
@@ -22,8 +23,9 @@ autocmd('TextYankPost', {
     end,
 })
 
+-- remove trailing whitespaces
 autocmd({"BufWritePre"}, {
-    group = ThePrimeagenGroup,
+    group = bdubsGroup,
     pattern = "*",
     command = [[%s/\s\+$//e]],
 })
