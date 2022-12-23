@@ -3,10 +3,24 @@ if not status_ok then
 	return
 end
 
+local function add_desc(desc, table)
+	local opts = {}
+	opts.desc = desc
+	opts = vim.tbl_extend("force", opts, table or {})
+	return opts
+end
+
 local builtin = require("telescope.builtin")
 vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "find files" })
 vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "git files" })
 vim.keymap.set("n", "<leader>p", builtin.oldfiles, { desc = "recent files" })
+vim.keymap.set(
+	"n",
+	"<leader>e",
+	"<cmd>Telescope file_browser path=%:p:h<CR>",
+	add_desc("Open file explorer", { noremap = true })
+)
+vim.keymap.set("n", "<leader>H", builtin.command_history, { desc = "command history" })
 
 local operator_path_display = function(_, file_path) -- absolute path
 	if not string.find(file_path, "^/Users/brent.whitehead/") then
@@ -33,18 +47,76 @@ telescope.setup({
 		buffers = {
 			path_display = { "tail" },
 		},
+		find_files = {
+			path_display = operator_path_display,
+			layout_strategy = "vertical",
+			layout_config = {
+				height = 0.9,
+				preview_cutoff = 60,
+			},
+		},
+		git_files = {
+			path_display = operator_path_display,
+			layout_strategy = "vertical",
+			layout_config = {
+				height = 0.9,
+				preview_cutoff = 60,
+			},
+		},
+		live_grep = {
+			path_display = operator_path_display,
+			layout_strategy = "vertical",
+			layout_config = {
+				height = 0.9,
+				preview_cutoff = 60,
+			},
+		},
+		oldfiles = {
+			path_display = operator_path_display,
+			layout_strategy = "vertical",
+			layout_config = {
+				height = 0.9,
+				preview_cutoff = 60,
+			},
+		},
+		lsp_references = {
+			path_display = operator_path_display,
+			layout_strategy = "vertical",
+			layout_config = {
+				height = 0.9,
+				preview_cutoff = 60,
+			},
+		},
+		lsp_definitions = {
+			path_display = operator_path_display,
+			layout_strategy = "vertical",
+			layout_config = {
+				height = 0.9,
+				preview_cutoff = 60,
+			},
+		},
+		lsp_type_definitions = {
+			path_display = operator_path_display,
+			layout_strategy = "vertical",
+			layout_config = {
+				height = 0.9,
+				preview_cutoff = 60,
+			},
+		},
+		lsp_implementations = {
+			layout_strategy = "vertical",
+			layout_config = {
+				height = 0.9,
+				preview_cutoff = 60,
+			},
+			path_display = operator_path_display,
+		},
 	},
 	defaults = {
 		prompt_prefix = " ",
 		selection_caret = " ",
-		layout_strategy = "vertical",
-		path_display = operator_path_display,
-
-		layout_config = {
-			height = 0.9,
-			preview_cutoff = 60,
-		},
-
+	},
+	extensions = {
 		fzf = {
 			fuzzy = true,
 			override_generic_sorter = true,
