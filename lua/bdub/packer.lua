@@ -60,6 +60,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		end,
 	})
 	use("RRethy/vim-illuminate")
+	use({ "nvim-telescope/telescope-file-browser.nvim" })
 
 	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
 	use("nvim-lualine/lualine.nvim")

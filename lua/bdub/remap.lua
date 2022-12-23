@@ -8,7 +8,12 @@ local function add_desc(desc, table)
 	return opts
 end
 
-vim.keymap.set("n", "<leader>e", vim.cmd.Ex, add_desc("Open file explorer"))
+vim.keymap.set(
+	"n",
+	"<leader>e",
+	"<cmd>Telescope file_browser path=%:p:h<CR>",
+	add_desc("Open file explorer", { noremap = true })
+)
 
 -- vim.keymap.set("n", "<C-M-S-j>", "mzJ`z")
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
