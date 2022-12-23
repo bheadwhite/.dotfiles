@@ -14,12 +14,17 @@ local builtin = require("telescope.builtin")
 vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "find files" })
 vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "git files" })
 vim.keymap.set("n", "<leader>p", builtin.oldfiles, { desc = "recent files" })
-vim.keymap.set(
-	"n",
-	"<leader>e",
-	"<cmd>Telescope file_browser path=%:p:h<CR>",
-	add_desc("Open file explorer", { noremap = true })
-)
+vim.keymap.set("n", "<leader>e", function()
+	telescope.extensions.file_browser.file_browser({
+		path = "%:p:h",
+		cwd = vim.fn.expand("%:p:h"),
+		respect_gitignore = false,
+		grouped = true,
+		initial_mode = "normal",
+		layout_config = { height = 40 },
+		hidden = true,
+	})
+end, add_desc("Open file explorer", { noremap = true }))
 vim.keymap.set("n", "<leader>H", builtin.command_history, { desc = "command history" })
 
 local operator_path_display = function(_, file_path) -- absolute path
@@ -42,75 +47,28 @@ local operator_path_display = function(_, file_path) -- absolute path
 	return relative_path
 end
 
+local default_opts = {
+	path_display = operator_path_display,
+	layout_strategy = "vertical",
+	layout_config = {
+		height = 0.9,
+		preview_cutoff = 60,
+	},
+}
+
 telescope.setup({
 	pickers = {
 		buffers = {
 			path_display = { "tail" },
 		},
-		find_files = {
-			path_display = operator_path_display,
-			layout_strategy = "vertical",
-			layout_config = {
-				height = 0.9,
-				preview_cutoff = 60,
-			},
-		},
-		git_files = {
-			path_display = operator_path_display,
-			layout_strategy = "vertical",
-			layout_config = {
-				height = 0.9,
-				preview_cutoff = 60,
-			},
-		},
-		live_grep = {
-			path_display = operator_path_display,
-			layout_strategy = "vertical",
-			layout_config = {
-				height = 0.9,
-				preview_cutoff = 60,
-			},
-		},
-		oldfiles = {
-			path_display = operator_path_display,
-			layout_strategy = "vertical",
-			layout_config = {
-				height = 0.9,
-				preview_cutoff = 60,
-			},
-		},
-		lsp_references = {
-			path_display = operator_path_display,
-			layout_strategy = "vertical",
-			layout_config = {
-				height = 0.9,
-				preview_cutoff = 60,
-			},
-		},
-		lsp_definitions = {
-			path_display = operator_path_display,
-			layout_strategy = "vertical",
-			layout_config = {
-				height = 0.9,
-				preview_cutoff = 60,
-			},
-		},
-		lsp_type_definitions = {
-			path_display = operator_path_display,
-			layout_strategy = "vertical",
-			layout_config = {
-				height = 0.9,
-				preview_cutoff = 60,
-			},
-		},
-		lsp_implementations = {
-			layout_strategy = "vertical",
-			layout_config = {
-				height = 0.9,
-				preview_cutoff = 60,
-			},
-			path_display = operator_path_display,
-		},
+		find_files = default_opts,
+		git_files = default_opts,
+		live_grep = default_opts,
+		oldfiles = default_opts,
+		lsp_references = default_opts,
+		lsp_definitions = default_opts,
+		lsp_type_definitions = default_opts,
+		lsp_implementations = default_opts,
 	},
 	defaults = {
 		prompt_prefix = " ",
