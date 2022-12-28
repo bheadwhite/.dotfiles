@@ -8,6 +8,8 @@ local function add_desc(desc, table)
 	return opts
 end
 
+local commands = require("bdub.commands")
+
 -- vim.keymap.set("n", "<C-M-S-j>", "mzJ`z")
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
@@ -34,6 +36,7 @@ vim.keymap.set("n", "<leader>j", "<cmd>cnext<CR>zz", add_desc("Next quickfix"))
 vim.keymap.set("n", "<leader>k", "<cmd>cprev<CR>zz", add_desc("Previous quickfix"))
 vim.keymap.set("n", "<leader>>", "<cmd>lnext<CR>zz", add_desc("Next location"))
 vim.keymap.set("n", "<leader><", "<cmd>lprev<CR>zz", add_desc("Previous location"))
+vim.keymap.set("c", "<M-k>", "\\(.*\\)", { desc = "one eyed fighting kirby" })
 
 vim.keymap.set(
 	"n",
@@ -43,16 +46,8 @@ vim.keymap.set(
 )
 vim.keymap.set("n", "<leader>X", "<cmd>!chmod +x %<CR>", add_desc("Make file executable"))
 vim.keymap.set("n", "<leader>w", ":w<CR>", add_desc("write", { silent = true }))
-vim.keymap.set("n", "<leader>q", function()
-	vim.cmd.Bdelete()
-	vim.cmd.q()
-end, add_desc("close buffer and close split", { noremap = true, silent = true }))
-vim.keymap.set(
-	"n",
-	"<C-M-r>",
-	"<cmd>lua require'bdub.commands'.copy_file_path()<cr>",
-	{ noremap = true, silent = true }
-)
+vim.keymap.set("n", "<leader>q", vim.cmd.q, add_desc("close buffer and close split", { noremap = true, silent = true }))
+vim.keymap.set("n", "<C-M-r>", commands.copy_file_path, { noremap = true, silent = true })
 
 local keymap = vim.api.nvim_set_keymap
 local options = { noremap = true, silent = true }

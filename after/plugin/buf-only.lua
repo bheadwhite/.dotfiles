@@ -70,4 +70,4 @@ function! BufOnly(buffer, bang)
 
 endfunction]])
 
-vim.keymap.set("n", "<leader>o", vim.cmd.BufOnly, { noremap = true })
+vim.keymap.set("n", "<leader>o", vim.cmd.BufOnly, { desc = "Close All Except this one", noremap = true })

@@ -22,6 +22,14 @@ local mappings = {
 	[">"] = { "which_key_ignore" },
 	["<"] = { "which_key_ignore" },
 	p = { "which_key_ignore" },
+	P = {
+		function()
+			local path = vim.fn.expand("%:.")
+			print(path)
+			vim.fn.setreg("+", path)
+		end,
+		"get relative path",
+	},
 	u = { "which_key_ignore" },
 	w = { "which_key_ignore" },
 	g = {
