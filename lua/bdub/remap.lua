@@ -9,66 +9,48 @@ local function add_desc(desc, table)
 end
 
 local commands = require("bdub.commands")
-
--- vim.keymap.set("n", "<C-M-S-j>", "mzJ`z")
-vim.keymap.set("n", "<C-d>", "<C-d>zz")
-vim.keymap.set("n", "<C-u>", "<C-u>zz")
-vim.keymap.set("n", "n", "nzzzv")
-vim.keymap.set("n", "N", "Nzzzv")
-
--- greatest remap ever
-vim.keymap.set("x", "<leader>P", [["_dP]], add_desc("Paste over selection"))
-
--- next greatest remap ever : asbjornHaland
-vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], add_desc("Copy to system clipboard"))
-vim.keymap.set("n", "<leader>Y", [["+Y]], add_desc("Copy line to system clipboard"))
-
--- yank til the end of the line
-vim.keymap.set("n", "S", "vg_", { noremap = true, silent = true })
-
--- keep put register consistent for visual puts
-vim.keymap.set("v", "p", '"_dP', { noremap = true, silent = true })
-
-vim.keymap.set("n", "Q", "<nop>")
-vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
-
-vim.keymap.set("n", "<leader>j", "<cmd>cnext<CR>zz", add_desc("Next quickfix"))
-vim.keymap.set("n", "<leader>k", "<cmd>cprev<CR>zz", add_desc("Previous quickfix"))
-vim.keymap.set("n", "<leader>>", "<cmd>lnext<CR>zz", add_desc("Next location"))
-vim.keymap.set("n", "<leader><", "<cmd>lprev<CR>zz", add_desc("Previous location"))
-vim.keymap.set("c", "<M-k>", "\\(.*\\)", { desc = "one eyed fighting kirby" })
-
-vim.keymap.set(
-	"n",
-	"<leader>S",
-	[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
-	add_desc("Search and replace under cursor")
-)
-vim.keymap.set("n", "<leader>X", "<cmd>!chmod +x %<CR>", add_desc("Make file executable"))
-vim.keymap.set("n", "<leader>w", ":w<CR>", add_desc("write", { silent = true }))
-vim.keymap.set("n", "<leader>q", vim.cmd.q, add_desc("close buffer and close split", { noremap = true, silent = true }))
-vim.keymap.set("n", "<C-M-r>", commands.copy_file_path, { noremap = true, silent = true })
-
-local keymap = vim.api.nvim_set_keymap
 local options = { noremap = true, silent = true }
 
--- window navigation
-keymap("n", "<C-M-S-h>", "<C-w>h", options)
-keymap("n", "<C-M-S-j>", "<C-w>j", options)
-keymap("n", "<C-M-S-k>", "<C-w>k", options)
-keymap("n", "<C-M-S-l>", "<C-w>l", options)
+local normal_keymaps = {
+	{ "gj", "mzJ`z", "join" },
+	{ "<c-d>", "<c-d>zz", "half page down" },
+	{ "<C-u>", "<C-u>zz", "half page up" },
+	{ "n", "nzzzv", "next with cursor centered" },
+	{ "N", "Nzzzv", "prev with cursor centered" },
+	{ "<leader>Y", [["+Y]], "Copy line to system clipboard" },
+	{ "S", "vg_", "select until EOL" },
+	{ "Q", "<nop>", "disable ex mode" },
+	{ "<leader>j", "<cmd>cnext<CR>zz", "next quickfix" },
+	{ "<leader>k", "<cmd>cprev<CR>zz", "prev quickfix" },
+	{ "<leader>>", "<cmd>lnext<CR>zz", "next location" },
+	{ "<leader><", "<cmd>lprev<CR>zz", "prev location" },
+	{ "<leader>S", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "substitue under cursor" },
+	{ "<leader>X", "<cmd>!chmod +x %<CR>", "make file executable" },
+	{ "<leader>w", ":w<CR>", "write" },
+	{ "<leader>q", vim.cmd.q, "close buffer" },
+	{ "<C-M-r>", commands.copy_file_path, "copy file path" },
+	{ "<C-M-S-h>", "<C-w>h", "left window nav" },
+	{ "<C-M-S-j>", "<C-w>j", "down window nav" },
+	{ "<C-M-S-k>", "<C-w>k", "up window nav" },
+	{ "<C-M-S-l>", "<C-w>l", "right window nav" },
+	{ "<C-Up>", ":resize -2<CR>", "resize split -2" },
+	{ "<C-Down>", ":resize +2<CR>", "resize split +2" },
+	{ "<C-Left>", ":vertical resize -2<CR>", "resize vertical split -2" },
+	{ "<C-Right>", ":vertical resize +2<CR>", "resize vertical split +2" },
+	{ "<C-,>", ":bp<CR>", "prev buffer" },
+	{ "<C-.>", ":bn<CR>", "next buffer" },
+	{ "<leader>h", ":nohl<CR>", "nohl" },
+	{ "*", ":keepjumps normal! mi*`i<CR>", "for jumps" },
+}
 
--- Resize with arrows
-keymap("n", "<C-Up>", ":resize -2<CR>", options)
-keymap("n", "<C-Down>", ":resize +2<CR>", options)
-keymap("n", "<C-Left>", ":vertical resize -2<CR>", options)
-keymap("n", "<C-Right>", ":vertical resize +2<CR>", options)
+for _, value in ipairs(normal_keymaps) do
+	vim.keymap.set("n", value[1], value[2], add_desc(value[3], options))
+end
 
--- Navigate buffers
-keymap("n", "<C-,>", ":bp<CR>", options)
-keymap("n", "<C-.>", ":bn<CR>", options)
-
-keymap("n", "<leader>h", ":nohl<CR>", add_desc("nohl", options))
-keymap("n", "J", "}", options)
-keymap("n", "K", "{", options)
-keymap("n", "*", ":keepjumps normal! mi*`i<CR>", options)
+-- system clipboard
+vim.keymap.set("x", "<leader>P", [["_dP]], add_desc("Paste over selection"))
+vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], add_desc("Copy to system clipboard"))
+vim.keymap.set("v", "p", '"_dP', options)
+vim.keymap.set("c", "<M-k>", "\\(.*\\)", { desc = "one eyed fighting kirby" })
+vim.keymap.set({ "n", "v" }, "J", "}", options)
+vim.keymap.set({ "n", "v" }, "K", "{", options)

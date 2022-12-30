@@ -3,6 +3,10 @@ if not status_ok then
 	return
 end
 
+local plenary = require("plenary")
+local action_state = require("telescope.actions.state")
+local commands = require("bdub.commands")
+
 local function add_desc(desc, table)
 	local opts = {}
 	opts.desc = desc
@@ -56,6 +60,16 @@ local default_opts = {
 	},
 }
 
+function copy_path_from_selection(bufnr)
+	local current_picker = action_state.get_current_picker(bufnr)
+	local selection = current_picker:get_selection()
+	local path = selection[1]
+	local cwd = vim.loop.cwd()
+	local relative_path = plenary.Path:new(path):make_relative(cwd)
+
+	commands.copy_operator_file_path(relative_path)
+end
+
 telescope.setup({
 	pickers = {
 		buffers = {
@@ -73,6 +87,14 @@ telescope.setup({
 	defaults = {
 		prompt_prefix = " ",
 		selection_caret = " ",
+		mappings = {
+			i = {
+				["<C-M-r>"] = copy_path_from_selection,
+			},
+			n = {
+				["<C-M-r>"] = copy_path_from_selection,
+			},
+		},
 	},
 	extensions = {
 		fzf = {
@@ -83,7 +105,9 @@ telescope.setup({
 		},
 		["ui-select"] = {
 			require("telescope.themes").get_dropdown({
-				-- even more opts
+				layout_config = {
+					width = 0.7,
+				},
 			}),
 		},
 	},
