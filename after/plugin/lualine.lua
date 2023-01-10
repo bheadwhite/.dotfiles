@@ -21,6 +21,10 @@ local function get_branch()
 	return string.sub(branch, 1, 40)
 end
 
+local function maximize_status()
+	return vim.t.maximized and "   " or ""
+end
+
 lualine.setup({
 	options = {
 		icons_enabled = true,
@@ -104,6 +108,10 @@ lualine.setup({
 					alternate_file = "#", -- Text to show to identify the alternate file
 					directory = "", -- Text to show when the buffer is a directory
 				},
+			},
+			{
+				maximize_status,
+				color = { fg = "#fffff", bg = "" },
 			},
 		},
 	},

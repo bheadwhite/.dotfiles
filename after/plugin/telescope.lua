@@ -6,6 +6,7 @@ end
 local plenary = require("plenary")
 local action_state = require("telescope.actions.state")
 local commands = require("bdub.commands")
+local actions = require("telescope.actions")
 
 local function add_desc(desc, table)
 	local opts = {}
@@ -90,6 +91,11 @@ telescope.setup({
 		mappings = {
 			i = {
 				["<C-M-r>"] = copy_path_from_selection,
+				["<c-f>"] = actions.to_fuzzy_refine,
+				["<C-M-S-l>"] = function()
+					print("hello world")
+					return vim.api.nvim_buf_set_text("!fixture !tests")
+				end,
 			},
 			n = {
 				["<C-M-r>"] = copy_path_from_selection,

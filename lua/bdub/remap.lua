@@ -29,10 +29,6 @@ local normal_keymaps = {
 	{ "<leader>w", ":w<CR>", "write" },
 	{ "<leader>q", vim.cmd.q, "close buffer" },
 	{ "<C-M-r>", commands.copy_file_path, "copy file path" },
-	{ "<C-M-S-h>", "<C-w>h", "left window nav" },
-	{ "<C-M-S-j>", "<C-w>j", "down window nav" },
-	{ "<C-M-S-k>", "<C-w>k", "up window nav" },
-	{ "<C-M-S-l>", "<C-w>l", "right window nav" },
 	{ "<C-Up>", ":resize -2<CR>", "resize split -2" },
 	{ "<C-Down>", ":resize +2<CR>", "resize split +2" },
 	{ "<C-Left>", ":vertical resize -2<CR>", "resize vertical split -2" },
@@ -40,6 +36,7 @@ local normal_keymaps = {
 	{ "<C-,>", ":bp<CR>", "prev buffer" },
 	{ "<C-.>", ":bn<CR>", "next buffer" },
 	{ "<leader>h", ":nohl<CR>", "nohl" },
+	{ " ", "<Nop>", "noop for map leader" },
 	{ "*", ":keepjumps normal! mi*`i<CR>", "for jumps" },
 }
 
@@ -49,8 +46,17 @@ end
 
 -- system clipboard
 vim.keymap.set("x", "<leader>P", [["_dP]], add_desc("Paste over selection"))
-vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], add_desc("Copy to system clipboard"))
 vim.keymap.set("v", "p", '"_dP', options)
+vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], add_desc("Copy to system clipboard"))
+
 vim.keymap.set("c", "<M-k>", "\\(.*\\)", { desc = "one eyed fighting kirby" })
 vim.keymap.set({ "n", "v" }, "J", "}", options)
 vim.keymap.set({ "n", "v" }, "K", "{", options)
+vim.keymap.set({ "n", "v" }, "L", "$", options)
+vim.keymap.set({ "n", "v" }, "H", "_", options)
+vim.keymap.set({ "n", "v", "x" }, "<C-M-S-h>", "<C-w>h", add_desc("left window nav"))
+vim.keymap.set({ "n", "v", "x" }, "<C-M-S-j>", "<C-w>j", add_desc("down window nav"))
+vim.keymap.set({ "n", "v", "x" }, "<C-M-S-k>", "<C-w>k", add_desc("up window nav"))
+vim.keymap.set({ "n", "v", "x" }, "<C-M-S-l>", "<C-w>l", add_desc("right window nav"))
+
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", options)

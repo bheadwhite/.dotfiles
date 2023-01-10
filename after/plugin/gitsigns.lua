@@ -57,8 +57,18 @@ local keymap = vim.api.nvim_set_keymap
 -- undo_stage_hunk = { "<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>", "Undo Stage Hunk" },
 -- diff = { "<cmd>Gitsigns diffthis HEAD<cr>", "Diff" },
 
-keymap("n", "L", "<cmd>lua require 'gitsigns'.next_hunk()<cr>", { noremap = true, silent = true, desc = "next hunk" })
-keymap("n", "H", "<cmd>lua require 'gitsigns'.prev_hunk()<cr>", { noremap = true, silent = true, desc = "prev hunk" })
+keymap(
+	"n",
+	"<leader>gj",
+	"<cmd>lua require 'gitsigns'.next_hunk()<cr>",
+	{ noremap = true, silent = true, desc = "next hunk" }
+)
+keymap(
+	"n",
+	"<leader>gk",
+	"<cmd>lua require 'gitsigns'.prev_hunk()<cr>",
+	{ noremap = true, silent = true, desc = "prev hunk" }
+)
 vim.keymap.set("n", "<leader>gb", "<cmd>lua require 'gitsigns'.blame_line()<cr>", { desc = "blame line" })
 vim.keymap.set("n", "<leader>gr", "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", { desc = "reset hunk" })
 vim.keymap.set("n", "<leader>gR", "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", { desc = "reset buffer" })

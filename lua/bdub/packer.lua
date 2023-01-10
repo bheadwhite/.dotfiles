@@ -64,7 +64,10 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 
 	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
 	use("nvim-lualine/lualine.nvim")
-	use("szw/vim-maximizer")
+	use("declancm/maximize.nvim")
+
+	use("akinsho/toggleterm.nvim")
+	use("Pocco81/HighStr.nvim")
 
 	use("nvim-treesitter/playground")
 	use("theprimeagen/harpoon")
