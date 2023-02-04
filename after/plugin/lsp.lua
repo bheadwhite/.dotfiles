@@ -58,16 +58,16 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
 		}),
 		{ "i", "c" }
 	),
-	["<C-Space>"] = cmp.mapping(
-		cmp.mapping.complete({
-			config = {
-				sources = {
-					{ name = "nvim_lsp_signature_help" },
-				},
-			},
-		}),
-		{ "i", "c" }
-	),
+	-- ["<C-Space>"] = cmp.mapping(
+	-- 	cmp.mapping.complete({
+	-- 		config = {
+	-- 			sources = {
+	-- 				{ name = "nvim_lsp_signature_help" },
+	-- 			},
+	-- 		},
+	-- 	}),
+	-- 	{ "i", "c" }
+	-- ),
 	["<M-j>"] = cmp.mapping(function(fallback)
 		if cmp.visible() then
 			cmp.select_next_item()
@@ -98,7 +98,7 @@ cmp_mappings["<S-Tab>"] = nil
 lsp.setup_nvim_cmp({
 	mapping = cmp_mappings,
 	sources = {
-		{ name = "nvim_lsp_signature_help" },
+		-- { name = "nvim_lsp_signature_help" },
 		{ name = "nvim_lsp" },
 		{ name = "path" },
 	},
@@ -151,14 +151,17 @@ lsp.on_attach(function(client, bufnr)
 	vim.keymap.set("n", "gi", function()
 		telescope.lsp_definitions({ { show_line = false } })
 	end, opts)
+	vim.keymap.set("v", "gI", function()
+		telescope.lsp_definitions({ show_line = false, jump_type = "split" })
+	end, add_desc("implementation down", bufnr))
 	vim.keymap.set("n", "gI", function()
 		telescope.lsp_definitions({ show_line = false, jump_type = "vsplit" })
-	end, add_desc("implementation", bufnr))
+	end, add_desc("implementation right", bufnr))
 	vim.keymap.set("n", "gr", function()
-		telescope.lsp_references({ show_line = false })
+		telescope.lsp_references({ show_line = false, include_declaration = false })
 	end, add_desc("references", bufnr))
 	vim.keymap.set("n", "gR", function()
-		telescope.lsp_references({ jump_type = "vsplit", show_line = false })
+		telescope.lsp_references({ jump_type = "vsplit", show_line = false, include_declaration = false })
 	end, add_desc("references split", bufnr))
 	vim.keymap.set("n", "gh", vim.lsp.buf.hover, opts)
 	vim.keymap.set("n", "<leader>vs", vim.lsp.buf.workspace_symbol, add_desc("workspace symbols", bufnr))
@@ -176,6 +179,9 @@ lsp.on_attach(function(client, bufnr)
 	end, add_desc("type definition", bufnr))
 	vim.keymap.set("n", "gT", function()
 		telescope.lsp_type_definitions({ jump_type = "vsplit", show_line = false })
+	end, add_desc("type definition split", bufnr))
+	vim.keymap.set("v", "gT", function()
+		telescope.lsp_type_definitions({ jump_type = "split", show_line = false })
 	end, add_desc("type definition split", bufnr))
 end)
 

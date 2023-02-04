@@ -114,6 +114,11 @@ lualine.setup({
 				color = { fg = "#fffff", bg = "" },
 			},
 		},
+		lualine_z = {
+			{
+				"tabs",
+			},
+		},
 	},
 	extensions = {},
 })

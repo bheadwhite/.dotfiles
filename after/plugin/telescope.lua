@@ -30,7 +30,6 @@ vim.keymap.set("n", "<leader>e", function()
 		hidden = true,
 	})
 end, add_desc("Open file explorer", { noremap = true }))
-vim.keymap.set("n", "<leader>H", builtin.command_history, { desc = "command history" })
 
 local operator_path_display = function(_, file_path) -- absolute path
 	if not string.find(file_path, "^/Users/brent.whitehead/") then
@@ -40,20 +39,29 @@ local operator_path_display = function(_, file_path) -- absolute path
 	local relative_path = string.gsub(file_path, "/Users/brent.whitehead(.*)", "~%1")
 
 	if string.find(relative_path, "ui/operator/src") then
-		local result = string.gsub(relative_path, ".*/?ui/operator/src/(.*)", "operator/%1")
-		print(result)
-		return result
+		return string.gsub(relative_path, ".*/?ui/operator/src/(.*)", "operator/%1")
 	elseif string.find(relative_path, "Projects/neo/commons/ui") then
-		local result = string.gsub(relative_path, ".*/?(commons/)ui/(.*)", "%1%2")
-		print(result)
-		return result
+		return string.gsub(relative_path, ".*/?(commons/)ui/(.*)", "%1%2")
 	end
 
 	return relative_path
 end
 
+local file_name_only = function(_, file_path)
+	return string.gsub(file_path, ".*/(.*)$", "%1")
+end
+
 local default_opts = {
 	path_display = operator_path_display,
+	layout_strategy = "vertical",
+	layout_config = {
+		height = 0.9,
+		preview_cutoff = 60,
+	},
+}
+
+local reference_opts = {
+	path_display = file_name_only,
 	layout_strategy = "vertical",
 	layout_config = {
 		height = 0.9,
@@ -80,7 +88,7 @@ telescope.setup({
 		git_files = default_opts,
 		live_grep = default_opts,
 		oldfiles = default_opts,
-		lsp_references = default_opts,
+		lsp_references = reference_opts,
 		lsp_definitions = default_opts,
 		lsp_type_definitions = default_opts,
 		lsp_implementations = default_opts,
@@ -88,13 +96,20 @@ telescope.setup({
 	defaults = {
 		prompt_prefix = " ",
 		selection_caret = " ",
+		dynamic_preview_title = true,
 		mappings = {
 			i = {
 				["<C-M-r>"] = copy_path_from_selection,
 				["<c-f>"] = actions.to_fuzzy_refine,
 				["<C-M-S-l>"] = function()
-					print("hello world")
-					return vim.api.nvim_buf_set_text("!fixture !tests")
+					print("target rpc references")
+					local val = vim.api.nvim_win_get_cursor(0)
+					local string = "!mock !fixture !test"
+					local startRow = val[1] - 1
+					local startCol = val[2]
+					vim.api.nvim_buf_set_text(0, startRow, startCol, startRow, startCol, { string })
+
+					vim.api.nvim_win_set_cursor(0, { 1, #tostring(vim.api.nvim_get_current_line()) })
 				end,
 			},
 			n = {

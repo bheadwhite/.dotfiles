@@ -1,5 +1,4 @@
-
-vim.cmd [[
+vim.cmd([[
   augroup _general_settings
     autocmd!
     autocmd FileType qf,help,man,lspinfo nnoremap <silent> <buffer> q :close<CR>
@@ -29,4 +28,10 @@ vim.cmd [[
     autocmd!
     autocmd BufWritePre * lua vim.lsp.buf.format()
   augroup end
-]]
+
+  augroup _typescript_mkprg
+    autocmd!
+    autocmd FileType typescript,typescriptreact compiler tsc | setlocal makeprg=npx\ tsc
+  augroup END
+
+]])

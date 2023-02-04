@@ -63,6 +63,8 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use({ "nvim-telescope/telescope-file-browser.nvim" })
 
 	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
+	use("nvim-treesitter/nvim-treesitter-textobjects")
+	use("RRethy/nvim-treesitter-textsubjects")
 	use("nvim-lualine/lualine.nvim")
 	use("declancm/maximize.nvim")
 
@@ -71,6 +73,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 
 	use("nvim-treesitter/playground")
 	use("theprimeagen/harpoon")
+	use("theprimeagen/refactoring.nvim")
 	use("mbbill/undotree")
 	use("windwp/nvim-autopairs") -- Autopairs, integrates with both cmp and treesitter
 	use("f-person/git-blame.nvim")
@@ -107,6 +110,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use("windwp/nvim-ts-autotag")
 	use("sindrets/diffview.nvim")
 	use("nvim-treesitter/nvim-treesitter-context")
+	use("tpope/vim-dispatch")
 	use("tpope/vim-dadbod")
 	use({
 		"kristijanhusak/vim-dadbod-ui",

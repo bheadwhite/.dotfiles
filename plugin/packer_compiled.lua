@@ -220,6 +220,16 @@ _G.packer_plugins = {
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/nvim-treesitter-context",
     url = "https://github.com/nvim-treesitter/nvim-treesitter-context"
   },
+  ["nvim-treesitter-textobjects"] = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/nvim-treesitter-textobjects",
+    url = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects"
+  },
+  ["nvim-treesitter-textsubjects"] = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/nvim-treesitter-textsubjects",
+    url = "https://github.com/RRethy/nvim-treesitter-textsubjects"
+  },
   ["nvim-ts-autotag"] = {
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/nvim-ts-autotag",
@@ -249,6 +259,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/plenary.nvim",
     url = "https://github.com/nvim-lua/plenary.nvim"
+  },
+  ["refactoring.nvim"] = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/refactoring.nvim",
+    url = "https://github.com/theprimeagen/refactoring.nvim"
   },
   ["tabout.nvim"] = {
     loaded = true,
@@ -296,6 +311,11 @@ _G.packer_plugins = {
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/vim-dadbod-ui",
     url = "https://github.com/kristijanhusak/vim-dadbod-ui"
   },
+  ["vim-dispatch"] = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/vim-dispatch",
+    url = "https://github.com/tpope/vim-dispatch"
+  },
   ["vim-illuminate"] = {
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/vim-illuminate",
@@ -319,14 +339,14 @@ _G.packer_plugins = {
 }
 
 time([[Defining packer_plugins]], false)
--- Config for: everforest
-time([[Config for everforest]], true)
-try_loadstring("\27LJ\2\n:\0\0\3\0\3\0\0056\0\0\0009\0\1\0'\2\2\0B\0\2\1K\0\1\0\27colorscheme everforest\bcmd\bvim\0", "config", "everforest")
-time([[Config for everforest]], false)
 -- Config for: vim-dadbod-ui
 time([[Config for vim-dadbod-ui]], true)
 try_loadstring("\27LJ\2\nB\0\0\2\0\3\0\0056\0\0\0009\0\1\0)\1\1\0=\1\2\0K\0\1\0%db_ui_auto_execute_table_helpers\6g\bvim\0", "config", "vim-dadbod-ui")
 time([[Config for vim-dadbod-ui]], false)
+-- Config for: everforest
+time([[Config for everforest]], true)
+try_loadstring("\27LJ\2\n:\0\0\3\0\3\0\0056\0\0\0009\0\1\0'\2\2\0B\0\2\1K\0\1\0\27colorscheme everforest\bcmd\bvim\0", "config", "everforest")
+time([[Config for everforest]], false)
 
 _G._packer.inside_compile = false
 if _G._packer.needs_bufread == true then
