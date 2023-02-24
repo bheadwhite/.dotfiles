@@ -50,6 +50,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use("kyazdani42/nvim-web-devicons")
+	use("stevearc/oil.nvim")
 
 	use("dstein64/vim-startuptime")
 	use("camilledejoye/nvim-lsp-selection-range")

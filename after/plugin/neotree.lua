@@ -49,8 +49,17 @@ neoTree.setup({
 	},
 })
 
+function InOil()
+	return vim.bo.filetype == "oil"
+end
+
 local toggleTree = function()
+	if InOil() then
+		vim.cmd([[Neotree toggle]])
+		return
+	end
+
 	vim.cmd([[Neotree toggle reveal]])
 end
 
-vim.keymap.set("n", "<leader>e", toggleTree, { noremap = true, silent = true, desc = "toggle file tree" })
+vim.keymap.set("n", "<leader>E", toggleTree, { noremap = true, silent = true, desc = "toggle file tree" })

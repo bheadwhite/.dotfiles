@@ -11,6 +11,14 @@ end
 local commands = require("bdub.commands")
 local options = { noremap = true, silent = true }
 
+function ToggleGit()
+	if vim.bo.filetype == "fugitive" then
+		vim.cmd.q()
+	else
+		vim.cmd([[Git]])
+	end
+end
+
 local normal_keymaps = {
 	{ "gj", "mzJ`z", "join" },
 	{ "<c-d>", "<c-d>zz", "half page down" },
@@ -21,6 +29,7 @@ local normal_keymaps = {
 	{ "Q", "<nop>", "disable ex mode" },
 	{ "<leader>j", "<C-w>J", "move split down" },
 	{ "<leader>k", "<C-w>K", "move split up" },
+	{ "<C-M-g>", ToggleGit, "git" },
 	{ "<leader>>", "<cmd>lnext<CR>zz", "next location" },
 	{ "<leader><", "<cmd>lprev<CR>zz", "prev location" },
 	{ "<leader>S", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "substitue under cursor" },
@@ -57,6 +66,7 @@ end
 -- system clipboard
 vim.keymap.set("x", "<leader>P", [["_dP]], add_desc("Paste over selection"))
 vim.keymap.set("v", "p", '"_dP', options)
+vim.keymap.set("v", "c", '"_di', options)
 vim.keymap.set({ "n", "v" }, "<C-M-c>", [["+y]], add_desc("Copy to system clipboard"))
 
 vim.keymap.set("c", "<M-k>", "\\(.*\\)", { desc = "one eyed fighting kirby" })
@@ -64,10 +74,10 @@ vim.keymap.set({ "n", "v" }, "J", "}", options)
 vim.keymap.set({ "n", "v" }, "K", "{", options)
 vim.keymap.set({ "n", "v" }, "L", "$", options)
 vim.keymap.set({ "n", "v" }, "H", "_", options)
-vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("left window nav"))
-vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", add_desc("down window nav"))
-vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("up window nav"))
-vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", add_desc("right window nav"))
+vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("move to top window"))
+vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", add_desc("move to right window"))
+vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", add_desc("move to bottom window"))
+vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("move to left window"))
 vim.keymap.set({ "n", "v" }, "<leader><tab>l", vim.cmd.tabn, add_desc("next tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab>h", vim.cmd.tabp, add_desc("prev tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><tab>", vim.cmd.tabe, add_desc("new tab"))
