@@ -3,11 +3,14 @@ local finders = require("telescope.finders")
 local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
+local M = {}
 
-local dropdown_theme =
-	require("telescope.themes").get_dropdown({ previewer = false, layout_config = {
+local dropdown_theme = require("telescope.themes").get_dropdown({
+	previewer = false,
+	layout_config = {
 		width = 800,
-	} })
+	},
+})
 
 local function get_vim_path()
 	local file_path = vim.fn.expand("%:.")
@@ -73,8 +76,6 @@ local function grep_files_attach_mapping(prompt_bufnr)
 
 	return true
 end
-
-local M = {}
 
 M.copy_operator_file_path = function(file_path)
 	if string.find(file_path, "commons/ui") then

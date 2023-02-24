@@ -8,28 +8,10 @@ local action_state = require("telescope.actions.state")
 local commands = require("bdub.commands")
 local actions = require("telescope.actions")
 
-local function add_desc(desc, table)
-	local opts = {}
-	opts.desc = desc
-	opts = vim.tbl_extend("force", opts, table or {})
-	return opts
-end
-
 local builtin = require("telescope.builtin")
 vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "find files" })
 vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "git files" })
 vim.keymap.set("n", "<leader>p", builtin.oldfiles, { desc = "recent files" })
-vim.keymap.set("n", "<leader>e", function()
-	telescope.extensions.file_browser.file_browser({
-		path = "%:p:h",
-		cwd = vim.fn.expand("%:p:h"),
-		respect_gitignore = false,
-		grouped = true,
-		initial_mode = "normal",
-		layout_config = { height = 40 },
-		hidden = true,
-	})
-end, add_desc("Open file explorer", { noremap = true }))
 
 local operator_path_display = function(_, file_path) -- absolute path
 	if not string.find(file_path, "^/Users/brent.whitehead/") then
@@ -69,7 +51,7 @@ local reference_opts = {
 	},
 }
 
-function copy_path_from_selection(bufnr)
+local copy_path_from_selection = function(bufnr)
 	local current_picker = action_state.get_current_picker(bufnr)
 	local selection = current_picker:get_selection()
 	local path = selection[1]
@@ -135,5 +117,4 @@ telescope.setup({
 })
 
 require("telescope").load_extension("fzf")
-require("telescope").load_extension("file_browser")
 require("telescope").load_extension("ui-select")

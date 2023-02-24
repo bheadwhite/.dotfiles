@@ -10,31 +10,27 @@ require("nvim-treesitter.configs").setup({
 				["ic"] = "@class.inner",
 				["ib"] = "@block.inner",
 				["ab"] = "@block.outer",
-				["ip"] = "@parameter.inner",
-				["ap"] = "@parameter.outer",
+				["ia"] = "@parameter.inner",
+				["aa"] = "@parameter.outer",
 			},
 		},
 	},
 	textsubjects = {
 		enable = true,
-		-- prev_selection = ",", -- (Optional) keymap to select the previous selection
+		prev_selection = "<S-CR>", -- (Optional) keymap to select the previous selection
 		keymaps = {
 			["<cr>"] = "textsubjects-smart",
 			["."] = "textsubjects-container-outer",
 			[","] = "textsubjects-container-inner",
 		},
 	},
-
 	-- A list of parser names, or "all"
 	ensure_installed = { "help", "javascript", "typescript", "c", "lua", "rust" },
-
 	-- Install parsers synchronously (only applied to `ensure_installed`)
 	sync_install = false,
-
 	-- Automatically install missing parsers when entering buffer
 	-- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
 	auto_install = true,
-
 	highlight = {
 		-- `false` will disable the whole extension
 		enable = true,
@@ -55,7 +51,7 @@ require("nvim-treesitter.configs").setup({
 		keymaps = {
 			init_selection = "<C-M-o>", -- maps in normal mode to init the node/scope selection
 			node_incremental = "<C-M-o>", -- increment to the upper named parent
-			node_decremental = "<C-M-i>", -- de crement to the previous node
+			node_decremental = "<C-M-i>", -- decrement to the previous node
 		},
 	},
 })

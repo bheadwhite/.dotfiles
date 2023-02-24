@@ -55,7 +55,6 @@ lualine.setup({
 				end,
 			},
 		},
-		-- lualine_x = { "encoding", "fileformat", "filetype" },
 		lualine_x = {
 			{
 				"diff",
@@ -114,10 +113,15 @@ lualine.setup({
 				color = { fg = "#fffff", bg = "" },
 			},
 		},
+		lualine_b = {
+			function()
+				local lsp_status = require("lsp-status")
+
+				return lsp_status.status()
+			end,
+		},
 		lualine_z = {
-			{
-				"tabs",
-			},
+			"tabs",
 		},
 	},
 	extensions = {},

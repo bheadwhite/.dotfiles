@@ -1,18 +1,27 @@
-local lsp = require("lsp-zero")
+local lsp_zero = require("lsp-zero")
 local ts_utils = require("nvim-lsp-ts-utils")
 local telescope = require("telescope.builtin")
+local lsp_selection_range = require("lsp-selection-range")
+local lsp_status = require("lsp-status")
 
-lsp.preset("recommended")
+local function add_desc(description, bufnr)
+	local opts = { buffer = bufnr, remap = false }
+	opts.desc = description
 
-lsp.ensure_installed({
+	return opts
+end
+
+lsp_zero.preset("recommended")
+
+lsp_zero.ensure_installed({
 	"tsserver",
 	"eslint",
-	"sumneko_lua",
+	"lua_ls",
 	"rust_analyzer",
 })
 
 -- Fix Undefined global 'vim'
-lsp.configure("sumneko_lua", {
+lsp_zero.configure("lua_ls", {
 	settings = {
 		Lua = {
 			diagnostics = {
@@ -22,28 +31,51 @@ lsp.configure("sumneko_lua", {
 	},
 })
 
-lsp.configure("tsserver", {
+lsp_zero.configure("tsserver", {
 	init_options = {
 		preferences = {
 			importModuleSpecifierPreference = "non-relative",
 		},
 		maxTsServerMemory = 4096,
 	},
-	capabilities = {
+	settings = {
+		diagnostics = {
+			ignoredCodes = { 2311, 80006 }, -- https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
+		},
+	},
+	capabilities = vim.tbl_extend("force", lsp_status.capabilities, {
 		textDocument = {
+			selectionRange = {
+				dynamicRegistration = true,
+			},
 			completion = {
 				completionItem = {
 					snippetSupport = true,
 				},
 			},
 		},
-	},
+	}),
+	on_attach = function(client, bufnr)
+		lsp_status.register_client(client)
+		lsp_status.on_attach(client)
+		client.server_capabilities.documentFormattingProvider = false
+
+		ts_utils.setup({
+			import_all_timeout = 5000,
+		})
+		ts_utils.setup_client(client)
+
+		vim.keymap.set("n", "<leader>r", ts_utils.rename_file, add_desc("rename file", bufnr))
+		vim.keymap.set("n", "<C-M-o>", lsp_selection_range.trigger, add_desc("selection range", bufnr))
+		vim.keymap.set("v", "<C-M-o>", lsp_selection_range.expand, add_desc("expand range", bufnr))
+	end,
 	root_dir = vim.loop.cwd,
 })
 
 local cmp = require("cmp")
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
-local cmp_mappings = lsp.defaults.cmp_mappings({
+
+local cmp_mappings = lsp_zero.defaults.cmp_mappings({
 	["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
 	["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
 	["<CR>"] = cmp.mapping.confirm({ select = true }),
@@ -95,7 +127,7 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
 cmp_mappings["<Tab>"] = nil
 cmp_mappings["<S-Tab>"] = nil
 
-lsp.setup_nvim_cmp({
+lsp_zero.setup_nvim_cmp({
 	mapping = cmp_mappings,
 	sources = {
 		-- { name = "nvim_lsp_signature_help" },
@@ -104,26 +136,7 @@ lsp.setup_nvim_cmp({
 	},
 })
 
-local function preview_location_callback(_, result)
-	if result == nil or vim.tbl_isempty(result) then
-		return nil
-	end
-	vim.lsp.util.preview_location(result[1])
-end
-
-function PeekDefinition()
-	local params = vim.lsp.util.make_position_params()
-	return vim.lsp.buf_request(0, "textDocument/definition", params, preview_location_callback)
-end
-
-local function add_desc(description, bufnr)
-	local opts = { buffer = bufnr, remap = false }
-	opts.desc = description
-
-	return opts
-end
-
-lsp.set_preferences({
+lsp_zero.set_preferences({
 	suggest_lsp_servers = false,
 	sign_icons = {
 		error = "E",
@@ -134,58 +147,56 @@ lsp.set_preferences({
 	set_lsp_keymaps = false,
 })
 
-lsp.on_attach(function(client, bufnr)
-	local opts = { buffer = bufnr, remap = false }
-
-	if client.name == "tsserver" then
-		client.server_capabilities.documentFormattingProvider = false
-
-		ts_utils.setup({
-			import_all_timeout = 5000,
-		})
-		ts_utils.setup_client(client)
-
-		vim.keymap.set("n", "<leader>R", ts_utils.rename_file, add_desc("rename file", bufnr))
+lsp_zero.on_attach(function(client, bufnr)
+	function GoToDefinition()
+		telescope.lsp_definitions({ show_line = false })
 	end
 
-	vim.keymap.set("n", "gi", function()
-		telescope.lsp_definitions({ { show_line = false } })
-	end, opts)
-	vim.keymap.set("v", "gI", function()
-		telescope.lsp_definitions({ show_line = false, jump_type = "split" })
-	end, add_desc("implementation down", bufnr))
-	vim.keymap.set("n", "gI", function()
+	function GoToVsplitDefinition()
 		telescope.lsp_definitions({ show_line = false, jump_type = "vsplit" })
-	end, add_desc("implementation right", bufnr))
-	vim.keymap.set("n", "gr", function()
-		telescope.lsp_references({ show_line = false, include_declaration = false })
-	end, add_desc("references", bufnr))
-	vim.keymap.set("n", "gR", function()
-		telescope.lsp_references({ jump_type = "vsplit", show_line = false, include_declaration = false })
-	end, add_desc("references split", bufnr))
-	vim.keymap.set("n", "gh", vim.lsp.buf.hover, opts)
-	vim.keymap.set("n", "<leader>vs", vim.lsp.buf.workspace_symbol, add_desc("workspace symbols", bufnr))
-	vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, add_desc("view diagnostic", bufnr))
-	vim.keymap.set("n", "<M-S-l>", vim.diagnostic.goto_next, opts)
-	vim.keymap.set("n", "<M-S-h>", vim.diagnostic.goto_prev, opts)
-	vim.keymap.set("n", "<leader>.", vim.lsp.buf.code_action, add_desc("code action", bufnr))
-	vim.keymap.set("n", "<C-A-n>", vim.lsp.buf.rename, add_desc("rename symbol", bufnr))
-	vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
-	vim.keymap.set("n", "gH", vim.lsp.buf.signature_help, add_desc("signature help", bufnr))
-	vim.keymap.set("n", "gp", PeekDefinition, add_desc("peek definition", bufnr))
+	end
 
-	vim.keymap.set("n", "gt", function()
+	function GoToReferences()
+		telescope.lsp_references({ show_line = false, include_declaration = false })
+	end
+
+	function GoToVsplitReferences()
+		telescope.lsp_references({ show_line = false, jump_type = "vsplit", include_declaration = false })
+	end
+
+	function GoToTypeDefinition()
 		telescope.lsp_type_definitions({ show_line = false })
-	end, add_desc("type definition", bufnr))
-	vim.keymap.set("n", "gT", function()
-		telescope.lsp_type_definitions({ jump_type = "vsplit", show_line = false })
-	end, add_desc("type definition split", bufnr))
-	vim.keymap.set("v", "gT", function()
-		telescope.lsp_type_definitions({ jump_type = "split", show_line = false })
-	end, add_desc("type definition split", bufnr))
+	end
+
+	function GoToVsplitTypeDefinition()
+		telescope.lsp_type_definitions({ show_line = false, jump_type = "vsplit" })
+	end
+
+	local normal_keymaps = {
+		{ "gi", GoToDefinition, "go to defintion" },
+		{ "gI", GoToVsplitDefinition, "go to defintion v_split" },
+		{ "gr", GoToReferences, "go to references" },
+		{ "gR", GoToVsplitReferences, "go to references v_split" },
+		{ "gt", GoToTypeDefinition, "go to type definition" },
+		{ "gT", GoToVsplitTypeDefinition, "go to type definition v_split" },
+		{ "<M-S-l>", vim.diagnostic.goto_next, "next diagnostic" },
+		{ "<M-S-h>", vim.diagnostic.goto_prev, "prev diagnostic" },
+		{ "<leader>vd", vim.diagnostic.open_float, "view diagnostic" },
+		{ "<leader>vs", vim.lsp.buf.workspace_symbol, "workspace symbols" },
+		{ "<leader>.", vim.lsp.buf.code_action, "code action" },
+		{ "<C-A-n>", vim.lsp.buf.rename, "rename symbol" },
+		{ "gh", vim.lsp.buf.hover, "hover" },
+		{ "gH", vim.lsp.buf.signature_help, "signature help" },
+	}
+
+	for _, value in ipairs(normal_keymaps) do
+		vim.keymap.set("n", value[1], value[2], add_desc(value[3], bufnr))
+	end
+
+	vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, add_desc("signature help", bufnr))
 end)
 
-lsp.setup()
+lsp_zero.setup()
 
 vim.diagnostic.config({
 	virtual_text = true,

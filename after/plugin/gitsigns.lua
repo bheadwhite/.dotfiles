@@ -59,13 +59,13 @@ local keymap = vim.api.nvim_set_keymap
 
 keymap(
 	"n",
-	"<leader>gj",
+	"<leader>j",
 	"<cmd>lua require 'gitsigns'.next_hunk()<cr>",
 	{ noremap = true, silent = true, desc = "next hunk" }
 )
 keymap(
 	"n",
-	"<leader>gk",
+	"<leader>k",
 	"<cmd>lua require 'gitsigns'.prev_hunk()<cr>",
 	{ noremap = true, silent = true, desc = "prev hunk" }
 )

@@ -34,4 +34,9 @@ vim.cmd([[
     autocmd FileType typescript,typescriptreact compiler tsc | setlocal makeprg=npx\ tsc
   augroup END
 
+  augroup refresh_lsp_progress
+    autocmd!
+    autocmd User LspProgressUpdate redrawstatus
+  augroup END
+
 ]])

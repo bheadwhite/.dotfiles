@@ -19,17 +19,18 @@ local normal_keymaps = {
 	{ "N", "Nzzzv", "prev with cursor centered" },
 	{ "S", "vg_", "select until EOL" },
 	{ "Q", "<nop>", "disable ex mode" },
-	{ "<leader>j", "<cmd>cnext<CR>zz", "next quickfix" },
-	{ "<leader>k", "<cmd>cprev<CR>zz", "prev quickfix" },
+	{ "<leader>j", "<C-w>J", "move split down" },
+	{ "<leader>k", "<C-w>K", "move split up" },
 	{ "<leader>>", "<cmd>lnext<CR>zz", "next location" },
 	{ "<leader><", "<cmd>lprev<CR>zz", "prev location" },
 	{ "<leader>S", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "substitue under cursor" },
 	{ "<leader>X", "<cmd>!chmod +x %<CR>", "make file executable" },
 	{ "<leader>w", ":w<CR>", "write" },
-	{ "<C-h>", "<C-w>H", "move split left" },
-	{ "<C-l>", "<C-w>L", "move split right" },
-	{ "<C-j>", "<C-w>J", "move split down" },
-	{ "<C-k>", "<C-w>K", "move split up" },
+	{ "<C-M-S-h>", "<C-w>R", "move split left" },
+	{ "<C-M-S-l>", "<C-w>r", "move split right" },
+	{ "<C-M-S-j>", "<cmd>cnext<CR>zz", "next quickfix" },
+	{ "<C-M-S-k>", "<cmd>cprev<CR>zz", "prev quickfix" },
+	{ "<C-M-S-q>", "<cmd>cclose<CR>", "close quickfix" },
 	{ "<leader>q", vim.cmd.q, "close buffer" },
 	{ "<C-M-r>", commands.copy_file_path, "copy file path" },
 	{ "<C-Up>", ":resize -2<CR>", "resize split -2" },
@@ -63,14 +64,15 @@ vim.keymap.set({ "n", "v" }, "J", "}", options)
 vim.keymap.set({ "n", "v" }, "K", "{", options)
 vim.keymap.set({ "n", "v" }, "L", "$", options)
 vim.keymap.set({ "n", "v" }, "H", "_", options)
-vim.keymap.set({ "n", "v", "x" }, "<C-M-S-h>", "<C-w>h", add_desc("left window nav"))
-vim.keymap.set({ "n", "v", "x" }, "<C-M-S-j>", "<C-w>j", add_desc("down window nav"))
-vim.keymap.set({ "n", "v", "x" }, "<C-M-S-k>", "<C-w>k", add_desc("up window nav"))
-vim.keymap.set({ "n", "v", "x" }, "<C-M-S-l>", "<C-w>l", add_desc("right window nav"))
+vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("left window nav"))
+vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", add_desc("down window nav"))
+vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("up window nav"))
+vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", add_desc("right window nav"))
 vim.keymap.set({ "n", "v" }, "<leader><tab>l", vim.cmd.tabn, add_desc("next tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab>h", vim.cmd.tabp, add_desc("prev tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><tab>", vim.cmd.tabe, add_desc("new tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><leader>", vim.cmd.tabc, add_desc("close tab"))
+vim.keymap.set("n", "<leader>z", "<cmd>tabedit %<CR>", { noremap = true, silent = true, desc = "zoom" })
 
 vim.keymap.set("n", "<esc>", "<cmd>noh<cr><esc>", add_desc("esc normal"))
 

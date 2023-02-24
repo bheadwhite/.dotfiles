@@ -12,6 +12,7 @@ if fn.empty(fn.glob(install_path)) > 0 then
 		install_path,
 	})
 	print("Installing packer close and reopen Neovim...")
+
 	vim.cmd([[packadd packer.nvim]])
 end
 -- Autocommand that reloads neovim whenever you save the plugins.lua file
@@ -41,44 +42,109 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use("wbthomason/packer.nvim")
 
 	use({
-		"nvim-telescope/telescope.nvim",
-		tag = "0.1.0",
-		-- or                            , branch = '0.1.x',
-		requires = { { "nvim-lua/plenary.nvim" } },
-	})
-	use({
-		"nvim-telescope/telescope-fzf-native.nvim",
-		run = "make",
-	})
-	use({ "nvim-telescope/telescope-ui-select.nvim" })
-
-	use({
 		"sainnhe/everforest",
 		as = "everforest",
 		config = function()
 			vim.cmd("colorscheme everforest")
 		end,
 	})
+
+	use("kyazdani42/nvim-web-devicons")
+
+	use("dstein64/vim-startuptime")
+	use("camilledejoye/nvim-lsp-selection-range")
+	use("sbulav/nredir.nvim")
 	use("RRethy/vim-illuminate")
-	use({ "nvim-telescope/telescope-file-browser.nvim" })
 
 	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
-	use("nvim-treesitter/nvim-treesitter-textobjects")
+	use("nvim-treesitter/nvim-treesitter-context")
 	use("RRethy/nvim-treesitter-textsubjects")
-	use("nvim-lualine/lualine.nvim")
-	use("declancm/maximize.nvim")
+	use("nvim-treesitter/nvim-treesitter-textobjects")
+	use("nvim-treesitter/playground")
+
+	use("sindrets/winshift.nvim")
+	use("rmagatti/goto-preview")
+
+	use("tpope/vim-fugitive")
+	use("f-person/git-blame.nvim")
+	use("lewis6991/gitsigns.nvim")
+	use("sindrets/diffview.nvim")
 
 	use("akinsho/toggleterm.nvim")
+	use("tpope/vim-dispatch")
+
 	use("Pocco81/HighStr.nvim")
 
-	use("nvim-treesitter/playground")
 	use("theprimeagen/harpoon")
-	use("theprimeagen/refactoring.nvim")
+
 	use("mbbill/undotree")
+
 	use("windwp/nvim-autopairs") -- Autopairs, integrates with both cmp and treesitter
-	use("f-person/git-blame.nvim")
-	use("kyazdani42/nvim-web-devicons")
+
 	use("folke/which-key.nvim")
+
+	use("booperlv/nvim-gomove")
+	use("abecodes/tabout.nvim")
+	use("tpope/vim-surround")
+	use("github/copilot.vim")
+	use("windwp/nvim-ts-autotag")
+
+	--- dad bod
+	use("tpope/vim-dadbod")
+	use({
+		"kristijanhusak/vim-dadbod-ui",
+		config = function()
+			vim.g.db_ui_auto_execute_table_helpers = 1
+		end,
+	})
+	--- end dad bod
+
+	use({
+		"nvim-telescope/telescope.nvim",
+		tag = "0.1.0",
+		-- or                            , branch = '0.1.x',
+		requires = { { "nvim-lua/plenary.nvim" } },
+	})
+
+	use({ "nvim-telescope/telescope-ui-select.nvim" })
+	use({
+		"nvim-telescope/telescope-fzf-native.nvim",
+		run = "make",
+	})
+	use({
+		"nvim-lua/lsp-status.nvim",
+		config = function()
+			require("lsp-status").register_progress()
+		end,
+	})
+
+	-- neotree:
+	use({
+		"nvim-neo-tree/neo-tree.nvim",
+		branch = "v2.x",
+		requires = {
+			"nvim-lua/plenary.nvim",
+			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+			"MunifTanjim/nui.nvim",
+			"s1n7ax/nvim-window-picker",
+		},
+	})
+	use({
+		"s1n7ax/nvim-window-picker",
+		tag = "v1.*",
+		config = function()
+			require("window-picker").setup()
+		end,
+	})
+	-- neotree
+
+	use({
+		"nvim-lualine/lualine.nvim",
+		requires = {
+			"kyazdani42/nvim-web-devicons",
+			"nvim-lua/lsp-status.nvim",
+		},
+	})
 
 	use({
 		"VonHeikemen/lsp-zero.nvim",
@@ -105,28 +171,11 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		},
 	})
 
-	use("folke/zen-mode.nvim")
-	use("github/copilot.vim")
-	use("windwp/nvim-ts-autotag")
-	use("sindrets/diffview.nvim")
-	use("nvim-treesitter/nvim-treesitter-context")
-	use("tpope/vim-dispatch")
-	use("tpope/vim-dadbod")
-	use({
-		"kristijanhusak/vim-dadbod-ui",
-		config = function()
-			vim.g.db_ui_auto_execute_table_helpers = 1
-		end,
-	})
 	use({
 		"numToStr/Comment.nvim",
 		"JoosepAlviste/nvim-ts-context-commentstring",
 	})
 
-	use("booperlv/nvim-gomove")
-	use("abecodes/tabout.nvim")
-	use("tpope/vim-surround")
-	use("lewis6991/gitsigns.nvim")
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
 	if PACKER_BOOTSTRAP then
