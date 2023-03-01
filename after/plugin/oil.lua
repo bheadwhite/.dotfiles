@@ -4,6 +4,8 @@ if not status_ok then
 end
 
 local actions = require("oil.actions")
+local custom_commands = require("bdub.commands")
+local PlenaryPath = require("plenary.path")
 
 oil.setup({
 	keymaps = {
@@ -12,6 +14,15 @@ oil.setup({
 		["<C-j>"] = false,
 		["<C-k>"] = false,
 		["<C-S-S>"] = actions.select_split,
+		["<C-M-r>"] = function()
+			local entry = oil.get_cursor_entry()
+			local path = oil.get_current_dir()
+			local full_path = path .. entry.name
+
+			local relative = PlenaryPath:new(full_path):make_relative()
+
+			custom_commands.copy_operator_file_path(relative)
+		end,
 		["F"] = function()
 			local dir = oil.get_current_dir()
 			oil.close()

@@ -35,8 +35,8 @@ local normal_keymaps = {
 	{ "<leader>S", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "substitue under cursor" },
 	{ "<leader>X", "<cmd>!chmod +x %<CR>", "make file executable" },
 	{ "<leader>w", ":w<CR>", "write" },
-	{ "<C-M-S-h>", "<C-w>R", "move split left" },
-	{ "<C-M-S-l>", "<C-w>r", "move split right" },
+	{ "<C-M-S-h>", ":WinShift<CR>h", "move split left" },
+	{ "<C-M-S-l>", ":WinShift<CR>l", "move split right" },
 	{ "<C-M-S-j>", "<cmd>cnext<CR>zz", "next quickfix" },
 	{ "<C-M-S-k>", "<cmd>cprev<CR>zz", "prev quickfix" },
 	{ "<C-M-S-q>", "<cmd>cclose<CR>", "close quickfix" },
@@ -82,7 +82,7 @@ vim.keymap.set({ "n", "v" }, "<leader><tab>l", vim.cmd.tabn, add_desc("next tab"
 vim.keymap.set({ "n", "v" }, "<leader><tab>h", vim.cmd.tabp, add_desc("prev tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><tab>", vim.cmd.tabe, add_desc("new tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><leader>", vim.cmd.tabc, add_desc("close tab"))
-vim.keymap.set("n", "<leader>z", "<cmd>tabedit %<CR>", { noremap = true, silent = true, desc = "zoom" })
+vim.keymap.set("n", "<leader>z", "ma<cmd>tabedit %<CR>`a", { noremap = true, silent = true, desc = "zoom" })
 
 vim.keymap.set("n", "<esc>", "<cmd>noh<cr><esc>", add_desc("esc normal"))
 

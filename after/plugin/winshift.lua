@@ -1,1 +1,1 @@
-vim.keymap.set("n", "<leader>W", ":WinShift<CR>", { noremap = true, silent = true, desc = "move window" })
+vim.keymap.set("n", "<C-M-S-w>", ":WinShift<CR>", { noremap = true, silent = true, desc = "move window" })
