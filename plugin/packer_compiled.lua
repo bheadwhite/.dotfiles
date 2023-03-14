@@ -79,6 +79,11 @@ _G.packer_plugins = {
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/Comment.nvim",
     url = "https://github.com/numToStr/Comment.nvim"
   },
+  ["DAPInstall.nvim"] = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/DAPInstall.nvim",
+    url = "https://github.com/ravenxrz/DAPInstall.nvim"
+  },
   ["HighStr.nvim"] = {
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/HighStr.nvim",
@@ -130,7 +135,7 @@ _G.packer_plugins = {
     url = "https://github.com/sindrets/diffview.nvim"
   },
   everforest = {
-    config = { "\27LJ\2\n:\0\0\3\0\3\0\0056\0\0\0009\0\1\0'\2\2\0B\0\2\1K\0\1\0\27colorscheme everforest\bcmd\bvim\0" },
+    config = { "\27LJ\2\ng\0\0\3\0\6\0\t6\0\0\0009\0\1\0'\1\3\0=\1\2\0006\0\0\0009\0\4\0'\2\5\0B\0\2\1K\0\1\0\27colorscheme everforest\bcmd\thard\26everforest_background\6g\bvim\0" },
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/everforest",
     url = "https://github.com/sainnhe/everforest"
@@ -159,6 +164,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/harpoon",
     url = "https://github.com/theprimeagen/harpoon"
+  },
+  jester = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/jester",
+    url = "https://github.com/David-Kunz/jester"
   },
   ["lsp-status.nvim"] = {
     config = { "\27LJ\2\nD\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\22register_progress\15lsp-status\frequire\0" },
@@ -215,6 +225,16 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/nvim-cmp",
     url = "https://github.com/hrsh7th/nvim-cmp"
+  },
+  ["nvim-dap"] = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/nvim-dap",
+    url = "https://github.com/mfussenegger/nvim-dap"
+  },
+  ["nvim-dap-ui"] = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/nvim-dap-ui",
+    url = "https://github.com/rcarriga/nvim-dap-ui"
   },
   ["nvim-gomove"] = {
     loaded = true,
@@ -302,6 +322,11 @@ _G.packer_plugins = {
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/tabout.nvim",
     url = "https://github.com/abecodes/tabout.nvim"
   },
+  ["telescope-dap.nvim"] = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/telescope-dap.nvim",
+    url = "https://github.com/nvim-telescope/telescope-dap.nvim"
+  },
   ["telescope-fzf-native.nvim"] = {
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/telescope-fzf-native.nvim",
@@ -326,6 +351,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/undotree",
     url = "https://github.com/mbbill/undotree"
+  },
+  ["vim-abolish"] = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/vim-abolish",
+    url = "https://github.com/tpope/vim-abolish"
   },
   ["vim-dadbod"] = {
     loaded = true,
@@ -376,22 +406,22 @@ _G.packer_plugins = {
 }
 
 time([[Defining packer_plugins]], false)
--- Config for: vim-dadbod-ui
-time([[Config for vim-dadbod-ui]], true)
-try_loadstring("\27LJ\2\nB\0\0\2\0\3\0\0056\0\0\0009\0\1\0)\1\1\0=\1\2\0K\0\1\0%db_ui_auto_execute_table_helpers\6g\bvim\0", "config", "vim-dadbod-ui")
-time([[Config for vim-dadbod-ui]], false)
+-- Config for: everforest
+time([[Config for everforest]], true)
+try_loadstring("\27LJ\2\ng\0\0\3\0\6\0\t6\0\0\0009\0\1\0'\1\3\0=\1\2\0006\0\0\0009\0\4\0'\2\5\0B\0\2\1K\0\1\0\27colorscheme everforest\bcmd\thard\26everforest_background\6g\bvim\0", "config", "everforest")
+time([[Config for everforest]], false)
 -- Config for: lsp-status.nvim
 time([[Config for lsp-status.nvim]], true)
 try_loadstring("\27LJ\2\nD\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\22register_progress\15lsp-status\frequire\0", "config", "lsp-status.nvim")
 time([[Config for lsp-status.nvim]], false)
--- Config for: everforest
-time([[Config for everforest]], true)
-try_loadstring("\27LJ\2\n:\0\0\3\0\3\0\0056\0\0\0009\0\1\0'\2\2\0B\0\2\1K\0\1\0\27colorscheme everforest\bcmd\bvim\0", "config", "everforest")
-time([[Config for everforest]], false)
 -- Config for: nvim-window-picker
 time([[Config for nvim-window-picker]], true)
 try_loadstring("\27LJ\2\n;\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\18window-picker\frequire\0", "config", "nvim-window-picker")
 time([[Config for nvim-window-picker]], false)
+-- Config for: vim-dadbod-ui
+time([[Config for vim-dadbod-ui]], true)
+try_loadstring("\27LJ\2\nB\0\0\2\0\3\0\0056\0\0\0009\0\1\0)\1\1\0=\1\2\0K\0\1\0%db_ui_auto_execute_table_helpers\6g\bvim\0", "config", "vim-dadbod-ui")
+time([[Config for vim-dadbod-ui]], false)
 
 _G._packer.inside_compile = false
 if _G._packer.needs_bufread == true then

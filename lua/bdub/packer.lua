@@ -45,17 +45,28 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		"sainnhe/everforest",
 		as = "everforest",
 		config = function()
+			vim.g.everforest_background = "hard"
 			vim.cmd("colorscheme everforest")
 		end,
 	})
 
 	use("kyazdani42/nvim-web-devicons")
 	use("stevearc/oil.nvim")
-
+	use("tpope/vim-abolish")
 	use("dstein64/vim-startuptime")
+
 	use("camilledejoye/nvim-lsp-selection-range")
-	use("sbulav/nredir.nvim")
 	use("RRethy/vim-illuminate")
+	use("sbulav/nredir.nvim")
+	use({
+		"mfussenegger/nvim-dap",
+		requires = {
+			"ravenxrz/DAPInstall.nvim",
+			"rcarriga/nvim-dap-ui",
+			"David-Kunz/jester",
+		},
+	})
+	use("nvim-telescope/telescope-dap.nvim")
 
 	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
 	use("nvim-treesitter/nvim-treesitter-context")

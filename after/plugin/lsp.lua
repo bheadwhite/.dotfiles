@@ -156,6 +156,10 @@ lsp_zero.on_attach(function(client, bufnr)
 		telescope.lsp_definitions({ show_line = false, jump_type = "vsplit" })
 	end
 
+	function GoToTabDefinition()
+		telescope.lsp_definitions({ show_line = false, jump_type = "tab" })
+	end
+
 	function GoToReferences()
 		telescope.lsp_references({ show_line = false, include_declaration = false })
 	end
@@ -193,6 +197,7 @@ lsp_zero.on_attach(function(client, bufnr)
 		vim.keymap.set("n", value[1], value[2], add_desc(value[3], bufnr))
 	end
 
+	vim.keymap.set("v", "gi", GoToTabDefinition, add_desc("go to defintion tab", bufnr))
 	vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, add_desc("signature help", bufnr))
 end)
 

@@ -24,7 +24,13 @@ oil.setup({
 			custom_commands.copy_operator_file_path(relative)
 		end,
 		["F"] = function()
+			local entry = oil.get_cursor_entry()
 			local dir = oil.get_current_dir()
+
+			if entry.type == "directory" then
+				dir = dir .. entry.name
+			end
+
 			oil.close()
 
 			require("telescope.builtin").live_grep({
@@ -56,4 +62,13 @@ function ToggleOil()
 	end
 end
 
+function OpenOil()
+	if InOil() then
+		return
+	end
+
+	oil.open()
+end
+
 vim.keymap.set("n", "<leader>e", ToggleOil, { noremap = true, desc = "toggle oil" })
+vim.keymap.set("n", "-", OpenOil, { noremap = true, desc = "open oil" })
