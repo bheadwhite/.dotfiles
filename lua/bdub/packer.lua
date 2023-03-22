@@ -55,6 +55,15 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use("tpope/vim-abolish")
 	use("dstein64/vim-startuptime")
 
+	use({
+		"stevearc/aerial.nvim",
+		config = function()
+			require("aerial").setup()
+		end,
+	})
+
+	use("ray-x/lsp_signature.nvim")
+
 	use("camilledejoye/nvim-lsp-selection-range")
 	use("RRethy/vim-illuminate")
 	use("sbulav/nredir.nvim")
@@ -63,10 +72,17 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		requires = {
 			"ravenxrz/DAPInstall.nvim",
 			"rcarriga/nvim-dap-ui",
-			"David-Kunz/jester",
 		},
 	})
 	use("nvim-telescope/telescope-dap.nvim")
+	use({ "stevearc/dressing.nvim" })
+
+	use({ "TimUntersberger/neogit", requires = "nvim-lua/plenary.nvim" })
+	use("akinsho/git-conflict.nvim")
+	use({
+		"AckslD/messages.nvim",
+		config = 'require("messages").setup()',
+	})
 
 	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
 	use("nvim-treesitter/nvim-treesitter-context")
@@ -94,6 +110,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use("windwp/nvim-autopairs") -- Autopairs, integrates with both cmp and treesitter
 
 	use("folke/which-key.nvim")
+	use("folke/neodev.nvim")
 
 	use("booperlv/nvim-gomove")
 	use("abecodes/tabout.nvim")

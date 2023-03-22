@@ -9,30 +9,6 @@ dap_install.setup({
 
 local dap_ui = require("dapui")
 dap_ui.setup()
-local jester = require("jester")
-
-jester.setup({
-	cmd = "./node_modules/.bin/jest -t '$result' -- $file", -- run command
-	identifiers = { "test", "it" }, -- used to identify tests
-	prepend = { "describe" }, -- prepend describe blocks
-	expressions = { "call_expression" }, -- tree-sitter object used to scan for tests/describe blocks
-	path_to_jest_run = "jest", -- used to run tests
-	path_to_jest_debug = "./node_modules/.bin/jest", -- used for debugging
-	terminal_cmd = ":vsplit | terminal", -- used to spawn a terminal for running tests, for debugging refer to nvim-dap's config
-	dap = { -- debug adapter configuration
-		type = "node2",
-		request = "launch",
-		cwd = vim.fn.getcwd(),
-		runtimeArgs = { "--inspect-brk", "$path_to_jest", "--no-coverage", "-t", "$result", "--", "$file" },
-		args = { "--no-cache" },
-		sourceMaps = false,
-		protocol = "inspector",
-		skipFiles = { "<node_internals>/**/*.js" },
-		console = "integratedTerminal",
-		port = 9229,
-		disableOptimisticBPs = true,
-	},
-})
 
 local dap = require("dap")
 
@@ -82,5 +58,3 @@ vim.keymap.set("n", "<leader>dj", dap.step_into, { noremap = true, silent = true
 vim.keymap.set("n", "<leader>dl", dap.step_over, { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>dk", dap.step_out, { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>dui", dap_ui.toggle, { noremap = true, silent = true })
-vim.keymap.set("n", "<C-M-S-t>", jester.run, { noremap = true, silent = true })
-vim.keymap.set("n", "<C-M-S-d>", jester.debug, { noremap = true, silent = true })

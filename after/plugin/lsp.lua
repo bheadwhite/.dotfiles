@@ -11,6 +11,8 @@ local function add_desc(description, bufnr)
 	return opts
 end
 
+require("neodev").setup()
+
 lsp_zero.preset("recommended")
 
 lsp_zero.ensure_installed({
@@ -59,6 +61,13 @@ lsp_zero.configure("tsserver", {
 		lsp_status.register_client(client)
 		lsp_status.on_attach(client)
 		client.server_capabilities.documentFormattingProvider = false
+
+		require("lsp_signature").on_attach({
+			bind = true,
+			handler_opts = {
+				border = "single",
+			},
+		}, bufnr)
 
 		ts_utils.setup({
 			import_all_timeout = 5000,
@@ -148,41 +157,41 @@ lsp_zero.set_preferences({
 })
 
 lsp_zero.on_attach(function(client, bufnr)
-	function GoToDefinition()
+	local function goToDefinition()
 		telescope.lsp_definitions({ show_line = false })
 	end
 
-	function GoToVsplitDefinition()
+	local function goToSplitDefinition()
 		telescope.lsp_definitions({ show_line = false, jump_type = "vsplit" })
 	end
 
-	function GoToTabDefinition()
+	local function goToTabDefinition()
 		telescope.lsp_definitions({ show_line = false, jump_type = "tab" })
 	end
 
-	function GoToReferences()
+	local function goToReferences()
 		telescope.lsp_references({ show_line = false, include_declaration = false })
 	end
 
-	function GoToVsplitReferences()
+	local function goToSplitReferences()
 		telescope.lsp_references({ show_line = false, jump_type = "vsplit", include_declaration = false })
 	end
 
-	function GoToTypeDefinition()
+	local function goToTypeDefinition()
 		telescope.lsp_type_definitions({ show_line = false })
 	end
 
-	function GoToVsplitTypeDefinition()
+	local function goToSplitTypeDefinition()
 		telescope.lsp_type_definitions({ show_line = false, jump_type = "vsplit" })
 	end
 
 	local normal_keymaps = {
-		{ "gi", GoToDefinition, "go to defintion" },
-		{ "gI", GoToVsplitDefinition, "go to defintion v_split" },
-		{ "gr", GoToReferences, "go to references" },
-		{ "gR", GoToVsplitReferences, "go to references v_split" },
-		{ "gt", GoToTypeDefinition, "go to type definition" },
-		{ "gT", GoToVsplitTypeDefinition, "go to type definition v_split" },
+		{ "gi", goToDefinition, "go to defintion" },
+		{ "gI", goToSplitDefinition, "go to defintion v_split" },
+		{ "gr", goToReferences, "go to references" },
+		{ "gR", goToSplitReferences, "go to references v_split" },
+		{ "gt", goToTypeDefinition, "go to type definition" },
+		{ "gT", goToSplitTypeDefinition, "go to type definition v_split" },
 		{ "<M-S-l>", vim.diagnostic.goto_next, "next diagnostic" },
 		{ "<M-S-h>", vim.diagnostic.goto_prev, "prev diagnostic" },
 		{ "<leader>vd", vim.diagnostic.open_float, "view diagnostic" },
@@ -197,7 +206,7 @@ lsp_zero.on_attach(function(client, bufnr)
 		vim.keymap.set("n", value[1], value[2], add_desc(value[3], bufnr))
 	end
 
-	vim.keymap.set("v", "gi", GoToTabDefinition, add_desc("go to defintion tab", bufnr))
+	vim.keymap.set("v", "gi", goToTabDefinition, add_desc("go to defintion tab", bufnr))
 	vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, add_desc("signature help", bufnr))
 end)
 

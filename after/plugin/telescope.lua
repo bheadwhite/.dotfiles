@@ -7,13 +7,14 @@ local plenary = require("plenary")
 local action_state = require("telescope.actions.state")
 local commands = require("bdub.commands")
 local actions = require("telescope.actions")
+local winshift_lib = require("winshift.lib")
 
 local builtin = require("telescope.builtin")
 vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "find files" })
 vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "git files" })
 vim.keymap.set("n", "<leader>p", builtin.oldfiles, { desc = "recent files" })
 
-local operator_path_display = function(_, file_path) -- absolute path
+local function operator_path_display(_, file_path) -- absolute path
 	if not string.find(file_path, "^/Users/brent.whitehead/") then
 		return file_path
 	end
@@ -29,11 +30,12 @@ local operator_path_display = function(_, file_path) -- absolute path
 	return relative_path
 end
 
-local file_name_only = function(_, file_path)
+local function file_name_only(_, file_path)
 	return string.gsub(file_path, ".*/(.*)$", "%1")
 end
 
 local default_opts = {
+	initial_mode = "normal",
 	path_display = operator_path_display,
 	layout_strategy = "vertical",
 	layout_config = {
@@ -43,6 +45,7 @@ local default_opts = {
 }
 
 local reference_opts = {
+	initial_mode = "normal",
 	path_display = file_name_only,
 	layout_strategy = "vertical",
 	layout_config = {
@@ -51,7 +54,16 @@ local reference_opts = {
 	},
 }
 
-local copy_path_from_selection = function(bufnr)
+local insert_mode_default = vim.tbl_extend("force", default_opts, {
+	initial_mode = "insert",
+})
+
+local function openAndSwap(selection)
+	actions.file_vsplit(selection)
+	winshift_lib.start_swap_mode()
+end
+
+local function copy_path_from_selection(bufnr)
 	local current_picker = action_state.get_current_picker(bufnr)
 	local selection = current_picker:get_selection()
 	local path = selection[1]
@@ -64,11 +76,12 @@ end
 telescope.setup({
 	pickers = {
 		buffers = {
+			initial_mode = "normal",
 			path_display = { "tail" },
 		},
-		find_files = default_opts,
-		git_files = default_opts,
-		live_grep = default_opts,
+		find_files = insert_mode_default,
+		git_files = insert_mode_default,
+		live_grep = insert_mode_default,
 		oldfiles = default_opts,
 		lsp_references = reference_opts,
 		lsp_definitions = default_opts,
@@ -83,6 +96,7 @@ telescope.setup({
 			i = {
 				["<C-M-r>"] = copy_path_from_selection,
 				["<c-f>"] = actions.to_fuzzy_refine,
+				["<C-v>"] = openAndSwap,
 				["<C-M-S-l>"] = function()
 					print("target rpc references")
 					local val = vim.api.nvim_win_get_cursor(0)
@@ -96,6 +110,7 @@ telescope.setup({
 			},
 			n = {
 				["<C-M-r>"] = copy_path_from_selection,
+				["<C-v>"] = openAndSwap,
 			},
 		},
 	},

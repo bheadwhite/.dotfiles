@@ -36,8 +36,7 @@ local ts_utils = require("nvim-treesitter.ts_utils")
 cmp.event:on("confirm_done", function(evt)
 	if ts_utils.get_node_at_cursor() then
 		local name = ts_utils.get_node_at_cursor():type()
-		-- and name ~= "argument_list"
-		if name ~= "named_imports" and name ~= "argument_list" then
+		if name ~= "named_imports" and name ~= "argument_list" and not string.find(name, "jsx") then
 			cmp_autopairs.on_confirm_done({ map_char = { tex = "" } })(evt)
 		end
 	end
