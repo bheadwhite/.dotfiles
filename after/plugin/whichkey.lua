@@ -7,7 +7,6 @@ local commands = require("bdub.commands")
 
 local mappings = {
 	["."] = { "which_key_ignore" },
-	s = { "<cmd>Telescope live_grep<cr>", "Live Grep" },
 	T = {
 		name = "Telescope",
 		d = { commands.find_files_within_directories, "Find File in Directory" },

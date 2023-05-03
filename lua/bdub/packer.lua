@@ -40,6 +40,19 @@ packer.init({
 
 return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/packer.nvim'
 	use("wbthomason/packer.nvim")
+	use("mileszs/ack.vim")
+	-- use({
+	-- 	"vuki656/package-info.nvim",
+	-- 	requires = "MunifTanjim/nui.nvim",
+	-- 	config = function()
+	-- 		require("package-info").setup({
+	-- 			colors = {
+	-- 				up_to_date = "#00ff00",
+	-- 				outdated = "#ff0000",
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- })
 
 	use({
 		"sainnhe/everforest",
@@ -60,9 +73,11 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		config = function()
 			require("aerial").setup()
 		end,
+		requires = {
+			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+			"kyazdani42/nvim-web-devicons", -- not strictly required, but recommended
+		},
 	})
-
-	use("ray-x/lsp_signature.nvim")
 
 	use("camilledejoye/nvim-lsp-selection-range")
 	use("RRethy/vim-illuminate")
@@ -111,6 +126,17 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 
 	use("folke/which-key.nvim")
 	use("folke/neodev.nvim")
+	use({
+		"folke/noice.nvim",
+		requires = {
+			-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+			"MunifTanjim/nui.nvim",
+			-- OPTIONAL:
+			--   `nvim-notify` is only needed, if you want to use the notification view.
+			--   If not available, we use `mini` as the fallback
+			"rcarriga/nvim-notify",
+		},
+	})
 
 	use("booperlv/nvim-gomove")
 	use("abecodes/tabout.nvim")
@@ -130,10 +156,10 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 
 	use({
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.0",
-		-- or                            , branch = '0.1.x',
-		requires = { { "nvim-lua/plenary.nvim" } },
+		requires = { { "nvim-lua/plenary.nvim", "nvim-telescope/telescope-live-grep-args.nvim" } },
 	})
+
+	use("nvim-telescope/telescope-live-grep-args.nvim")
 
 	use({ "nvim-telescope/telescope-ui-select.nvim" })
 	use({
@@ -171,7 +197,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		"nvim-lualine/lualine.nvim",
 		requires = {
 			"kyazdani42/nvim-web-devicons",
-			"nvim-lua/lsp-status.nvim",
 		},
 	})
 

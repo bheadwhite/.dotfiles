@@ -38,7 +38,6 @@ lsp_zero.configure("tsserver", {
 		preferences = {
 			importModuleSpecifierPreference = "non-relative",
 		},
-		maxTsServerMemory = 4096,
 	},
 	settings = {
 		diagnostics = {
@@ -62,12 +61,16 @@ lsp_zero.configure("tsserver", {
 		lsp_status.on_attach(client)
 		client.server_capabilities.documentFormattingProvider = false
 
-		require("lsp_signature").on_attach({
-			bind = true,
-			handler_opts = {
-				border = "single",
-			},
-		}, bufnr)
+		-- require("nvim-navbuddy").attach(client, bufnr)
+
+		-- require("lsp_signature").on_attach({
+		-- 	bind = true,
+		-- 	handler_opts = {
+		-- 		border = "single",
+		-- 	},
+		-- 	floating_window = false,
+		-- 	virtual_text = true,
+		-- }, bufnr)
 
 		ts_utils.setup({
 			import_all_timeout = 5000,
@@ -135,6 +138,7 @@ local cmp_mappings = lsp_zero.defaults.cmp_mappings({
 -- this helps with copilot setup
 cmp_mappings["<Tab>"] = nil
 cmp_mappings["<S-Tab>"] = nil
+cmp_mappings["<C-M-Tab>"] = nil
 
 lsp_zero.setup_nvim_cmp({
 	mapping = cmp_mappings,

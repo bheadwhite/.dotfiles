@@ -3,6 +3,7 @@ local finders = require("telescope.finders")
 local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
+
 local M = {}
 
 local dropdown_theme = require("telescope.themes").get_dropdown({
@@ -19,6 +20,13 @@ local function get_vim_path()
 	end
 
 	return file_path
+end
+
+M.set_vim_title = function()
+	local cwd = vim.fn.getcwd()
+	local dir_name = cwd:match("^.+/(.+)$")
+
+	vim.cmd("set titlestring=" .. dir_name)
 end
 
 local function find_directories()

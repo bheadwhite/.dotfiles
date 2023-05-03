@@ -46,7 +46,7 @@ local normal_keymaps = {
 	{ "<C-Right>", ":vertical resize +2<CR>", "resize vertical split +2" },
 	{ "<C-,>", ":WinShift<CR>h<esc>", "move window left" },
 	{ "<C-.>", ":WinShift<CR>l<esc>", "move window right" },
-	{ "*", ":keepjumps normal! mi*`i<CR>", "for jumps" },
+	{ "*", ":keepjumps normal! mi*`iN<CR>", "for jumps" },
 	{
 		"gn",
 		function()
@@ -61,6 +61,22 @@ for _, value in ipairs(normal_keymaps) do
 	vim.keymap.set("n", value[1], value[2], add_desc(value[3], options))
 end
 
+local function nextDown()
+	if vim.bo.filetype == "typescript" then
+		vim.cmd([[AerialNext]])
+	else
+		vim.cmd([[normal! 5j]])
+	end
+end
+
+local function nextUp()
+	if vim.bo.filetype == "typescript" then
+		vim.cmd([[AerialPrev]])
+	else
+		vim.cmd([[normal! 5k]])
+	end
+end
+
 -- system clipboard
 vim.keymap.set("x", "<leader>P", [["_dP]], add_desc("Paste over selection"))
 vim.keymap.set("v", "p", '"_dP', options)
@@ -70,8 +86,8 @@ vim.keymap.set({ "n", "v" }, "<C-M-c>", [["+y]], add_desc("Copy to system clipbo
 vim.keymap.set("c", "<M-k>", "\\(.*\\)", { desc = "one eyed fighting kirby" })
 vim.keymap.set({ "n", "v" }, "j", "gj", options)
 vim.keymap.set({ "n", "v" }, "k", "gk", options)
-vim.keymap.set({ "n", "v" }, "J", "5j", options)
-vim.keymap.set({ "n", "v" }, "K", "5k", options)
+vim.keymap.set({ "n", "v" }, "J", nextDown, options)
+vim.keymap.set({ "n", "v" }, "K", nextUp, options)
 vim.keymap.set({ "n", "v" }, "L", "$", options)
 vim.keymap.set({ "n", "v" }, "H", "_", options)
 vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("move to top window"))

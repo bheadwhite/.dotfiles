@@ -31,12 +31,17 @@ vim.cmd([[
 
   augroup _typescript_mkprg
     autocmd!
-    autocmd FileType typescript,typescriptreact compiler tsc | setlocal makeprg=npx\ tsc
+    autocmd FileType typescript,typescriptreact compiler tsc | setlocal makeprg=NODE_OPTIONS='--max-old-space-size=8192'\ npx\ tsc
   augroup END
 
   augroup refresh_lsp_progress
     autocmd!
     autocmd User LspProgressUpdate redrawstatus
+  augroup END
+
+  augroup set_vim_title
+    autocmd!
+    autocmd BufEnter * silent!lua require("bdub.commands").set_vim_title()
   augroup END
 
 ]])

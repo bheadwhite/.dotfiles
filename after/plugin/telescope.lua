@@ -8,11 +8,7 @@ local action_state = require("telescope.actions.state")
 local commands = require("bdub.commands")
 local actions = require("telescope.actions")
 local winshift_lib = require("winshift.lib")
-
 local builtin = require("telescope.builtin")
-vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "find files" })
-vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "git files" })
-vim.keymap.set("n", "<leader>p", builtin.oldfiles, { desc = "recent files" })
 
 local function operator_path_display(_, file_path) -- absolute path
 	if not string.find(file_path, "^/Users/brent.whitehead/") then
@@ -97,6 +93,7 @@ telescope.setup({
 				["<C-M-r>"] = copy_path_from_selection,
 				["<c-f>"] = actions.to_fuzzy_refine,
 				["<C-v>"] = openAndSwap,
+				["<C-u>"] = false,
 				["<C-M-S-l>"] = function()
 					print("target rpc references")
 					local val = vim.api.nvim_win_get_cursor(0)
@@ -111,6 +108,7 @@ telescope.setup({
 			n = {
 				["<C-M-r>"] = copy_path_from_selection,
 				["<C-v>"] = openAndSwap,
+				["<M-S-q>"] = actions.add_to_qflist,
 			},
 		},
 	},
@@ -133,3 +131,13 @@ telescope.setup({
 
 require("telescope").load_extension("fzf")
 require("telescope").load_extension("ui-select")
+require("telescope").load_extension("live_grep_args")
+
+vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "find files" })
+vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "git files" })
+vim.keymap.set("n", "<leader>p", builtin.oldfiles, { desc = "recent files" })
+vim.keymap.set("n", "<leader>Tr", builtin.registers, { desc = "registers" })
+vim.keymap.set("n", "<leader>Tq", builtin.quickfixhistory, { desc = "qfhistory" })
+vim.keymap.set("n", "<leader>s", function()
+	require("telescope").extensions.live_grep_args.live_grep_args()
+end, { desc = "live grep args" })

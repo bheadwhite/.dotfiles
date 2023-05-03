@@ -34,6 +34,9 @@ local function openFileAndSwap()
 end
 
 oil.setup({
+	view_options = {
+		show_hidden = true,
+	},
 	keymaps = {
 		["<C-h>"] = false,
 		["<C-l>"] = false,
@@ -54,10 +57,21 @@ oil.setup({
 				dir = dir .. entry.name
 			end
 
-			oil.close()
+			require("telescope").extensions.live_grep_args.live_grep_args({
+				prompt_title = "ripgrep search in " .. dir,
+				search_dirs = { dir },
+			})
+		end,
+		["f"] = function()
+			local entry = oil.get_cursor_entry()
+			local dir = oil.get_current_dir()
 
-			require("telescope.builtin").live_grep({
-				prompt_title = "grep files in " .. dir,
+			if entry.type == "directory" then
+				dir = dir .. entry.name
+			end
+
+			require("telescope.builtin").find_files({
+				prompt_title = "file search within " .. dir,
 				search_dirs = { dir },
 			})
 		end,
