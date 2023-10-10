@@ -1,6 +1,7 @@
 require("noice").setup({
 	-- add any options here
 	messages = {
+		enabled = false,
 		view = "mini", -- default view for messages
 		view_error = "mini", -- view for errors
 		view_warn = "mini", -- view for warnings
@@ -8,7 +9,7 @@ require("noice").setup({
 		view_search = "mini", -- v,
 	},
 	notify = {
-		view = "mini",
+		enabled = false,
 	},
 	signature = {
 		auto_open = {

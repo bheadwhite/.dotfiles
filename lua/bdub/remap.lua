@@ -19,6 +19,31 @@ function ToggleGit()
 	end
 end
 
+function vSplit()
+	--vertically split the window and jump back to the original window
+	vim.cmd([[vsplit | wincmd p]])
+end
+
+local function goToConstructor()
+	local found = vim.fn.search("constructor(")
+	if found == 0 then
+		error("constructor not found")
+	else
+		vim.cmd([[/constructor]])
+		vim.cmd([[nohl| normal ^]])
+	end
+end
+
+local function goToExport()
+	local found = vim.fn.search("constructor(")
+	if found == 0 then
+		error("export not found")
+	else
+		vim.cmd([[/export]])
+		vim.cmd([[nohl| normal ^]])
+	end
+end
+
 local normal_keymaps = {
 	{ "gj", "mzJ`z", "join" },
 	{ "<c-d>", "<c-d>zz", "half page down" },
@@ -35,6 +60,7 @@ local normal_keymaps = {
 	{ "<leader>S", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "substitue under cursor" },
 	{ "<leader>X", "<cmd>!chmod +x %<CR>", "make file executable" },
 	{ "<leader>w", ":w<CR>", "write" },
+	{ "<C-\\>", vSplit, "vertical split" },
 	{ "<C-M-S-j>", "<cmd>cnext<CR>zz", "next quickfix" },
 	{ "<C-M-S-k>", "<cmd>cprev<CR>zz", "prev quickfix" },
 	{ "<C-M-S-q>", "<cmd>cclose<CR>", "close quickfix" },
@@ -50,8 +76,13 @@ local normal_keymaps = {
 	{
 		"gn",
 		function()
-			vim.cmd([[/constructor]])
-			vim.cmd([[nohl]])
+			if pcall(goToConstructor) then
+				print("constructor found")
+			elseif pcall(goToExport) then
+				print("export found")
+			else
+				print("no constructor or export found")
+			end
 		end,
 		"go to constructor",
 	},
@@ -98,6 +129,7 @@ vim.keymap.set({ "n", "v" }, "<leader><tab>l", vim.cmd.tabn, add_desc("next tab"
 vim.keymap.set({ "n", "v" }, "<leader><tab>h", vim.cmd.tabp, add_desc("prev tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><tab>", vim.cmd.tabe, add_desc("new tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><leader>", vim.cmd.tabc, add_desc("close tab"))
+vim.keymap.set({ "n", "v" }, "<leader><tab>z", "<C-w><S-T>", add_desc("move window to new tab"))
 vim.keymap.set("n", "<leader>z", "ma<cmd>tabedit %<CR>`a", { noremap = true, silent = true, desc = "zoom" })
 
 vim.keymap.set("n", "<esc>", "<cmd>noh<cr><esc>", add_desc("esc normal"))

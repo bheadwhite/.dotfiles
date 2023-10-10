@@ -11,7 +11,7 @@ local function add_desc(description, bufnr)
 	return opts
 end
 
-require("neodev").setup()
+-- require("neodev").setup()
 
 lsp_zero.preset("recommended")
 
@@ -28,10 +28,20 @@ lsp_zero.configure("lua_ls", {
 		Lua = {
 			diagnostics = {
 				globals = { "vim" },
+				disable = { "lowercase-global" },
 			},
 		},
 	},
 })
+
+local function organize_imports()
+	local params = {
+		command = "_typescript.organizeImports",
+		arguments = { vim.api.nvim_buf_get_name(0) },
+		title = "",
+	}
+	vim.lsp.buf.execute_command(params)
+end
 
 lsp_zero.configure("tsserver", {
 	init_options = {
@@ -41,7 +51,13 @@ lsp_zero.configure("tsserver", {
 	},
 	settings = {
 		diagnostics = {
-			ignoredCodes = { 2311, 80006 }, -- https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
+			ignoredCodes = { 2311, 80006, 80001, 7044, 7043 }, -- https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
+		},
+	},
+	commands = {
+		OrganizeImports = {
+			organize_imports,
+			description = "Organize Imports",
 		},
 	},
 	capabilities = vim.tbl_extend("force", lsp_status.capabilities, {
@@ -162,7 +178,7 @@ lsp_zero.set_preferences({
 
 lsp_zero.on_attach(function(client, bufnr)
 	local function goToDefinition()
-		telescope.lsp_definitions({ show_line = false })
+		vim.cmd("Trouble lsp_definitions")
 	end
 
 	local function goToSplitDefinition()
@@ -173,8 +189,8 @@ lsp_zero.on_attach(function(client, bufnr)
 		telescope.lsp_definitions({ show_line = false, jump_type = "tab" })
 	end
 
-	local function goToReferences()
-		telescope.lsp_references({ show_line = false, include_declaration = false })
+	local function lspFinder()
+		vim.cmd("Trouble lsp_references")
 	end
 
 	local function goToSplitReferences()
@@ -185,17 +201,28 @@ lsp_zero.on_attach(function(client, bufnr)
 		telescope.lsp_type_definitions({ show_line = false })
 	end
 
-	local function goToSplitTypeDefinition()
+	local function openTypeInSplit()
 		telescope.lsp_type_definitions({ show_line = false, jump_type = "vsplit" })
 	end
 
+	local function goToTabTypeDefinition()
+		telescope.lsp_type_definitions({ show_line = false, jump_type = "tab" })
+	end
+
+	local function toggleTrouble()
+		vim.cmd("TroubleToggle")
+	end
+
 	local normal_keymaps = {
+		{ "<leader>xx", toggleTrouble, "toggle trouble" },
 		{ "gi", goToDefinition, "go to defintion" },
-		{ "gI", goToSplitDefinition, "go to defintion v_split" },
-		{ "gr", goToReferences, "go to references" },
+		{ "gI", goToSplitDefinition, "open definition in split" },
+		{ "g<tab>i", goToTabDefinition, "go to definition in new tab" },
+		{ "gr", lspFinder, "lsp finder" },
 		{ "gR", goToSplitReferences, "go to references v_split" },
 		{ "gt", goToTypeDefinition, "go to type definition" },
-		{ "gT", goToSplitTypeDefinition, "go to type definition v_split" },
+		{ "gT", openTypeInSplit, "open type in split" },
+		{ "g<tab>t", goToTabTypeDefinition, "go to type definition in new tab" },
 		{ "<M-S-l>", vim.diagnostic.goto_next, "next diagnostic" },
 		{ "<M-S-h>", vim.diagnostic.goto_prev, "prev diagnostic" },
 		{ "<leader>vd", vim.diagnostic.open_float, "view diagnostic" },
@@ -210,7 +237,6 @@ lsp_zero.on_attach(function(client, bufnr)
 		vim.keymap.set("n", value[1], value[2], add_desc(value[3], bufnr))
 	end
 
-	vim.keymap.set("v", "gi", goToTabDefinition, add_desc("go to defintion tab", bufnr))
 	vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, add_desc("signature help", bufnr))
 end)
 

@@ -18,3 +18,5 @@ vim.keymap.set("x", "<M-]>", "<Plug>GoVSMDown", { noremap = false })
 
 vim.keymap.set("n", "<M-S-j>", "<Plug>GoNSDDown", { noremap = false })
 vim.keymap.set("n", "<M-S-k>", "<Plug>GoNSDUp", { noremap = false })
+vim.keymap.set("x", "<M-S-j>", "<Plug>GoVSDDown", { noremap = false })
+vim.keymap.set("x", "<M-S-k>", "<Plug>GoVSDUp", { noremap = false })

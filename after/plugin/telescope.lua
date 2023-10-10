@@ -87,6 +87,10 @@ telescope.setup({
 	defaults = {
 		prompt_prefix = " ",
 		selection_caret = " ",
+		file_ignore_patterns = {
+			".*/webphone/",
+			".*/pb_description/",
+		},
 		dynamic_preview_title = true,
 		mappings = {
 			i = {

@@ -40,143 +40,55 @@ packer.init({
 
 return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/packer.nvim'
 	use("wbthomason/packer.nvim")
-	use("mileszs/ack.vim")
-	-- use({
-	-- 	"vuki656/package-info.nvim",
-	-- 	requires = "MunifTanjim/nui.nvim",
-	-- 	config = function()
-	-- 		require("package-info").setup({
-	-- 			colors = {
-	-- 				up_to_date = "#00ff00",
-	-- 				outdated = "#ff0000",
-	-- 			},
-	-- 		})
-	-- 	end,
-	-- })
+	use("mileszs/ack.vim") -- Ack search
+	use("tpope/vim-dispatch") -- Async commands
+	use("windwp/nvim-autopairs") -- Autopairs, integrates with both cmp and treesitter
+	use("windwp/nvim-ts-autotag") -- auto close html tags
+	use({
+		"kevinhwang91/nvim-bqf", -- Better quickfix
+		ft = "qf",
+	})
 
 	use({
-		"sainnhe/everforest",
-		as = "everforest",
+		"kevinhwang91/nvim-hlslens", -- Better search
 		config = function()
-			vim.g.everforest_background = "hard"
-			vim.cmd("colorscheme everforest")
+			require("hlslens").setup()
 		end,
 	})
 
-	use("kyazdani42/nvim-web-devicons")
-	use("stevearc/oil.nvim")
-	use("tpope/vim-abolish")
-	use("dstein64/vim-startuptime")
-
 	use({
-		"stevearc/aerial.nvim",
-		config = function()
-			require("aerial").setup()
-		end,
-		requires = {
-			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-			"kyazdani42/nvim-web-devicons", -- not strictly required, but recommended
-		},
+		"cbochs/grapple.nvim", -- Bookmarks / tags
+		requires = { "nvim-lua/plenary.nvim" },
 	})
 
-	use("camilledejoye/nvim-lsp-selection-range")
-	use("RRethy/vim-illuminate")
-	use("sbulav/nredir.nvim")
+	use("theprimeagen/harpoon") -- Bookmarks
+	use("tpope/vim-abolish") -- case conversion / substitution
 	use({
-		"mfussenegger/nvim-dap",
+		"numToStr/Comment.nvim", -- comments
+		"JoosepAlviste/nvim-ts-context-commentstring", -- comments
+	})
+	use("github/copilot.vim") -- copilot
+
+	use("tpope/vim-dadbod") -- db
+	use({
+		"kristijanhusak/vim-dadbod-ui", -- db
+		config = function()
+			vim.g.db_ui_auto_execute_table_helpers = 1
+		end,
+	})
+	use("nvim-telescope/telescope-dap.nvim") -- Debugging
+	use({
+		"mfussenegger/nvim-dap", -- Debugging
 		requires = {
 			"ravenxrz/DAPInstall.nvim",
 			"rcarriga/nvim-dap-ui",
 		},
 	})
-	use("nvim-telescope/telescope-dap.nvim")
-	use({ "stevearc/dressing.nvim" })
 
-	use({ "TimUntersberger/neogit", requires = "nvim-lua/plenary.nvim" })
-	use("akinsho/git-conflict.nvim")
+	use("stevearc/oil.nvim") -- file explorer
 	use({
-		"AckslD/messages.nvim",
-		config = 'require("messages").setup()',
-	})
-
-	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
-	use("nvim-treesitter/nvim-treesitter-context")
-	use("RRethy/nvim-treesitter-textsubjects")
-	use("nvim-treesitter/nvim-treesitter-textobjects")
-	use("nvim-treesitter/playground")
-
-	use("sindrets/winshift.nvim")
-	use("rmagatti/goto-preview")
-
-	use("tpope/vim-fugitive")
-	use("f-person/git-blame.nvim")
-	use("lewis6991/gitsigns.nvim")
-	use("sindrets/diffview.nvim")
-
-	use("akinsho/toggleterm.nvim")
-	use("tpope/vim-dispatch")
-
-	use("Pocco81/HighStr.nvim")
-
-	use("theprimeagen/harpoon")
-
-	use("mbbill/undotree")
-
-	use("windwp/nvim-autopairs") -- Autopairs, integrates with both cmp and treesitter
-
-	use("folke/which-key.nvim")
-	use("folke/neodev.nvim")
-	use({
-		"folke/noice.nvim",
-		requires = {
-			-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-			"MunifTanjim/nui.nvim",
-			-- OPTIONAL:
-			--   `nvim-notify` is only needed, if you want to use the notification view.
-			--   If not available, we use `mini` as the fallback
-			"rcarriga/nvim-notify",
-		},
-	})
-
-	use("booperlv/nvim-gomove")
-	use("abecodes/tabout.nvim")
-	use("tpope/vim-surround")
-	use("github/copilot.vim")
-	use("windwp/nvim-ts-autotag")
-
-	--- dad bod
-	use("tpope/vim-dadbod")
-	use({
-		"kristijanhusak/vim-dadbod-ui",
-		config = function()
-			vim.g.db_ui_auto_execute_table_helpers = 1
-		end,
-	})
-	--- end dad bod
-
-	use({
-		"nvim-telescope/telescope.nvim",
-		requires = { { "nvim-lua/plenary.nvim", "nvim-telescope/telescope-live-grep-args.nvim" } },
-	})
-
-	use("nvim-telescope/telescope-live-grep-args.nvim")
-
-	use({ "nvim-telescope/telescope-ui-select.nvim" })
-	use({
-		"nvim-telescope/telescope-fzf-native.nvim",
-		run = "make",
-	})
-	use({
-		"nvim-lua/lsp-status.nvim",
-		config = function()
-			require("lsp-status").register_progress()
-		end,
-	})
-
-	-- neotree:
-	use({
-		"nvim-neo-tree/neo-tree.nvim",
-		branch = "v2.x",
+		"nvim-neo-tree/neo-tree.nvim", -- file explorer
+		branch = "v3.x",
 		requires = {
 			"nvim-lua/plenary.nvim",
 			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
@@ -185,23 +97,31 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		},
 	})
 	use({
-		"s1n7ax/nvim-window-picker",
-		tag = "v1.*",
+		"stevearc/aerial.nvim", -- file outline
 		config = function()
-			require("window-picker").setup()
+			require("aerial").setup()
 		end,
-	})
-	-- neotree
-
-	use({
-		"nvim-lualine/lualine.nvim",
 		requires = {
+			"nvim-tree/nvim-web-devicons",
 			"kyazdani42/nvim-web-devicons",
 		},
 	})
 
 	use({
-		"VonHeikemen/lsp-zero.nvim",
+		"akinsho/git-conflict.nvim", -- Git conflict markers
+		tag = "*",
+	})
+	use("tpope/vim-fugitive") -- Git
+	use("f-person/git-blame.nvim") -- Git blame
+	use("lewis6991/gitsigns.nvim") -- Git signs
+	use("sindrets/diffview.nvim") -- Git diff
+
+	use("Pocco81/HighStr.nvim") -- Highlight strings
+	use("RRethy/vim-illuminate") -- Highlight word under cursor
+	use("kyazdani42/nvim-web-devicons") -- Icons
+
+	use({
+		"VonHeikemen/lsp-zero.nvim", -- LSP
 		requires = {
 			-- LSP Support
 			{ "neovim/nvim-lspconfig" },
@@ -212,7 +132,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 			{ "jose-elias-alvarez/null-ls.nvim" },
 
 			-- Autocompletion
-			{ "hrsh7th/nvim-cmp" },
+			{ "hrsh7th/nvim-cmp", commit = "3874e09e80f5fd97ae941442f1dc433317298ae9" },
 			{ "hrsh7th/cmp-buffer" },
 			{ "hrsh7th/cmp-path" },
 			{ "saadparwaiz1/cmp_luasnip" },
@@ -225,9 +145,128 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		},
 	})
 
+	-- use({
+	-- 	"dnlhc/glance.nvim", -- LSP
+	-- 	config = function()
+	-- 		require("glance").setup({
+	-- 			-- your configuration
+	-- 			detached = true,
+	-- 		})
+	-- 	end,
+	-- })
+
+	use("camilledejoye/nvim-lsp-selection-range") -- LSP
 	use({
-		"numToStr/Comment.nvim",
-		"JoosepAlviste/nvim-ts-context-commentstring",
+		"nvim-lua/lsp-status.nvim", -- LSP
+		config = function()
+			require("lsp-status").register_progress()
+		end,
+	})
+
+	use({
+		"folke/trouble.nvim", -- LSP / diagnostics
+		requires = "kyazdani42/nvim-web-devicons",
+		config = function()
+			require("trouble").setup({})
+		end,
+	})
+	use({
+		"nvimdev/lspsaga.nvim", -- LSP niceties
+		after = "nvim-lspconfig",
+		config = function()
+			require("lspsaga").setup({
+				finder = {
+					default = "ref",
+					left_width = 0.3,
+					right_width = 0.8,
+				},
+				floaterm = {
+					height = 0.9,
+					width = 0.9,
+				},
+			})
+		end,
+	})
+
+	use({
+		"AckslD/messages.nvim", -- messages
+		config = function()
+			require("messages").setup()
+		end,
+	})
+	use("booperlv/nvim-gomove") -- move lines around
+	use("abecodes/tabout.nvim") -- move cursor between brackets
+
+	use({
+		"folke/noice.nvim", -- nice notifications
+		requires = {
+			-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+			"MunifTanjim/nui.nvim",
+			-- OPTIONAL:
+			--   `nvim-notify` is only needed, if you want to use the notification view.
+			--   If not available, we use `mini` as the fallback
+			"rcarriga/nvim-notify",
+		},
+	})
+
+	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" }) -- Treesitter
+	use("nvim-treesitter/nvim-treesitter-context") -- Treesitter
+	use("RRethy/nvim-treesitter-textsubjects") -- Treesitter
+	use("nvim-treesitter/nvim-treesitter-textobjects") -- Treesitter
+	use("nvim-treesitter/playground") -- Treesitter
+
+	use("sindrets/winshift.nvim") -- Move windows around
+
+	use("rmagatti/goto-preview") -- Preview goto
+
+	use({ "stevearc/dressing.nvim" }) -- UI niceties
+	use("mbbill/undotree") -- Undo tree
+
+	use("folke/which-key.nvim") -- Keybindings
+
+	use("sbulav/nredir.nvim") -- Redirects output
+	use("dstein64/vim-startuptime") -- startup time
+	use({
+		"nvim-lualine/lualine.nvim", -- statusline
+		requires = {
+			"kyazdani42/nvim-web-devicons",
+		},
+	})
+	use("tpope/vim-surround") -- surround text with brackets
+
+	use({
+		"nvim-telescope/telescope.nvim", -- Telescope
+		requires = { { "nvim-lua/plenary.nvim", "nvim-telescope/telescope-live-grep-args.nvim" } },
+	})
+	use("nvim-telescope/telescope-live-grep-args.nvim") -- Telescope
+	use({ "nvim-telescope/telescope-ui-select.nvim" }) -- Telescope
+	use({
+		"nvim-telescope/telescope-fzf-native.nvim", -- Telescope
+		run = "make",
+	})
+	use("akinsho/toggleterm.nvim") -- Terminal
+
+	use({
+		"sainnhe/everforest", -- Theme
+		as = "everforest",
+		config = function()
+			vim.g.everforest_background = "hard"
+			vim.cmd("colorscheme everforest")
+		end,
+	})
+	use({
+		"dmmulroy/tsc.nvim", -- Typescript
+		config = function()
+			require("tsc").setup()
+		end,
+	})
+
+	use({
+		"s1n7ax/nvim-window-picker", -- window picker
+		tag = "v1.*",
+		config = function()
+			require("window-picker").setup()
+		end,
 	})
 
 	-- Automatically set up your configuration after cloning packer.nvim
