@@ -61,7 +61,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		requires = { "nvim-lua/plenary.nvim" },
 	})
 
-	use("theprimeagen/harpoon") -- Bookmarks
+	-- use("theprimeagen/harpoon") -- Bookmarks
 	use("tpope/vim-abolish") -- case conversion / substitution
 	use({
 		"numToStr/Comment.nvim", -- comments
@@ -76,14 +76,14 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 			vim.g.db_ui_auto_execute_table_helpers = 1
 		end,
 	})
-	use("nvim-telescope/telescope-dap.nvim") -- Debugging
-	use({
-		"mfussenegger/nvim-dap", -- Debugging
-		requires = {
-			"ravenxrz/DAPInstall.nvim",
-			"rcarriga/nvim-dap-ui",
-		},
-	})
+	-- use("nvim-telescope/telescope-dap.nvim") -- Debugging
+	-- use({
+	--     "mfussenegger/nvim-dap", -- Debugging
+	--     requires = {
+	--         "ravenxrz/DAPInstall.nvim",
+	--         "rcarriga/nvim-dap-ui",
+	--     },
+	-- })
 
 	use("stevearc/oil.nvim") -- file explorer
 	use({
@@ -98,9 +98,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 	use({
 		"stevearc/aerial.nvim", -- file outline
-		config = function()
-			require("aerial").setup()
-		end,
 		requires = {
 			"nvim-tree/nvim-web-devicons",
 			"kyazdani42/nvim-web-devicons",
@@ -145,46 +142,18 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		},
 	})
 
-	-- use({
-	-- 	"dnlhc/glance.nvim", -- LSP
-	-- 	config = function()
-	-- 		require("glance").setup({
-	-- 			-- your configuration
-	-- 			detached = true,
-	-- 		})
-	-- 	end,
-	-- })
+	use({
+		"pmizio/typescript-tools.nvim",
+		requires = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+	})
+
+	use("dnlhc/glance.nvim") -- LSP
 
 	use("camilledejoye/nvim-lsp-selection-range") -- LSP
 	use({
 		"nvim-lua/lsp-status.nvim", -- LSP
 		config = function()
 			require("lsp-status").register_progress()
-		end,
-	})
-
-	use({
-		"folke/trouble.nvim", -- LSP / diagnostics
-		requires = "kyazdani42/nvim-web-devicons",
-		config = function()
-			require("trouble").setup({})
-		end,
-	})
-	use({
-		"nvimdev/lspsaga.nvim", -- LSP niceties
-		after = "nvim-lspconfig",
-		config = function()
-			require("lspsaga").setup({
-				finder = {
-					default = "ref",
-					left_width = 0.3,
-					right_width = 0.8,
-				},
-				floaterm = {
-					height = 0.9,
-					width = 0.9,
-				},
-			})
 		end,
 	})
 

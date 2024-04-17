@@ -5,6 +5,8 @@ end
 
 local commands = require("bdub.commands")
 
+-- = { name = "format", j = { commands.format_jq, "Format JQ" } },
+
 local mappings = {
 	["."] = { "which_key_ignore" },
 	T = {

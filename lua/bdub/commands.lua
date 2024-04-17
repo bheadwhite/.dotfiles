@@ -127,4 +127,8 @@ M.grep_string_within_directories = function()
 	pickers.new(dropdown_theme, options):find()
 end
 
+M.format_jq = function()
+	vim.cmd("%!jq .")
+end
+
 return M

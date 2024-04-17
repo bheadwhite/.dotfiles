@@ -136,6 +136,7 @@ telescope.setup({
 require("telescope").load_extension("fzf")
 require("telescope").load_extension("ui-select")
 require("telescope").load_extension("live_grep_args")
+require("telescope").load_extension("grapple")
 
 vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "find files" })
 vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "git files" })

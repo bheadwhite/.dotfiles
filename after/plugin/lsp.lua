@@ -1,8 +1,6 @@
 local lsp_zero = require("lsp-zero")
-local ts_utils = require("nvim-lsp-ts-utils")
 local telescope = require("telescope.builtin")
-local lsp_selection_range = require("lsp-selection-range")
-local lsp_status = require("lsp-status")
+local notify = require("notify")
 
 local function add_desc(description, bufnr)
 	local opts = { buffer = bufnr, remap = false }
@@ -11,12 +9,9 @@ local function add_desc(description, bufnr)
 	return opts
 end
 
--- require("neodev").setup()
-
 lsp_zero.preset("recommended")
 
 lsp_zero.ensure_installed({
-	"tsserver",
 	"eslint",
 	"lua_ls",
 	"rust_analyzer",
@@ -34,71 +29,74 @@ lsp_zero.configure("lua_ls", {
 	},
 })
 
-local function organize_imports()
-	local params = {
-		command = "_typescript.organizeImports",
-		arguments = { vim.api.nvim_buf_get_name(0) },
-		title = "",
-	}
-	vim.lsp.buf.execute_command(params)
+local function goToConstructor()
+	local found = vim.fn.search("constructor(")
+
+	if found == 0 then
+		print("no constructor found")
+	else
+		vim.cmd([[/constructor]])
+		vim.cmd([[nohl| normal ^]])
+	end
 end
 
-lsp_zero.configure("tsserver", {
-	init_options = {
-		preferences = {
-			importModuleSpecifierPreference = "non-relative",
-		},
-	},
-	settings = {
-		diagnostics = {
-			ignoredCodes = { 2311, 80006, 80001, 7044, 7043 }, -- https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
-		},
-	},
-	commands = {
-		OrganizeImports = {
-			organize_imports,
-			description = "Organize Imports",
-		},
-	},
-	capabilities = vim.tbl_extend("force", lsp_status.capabilities, {
-		textDocument = {
-			selectionRange = {
-				dynamicRegistration = true,
-			},
-			completion = {
-				completionItem = {
-					snippetSupport = true,
-				},
-			},
-		},
-	}),
-	on_attach = function(client, bufnr)
-		lsp_status.register_client(client)
-		lsp_status.on_attach(client)
-		client.server_capabilities.documentFormattingProvider = false
+local function jump_to_parent_class()
+	--find constructor if none found then notify such and return
+	local found = vim.fn.search("constructor(")
 
-		-- require("nvim-navbuddy").attach(client, bufnr)
+	if found == 0 then
+		notify.notify("No constructor found", "error", { title = "Jump to Parent", timeout = 200 })
+		return
+	end
 
-		-- require("lsp_signature").on_attach({
-		-- 	bind = true,
-		-- 	handler_opts = {
-		-- 		border = "single",
-		-- 	},
-		-- 	floating_window = false,
-		-- 	virtual_text = true,
-		-- }, bufnr)
+	goToConstructor()
+	local current_buf = vim.api.nvim_get_current_buf()
+	local params = vim.lsp.util.make_position_params()
+	local current_uri = vim.uri_from_bufnr(current_buf)
 
-		ts_utils.setup({
-			import_all_timeout = 5000,
-		})
-		ts_utils.setup_client(client)
+	-- Ensure the context is set correctly for the references request
+	params.context = { includeDeclaration = true }
 
-		vim.keymap.set("n", "<leader>r", ts_utils.rename_file, add_desc("rename file", bufnr))
-		vim.keymap.set("n", "<C-M-o>", lsp_selection_range.trigger, add_desc("selection range", bufnr))
-		vim.keymap.set("v", "<C-M-o>", lsp_selection_range.expand, add_desc("expand range", bufnr))
-	end,
-	root_dir = vim.loop.cwd,
-})
+	vim.lsp.buf_request(0, "textDocument/references", params, function(err, result)
+		if err ~= nil then
+			print("Error during references request: " .. err.message)
+			return
+		end
+
+		-- Filter out unwanted references and the current file's URI
+		local filtered_result = {}
+		local added_uris = {}
+		for _, ref in ipairs(result or {}) do
+			local uri = ref.uri or ""
+			if
+				not added_uris[uri]
+				and uri ~= current_uri
+				and not (string.find(uri, "%.test%.") or string.find(uri, "stories") or string.find(uri, "mock"))
+			then
+				table.insert(filtered_result, ref)
+				added_uris[uri] = true
+			end
+		end
+
+		if filtered_result and #filtered_result == 1 then
+			local uri = filtered_result[1].uri
+			local bufnr = vim.uri_to_bufnr(uri)
+			local range = filtered_result[1].range
+
+			-- Jump to the location of the single reference
+			vim.lsp.util.jump_to_location({ uri = uri, range = range })
+			vim.api.nvim_set_current_buf(bufnr)
+			goToConstructor()
+		elseif result then
+			vim.cmd("Glance references")
+		else
+			print("No references found.")
+		end
+	end)
+end
+
+-- To use this function, you can map it to a keybinding in your Neovim configuration.
+vim.keymap.set("n", "gp", jump_to_parent_class, { noremap = true, silent = true })
 
 local cmp = require("cmp")
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
@@ -176,9 +174,9 @@ lsp_zero.set_preferences({
 	set_lsp_keymaps = false,
 })
 
-lsp_zero.on_attach(function(client, bufnr)
+lsp_zero.on_attach(function(_, bufnr)
 	local function goToDefinition()
-		vim.cmd("Trouble lsp_definitions")
+		telescope.lsp_definitions({ show_line = false })
 	end
 
 	local function goToSplitDefinition()
@@ -190,7 +188,8 @@ lsp_zero.on_attach(function(client, bufnr)
 	end
 
 	local function lspFinder()
-		vim.cmd("Trouble lsp_references")
+		--dont fire events BufLeave or WinLeave
+		vim.cmd("Glance references")
 	end
 
 	local function goToSplitReferences()
@@ -209,12 +208,7 @@ lsp_zero.on_attach(function(client, bufnr)
 		telescope.lsp_type_definitions({ show_line = false, jump_type = "tab" })
 	end
 
-	local function toggleTrouble()
-		vim.cmd("TroubleToggle")
-	end
-
 	local normal_keymaps = {
-		{ "<leader>xx", toggleTrouble, "toggle trouble" },
 		{ "gi", goToDefinition, "go to defintion" },
 		{ "gI", goToSplitDefinition, "open definition in split" },
 		{ "g<tab>i", goToTabDefinition, "go to definition in new tab" },
