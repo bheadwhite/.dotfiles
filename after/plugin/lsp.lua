@@ -11,12 +11,11 @@ end
 
 lsp_zero.preset("recommended")
 
-lsp_zero.ensure_installed({
-	-- "tailwindcss",
-	"eslint",
-	"lua_ls",
-	"rust_analyzer",
-})
+-- lsp_zero.ensure_installed({
+-- 	"eslint",
+-- 	"lua_ls",
+-- 	"rust_analyzer",
+-- })
 
 -- Fix Undefined global 'vim'
 lsp_zero.configure("lua_ls", {
@@ -101,31 +100,13 @@ vim.keymap.set("n", "gp", jump_to_parent_class, { noremap = true, silent = true 
 local cmp = require("cmp")
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
-local cmp_mappings = lsp_zero.defaults.cmp_mappings({
+lsp_zero.extend_cmp()
+
+local cmp_mappings = {
 	["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
 	["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
 	["<CR>"] = cmp.mapping.confirm({ select = true }),
-	["<M-Space>"] = cmp.mapping(
-		cmp.mapping.complete({
-			config = {
-				sources = {
-					{ name = "nvim_lsp" },
-					{ name = "path" },
-				},
-			},
-		}),
-		{ "i", "c" }
-	),
-	-- ["<C-Space>"] = cmp.mapping(
-	-- 	cmp.mapping.complete({
-	-- 		config = {
-	-- 			sources = {
-	-- 				{ name = "nvim_lsp_signature_help" },
-	-- 			},
-	-- 		},
-	-- 	}),
-	-- 	{ "i", "c" }
-	-- ),
+	["<M-Space>"] = cmp.mapping.complete(cmp_select),
 	["<M-j>"] = cmp.mapping(function(fallback)
 		if cmp.visible() then
 			cmp.select_next_item()
@@ -146,7 +127,7 @@ local cmp_mappings = lsp_zero.defaults.cmp_mappings({
 		"i",
 		"s",
 	}),
-})
+}
 
 -- disable completion with tab
 -- this helps with copilot setup
@@ -154,13 +135,8 @@ cmp_mappings["<Tab>"] = nil
 cmp_mappings["<S-Tab>"] = nil
 cmp_mappings["<C-M-Tab>"] = nil
 
-lsp_zero.setup_nvim_cmp({
+cmp.setup({
 	mapping = cmp_mappings,
-	sources = {
-		-- { name = "nvim_lsp_signature_help" },
-		{ name = "nvim_lsp" },
-		{ name = "path" },
-	},
 })
 
 lsp_zero.set_preferences({

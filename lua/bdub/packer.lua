@@ -155,6 +155,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 
 	use({
 		"VonHeikemen/lsp-zero.nvim", -- LSP
+		branch = "v3.x",
 		requires = {
 			-- LSP Support
 			{ "neovim/nvim-lspconfig" },
