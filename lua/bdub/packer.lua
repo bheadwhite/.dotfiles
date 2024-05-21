@@ -50,6 +50,15 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use({
+		"laytan/tailwind-sorter.nvim",
+		requires = { "nvim-treesitter/nvim-treesitter", "nvim-lua/plenary.nvim" },
+		config = function()
+			require("tailwind-sorter").setup()
+		end,
+		run = "cd formatter && npm ci && npm run build",
+	})
+
+	use({
 		"kevinhwang91/nvim-hlslens", -- Better search
 		config = function()
 			require("hlslens").setup()
@@ -57,11 +66,30 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use({
-		"cbochs/grapple.nvim", -- Bookmarks / tags
-		requires = { "nvim-lua/plenary.nvim" },
+		"stevearc/conform.nvim",
+		config = function()
+			require("conform").setup({
+				formatters_by_ft = {
+					javascript = { { "prettier" } },
+				},
+			})
+		end,
 	})
 
-	-- use("theprimeagen/harpoon") -- Bookmarks
+	use({
+		"cbochs/grapple.nvim", -- Bookmarks / tags
+		requires = { "nvim-lua/plenary.nvim" },
+		-- commit = "12172536620464f8cc124e07c6e3ccd306ea3c5c",
+	})
+
+	-- use({
+	-- 	"theprimeagen/harpoon",
+	-- 	branch = "harpoon2",
+	-- 	config = function()
+	-- 		require("harpoon"):setup()
+	-- 	end,
+	-- 	requires = { { "nvim-lua/plenary.nvim" } },
+	-- }) -- Bookmarks
 	use("tpope/vim-abolish") -- case conversion / substitution
 	use({
 		"numToStr/Comment.nvim", -- comments
@@ -102,6 +130,14 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 			"nvim-tree/nvim-web-devicons",
 			"kyazdani42/nvim-web-devicons",
 		},
+	})
+
+	use({
+		"neanias/everforest-nvim",
+		-- Optional; default configuration will be used if setup isn't called.
+		config = function()
+			require("everforest").setup()
+		end,
 	})
 
 	use({
@@ -215,14 +251,14 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 	use("akinsho/toggleterm.nvim") -- Terminal
 
-	use({
-		"sainnhe/everforest", -- Theme
-		as = "everforest",
-		config = function()
-			vim.g.everforest_background = "hard"
-			vim.cmd("colorscheme everforest")
-		end,
-	})
+	-- use({
+	-- 	"sainnhe/everforest", -- Theme
+	-- 	as = "everforest",
+	-- 	config = function()
+	-- 		vim.g.everforest_background = "hard"
+	-- 		vim.cmd("colorscheme everforest")
+	-- 	end,
+	-- })
 	use({
 		"dmmulroy/tsc.nvim", -- Typescript
 		config = function()

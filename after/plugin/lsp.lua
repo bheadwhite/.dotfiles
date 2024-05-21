@@ -12,6 +12,7 @@ end
 lsp_zero.preset("recommended")
 
 lsp_zero.ensure_installed({
+	-- "tailwindcss",
 	"eslint",
 	"lua_ls",
 	"rust_analyzer",
@@ -86,7 +87,6 @@ local function jump_to_parent_class()
 			-- Jump to the location of the single reference
 			vim.lsp.util.jump_to_location({ uri = uri, range = range })
 			vim.api.nvim_set_current_buf(bufnr)
-			goToConstructor()
 		elseif result then
 			vim.cmd("Glance references")
 		else

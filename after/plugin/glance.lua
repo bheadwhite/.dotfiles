@@ -5,19 +5,24 @@ local glanceState = {
 	findTests = false,
 }
 
+local function showFilterNotify(shouldFindTests)
+	local message = ""
+	if shouldFindTests then
+		message = "Showing ALL ([leader+t] to filter)"
+	else
+		message = "Filtering Tests, Mocks and Stories ([leader+t] to clear)"
+	end
+
+	notify.notify(message, (shouldFindTests and "info" or "warn"), { title = "Filter References", timeout = 200 })
+end
+
 glance.setup({
 	-- your configuration
 	detached = true,
 	hooks = {
 		before_open = function(results, open, jump)
 			local filtered_results = {}
-			if not glanceState.findTests then
-				notify.notify(
-					"Tests, mocks and stories are being filtered [<leader>t to toggle]",
-					"info",
-					{ title = "Glance", timeout = 200 }
-				)
-			end
+			showFilterNotify(glanceState.findTests)
 			local bufUri = vim.uri_from_bufnr(0):lower()
 
 			for _, result in ipairs(results) do
@@ -49,11 +54,10 @@ glance.setup({
 })
 
 changeGlanceState = function()
-	local newState = not glanceState.findTests
-	local message = "Tests, mocks and stories are " .. (newState and "not filtered" or "filtered")
-	notify.notify(message, "info", { title = "Glance", timeout = 200 })
+	local shouldFindTests = not glanceState.findTests
+	showFilterNotify(shouldFindTests)
 
-	glanceState.findTests = newState
+	glanceState.findTests = shouldFindTests
 end
 
 vim.keymap.set("n", "<leader>t", changeGlanceState, { noremap = true, silent = true })

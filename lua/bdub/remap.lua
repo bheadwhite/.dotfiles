@@ -108,22 +108,6 @@ for _, value in ipairs(normal_keymaps) do
 	vim.keymap.set("n", value[1], value[2], add_desc(value[3], options))
 end
 
-local function nextDown()
-	if vim.bo.filetype == "typescript" then
-		vim.cmd([[AerialNext]])
-	else
-		vim.cmd([[normal! 5j]])
-	end
-end
-
-local function nextUp()
-	if vim.bo.filetype == "typescript" then
-		vim.cmd([[AerialPrev]])
-	else
-		vim.cmd([[normal! 5k]])
-	end
-end
-
 --
 local function set_custom_highlight()
 	local background_color = "#1E2326" -- Replace with your desired color
@@ -190,8 +174,7 @@ vim.keymap.set({ "n", "v" }, "<C-M-c>", [["+y]], add_desc("Copy to system clipbo
 vim.keymap.set("c", "<M-k>", "\\(.*\\)", { desc = "one eyed fighting kirby" })
 vim.keymap.set({ "n", "v" }, "j", "gj", options)
 vim.keymap.set({ "n", "v" }, "k", "gk", options)
-vim.keymap.set({ "n", "v" }, "J", nextDown, options)
-vim.keymap.set({ "n", "v" }, "K", nextUp, options)
+vim.keymap.set({ "n", "v" }, "J", function() end, options)
 vim.keymap.set({ "n", "v" }, "L", "$", options)
 vim.keymap.set({ "n", "v" }, "H", "_", options)
 vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("move to top window"))

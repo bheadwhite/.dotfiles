@@ -1,6 +1,9 @@
 local api = require("typescript-tools.api")
-print("tyrpescript tools")
 require("typescript-tools").setup({
+	on_attach = function(client)
+		client.server_capabilities.documentFormattingProvider = false
+		client.server_capabilities.documentRangeFormattingProvider = false
+	end,
 	settings = {
 		tsserver_file_preferences = {
 			importModuleSpecifierPreference = "non-relative",
@@ -19,14 +22,11 @@ require("typescript-tools").setup({
 
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = vim.api.nvim_create_augroup("TS", { clear = true }),
-	desc = "TS format and add missing imports",
+	desc = "TS add missing imports",
 	pattern = { "*.ts", "*.tsx" },
 	callback = function()
-		vim.lsp.buf.format()
-		vim.cmd([[TSToolsAddMissingImports]])
-		vim.defer_fn(function()
-			-- Using ':noautocmd w' to avoid triggering BufWritePre again
-			vim.cmd("noautocmd w")
-		end, 1000) -- Delay in milliseconds, adjust as necessary
+		vim.cmd([[TSToolsAddMissingImports sync]])
 	end,
 })
+
+vim.keymap.set("n", "<leader>r", "<cmd>TSToolsRenameFile<CR>", { noremap = true, silent = true })
