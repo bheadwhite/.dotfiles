@@ -131,4 +131,72 @@ M.format_jq = function()
 	vim.cmd("%!jq .")
 end
 
+vim.api.nvim_create_user_command("ApplyLastSubstitute", function()
+	-- Get the last substitute command from the command history
+	local last_cmd = vim.fn.histget(":", -2)
+	print(last_cmd)
+
+	-- Extract the substitute command if it exists
+	local substitute_cmd = last_cmd:match("^%%?s/.*$")
+
+	if not substitute_cmd then
+		print("No substitute command found in history.")
+		return
+	end
+
+	local cdo_cmd = "silent! noau cdo " .. substitute_cmd .. " | update"
+
+	-- Iterate over the quickfix list and apply the substitute command
+	vim.cmd(cdo_cmd)
+
+	print("Applied substitute command to all quickfix list items.")
+end, {})
+
+-- -- Function to run a shell command and return the output
+-- local function run_command(cmd)
+-- 	local handle = io.popen(cmd)
+-- 	if not handle then
+-- 		return ""
+-- 	end
+--
+-- 	local result = handle:read("*a")
+-- 	handle:close()
+-- 	return result
+-- end
+--
+-- -- Function to get the list of changed files in the working directory
+-- local function get_changed_files()
+-- 	local output = run_command("git status --porcelain")
+-- 	local files = {}
+-- 	for line in output:gmatch("[^\r\n]+") do
+-- 		local file = line:match(".. (.+)")
+-- 		if file then
+-- 			table.insert(files, file)
+-- 		end
+-- 	end
+-- 	return files
+-- end
+--
+-- -- Function to populate the quickfix list
+-- local function populate_quickfix_list(files)
+-- 	local qf_list = {}
+-- 	for _, file in ipairs(files) do
+-- 		table.insert(qf_list, { filename = file })
+-- 	end
+-- 	vim.fn.setqflist(qf_list, "r")
+-- 	vim.cmd("copen")
+-- end
+--
+-- -- Main function
+-- local function populate_qf_list_with_changed_files()
+-- 	local changed_files = get_changed_files()
+-- 	if #changed_files > 0 then
+-- 		populate_quickfix_list(changed_files)
+-- 	else
+-- 		print("No changes in the working directory.")
+-- 	end
+-- end
+--
+-- vim.keymap.set("n", "<leader>gl", populate_qf_list_with_changed_files, { noremap = true, silent = true })
+
 return M

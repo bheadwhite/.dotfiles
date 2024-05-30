@@ -66,17 +66,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use({
-		"stevearc/conform.nvim",
-		config = function()
-			require("conform").setup({
-				formatters_by_ft = {
-					javascript = { { "prettier" } },
-				},
-			})
-		end,
-	})
-
-	use({
 		"cbochs/grapple.nvim", -- Bookmarks / tags
 		requires = { "nvim-lua/plenary.nvim" },
 		-- commit = "12172536620464f8cc124e07c6e3ccd306ea3c5c",
@@ -92,8 +81,20 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	-- }) -- Bookmarks
 	use("tpope/vim-abolish") -- case conversion / substitution
 	use({
-		"numToStr/Comment.nvim", -- comments
+		"numToStr/Comment.nvim",
+		config = function()
+			require("Comment").setup({
+				pre_hook = function()
+					return vim.bo.commentstring
+				end,
+			})
+		end,
+	})
+	use({
 		"JoosepAlviste/nvim-ts-context-commentstring", -- comments
+		config = function()
+			require("ts_context_commentstring").setup({})
+		end,
 	})
 	use("github/copilot.vim") -- copilot
 
@@ -204,6 +205,13 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use("abecodes/tabout.nvim") -- move cursor between brackets
 
 	use({
+		"rcarriga/nvim-notify",
+		config = function()
+			vim.notify = require("notify")
+		end,
+	})
+
+	use({
 		"folke/noice.nvim", -- nice notifications
 		requires = {
 			-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
@@ -263,7 +271,9 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use({
 		"dmmulroy/tsc.nvim", -- Typescript
 		config = function()
-			require("tsc").setup()
+			require("tsc").setup({
+				use_diagnostics = true,
+			})
 		end,
 	})
 

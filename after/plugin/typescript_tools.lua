@@ -25,7 +25,8 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 	desc = "TS add missing imports",
 	pattern = { "*.ts", "*.tsx" },
 	callback = function()
-		vim.cmd([[TSToolsAddMissingImports sync]])
+		pcall(vim.cmd, [[TSToolsAddMissingImports sync]])
+		vim.lsp.buf.format()
 	end,
 })
 

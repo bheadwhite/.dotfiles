@@ -1,6 +1,7 @@
 local aerial = require("aerial")
 
 aerial.setup({
+	close_on_select = true,
 	post_parse_symbol = function(bufnr, item, ctx)
 		local line = vim.api.nvim_buf_get_lines(bufnr, item.lnum - 1, item.lnum, false)[1]
 		if line == nil then

@@ -40,16 +40,24 @@ local function goToConstructor()
 	end
 end
 
+-- make me a function that will traverse up the lines of the current buffer
+-- look for the word "export"
+-- it will move the cursor to the line that contains the word "export"
+-- and look up references for said line
+
 local function jump_to_parent_class()
 	--find constructor if none found then notify such and return
 	local found = vim.fn.search("constructor(")
 
 	if found == 0 then
-		notify.notify("No constructor found", "error", { title = "Jump to Parent", timeout = 200 })
-		return
+		local exportFound = vim.fn.search("export", "bW")
+
+		if exportFound == 0 then
+			notify.notify("No constructor, or export found", "error", { title = "Jump to Parent", timeout = 200 })
+			return
+		end
 	end
 
-	goToConstructor()
 	local current_buf = vim.api.nvim_get_current_buf()
 	local params = vim.lsp.util.make_position_params()
 	local current_uri = vim.uri_from_bufnr(current_buf)
@@ -58,6 +66,11 @@ local function jump_to_parent_class()
 	params.context = { includeDeclaration = true }
 
 	vim.lsp.buf_request(0, "textDocument/references", params, function(err, result)
+		--sort results by line number
+		table.sort(result, function(a, b)
+			return a.range.start.line > b.range.start.line
+		end)
+
 		if err ~= nil then
 			print("Error during references request: " .. err.message)
 			return
@@ -68,6 +81,7 @@ local function jump_to_parent_class()
 		local added_uris = {}
 		for _, ref in ipairs(result or {}) do
 			local uri = ref.uri or ""
+			print(vim.inspect(ref))
 			if
 				not added_uris[uri]
 				and uri ~= current_uri

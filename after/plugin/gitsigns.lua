@@ -47,8 +47,6 @@ gitsigns.setup({
 	},
 })
 
-local keymap = vim.api.nvim_set_keymap
-
 -- blame = { "<cmd>lua require 'gitsigns'.blame_line()<cr>", "Blame" },
 -- reset_hunk = { "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", "Reset Hunk" },
 -- reset_buffer = { "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", "Reset Buffer" },
@@ -57,18 +55,37 @@ local keymap = vim.api.nvim_set_keymap
 -- undo_stage_hunk = { "<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>", "Undo Stage Hunk" },
 -- diff = { "<cmd>Gitsigns diffthis HEAD<cr>", "Diff" },
 
-keymap(
-	"n",
-	"<leader>j",
-	"<cmd>lua require 'gitsigns'.next_hunk()<cr>",
-	{ noremap = true, silent = true, desc = "next hunk" }
-)
-keymap(
-	"n",
-	"<leader>k",
-	"<cmd>lua require 'gitsigns'.prev_hunk()<cr>",
-	{ noremap = true, silent = true, desc = "prev hunk" }
-)
+local last_func = nil
+-- use last command function
+local function use_last_func()
+	if last_func then
+		last_func()
+	end
+end
+
+function function_decorator(func)
+	return function()
+		last_func = func
+		func()
+	end
+end
+
+local nextHunk = function_decorator(function()
+	require("gitsigns").next_hunk()
+	vim.cmd([[normal! zz]])
+end)
+
+local prevHunk = function_decorator(function()
+	require("gitsigns").prev_hunk()
+	vim.cmd([[normal! zz]])
+end)
+
+vim.keymap.set("n", "<C-M-Enter>", use_last_func, { noremap = true, silent = true, desc = "use last func" })
+
+-- Key mappings to invoke the commands
+vim.keymap.set("n", "<C-M-.>", nextHunk, { noremap = true, silent = true, desc = "next hunk" })
+vim.keymap.set("n", "<C-M-,>", prevHunk, { noremap = true, silent = true, desc = "prev hunk" })
+
 vim.keymap.set("n", "<leader>gb", "<cmd>lua require 'gitsigns'.blame_line()<cr>", { desc = "blame line" })
 vim.keymap.set("n", "<leader>gr", "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", { desc = "reset hunk" })
 vim.keymap.set("n", "<leader>gR", "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", { desc = "reset buffer" })
