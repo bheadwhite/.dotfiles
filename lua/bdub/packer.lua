@@ -156,7 +156,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 
 	use({
 		"VonHeikemen/lsp-zero.nvim", -- LSP
-		branch = "v3.x",
 		requires = {
 			-- LSP Support
 			{ "neovim/nvim-lspconfig" },
@@ -202,12 +201,29 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		end,
 	})
 	use("booperlv/nvim-gomove") -- move lines around
-	use("abecodes/tabout.nvim") -- move cursor between brackets
+	-- use("abecodes/tabout.nvim") -- move cursor between brackets
+	use({
+		"kawre/neotab.nvim",
+		config = function()
+			require("neotab").setup({
+				enable_persistant_history = true,
+				auto_insert = true,
+				act_as_tab = false,
+				disable_default_keybindings = false,
+				keys = {
+					next = "<Tab>",
+					prev = "<S-Tab>",
+					close = "<C-c>",
+					toggle = "<C-t>",
+				},
+			})
+		end,
+	})
 
 	use({
 		"rcarriga/nvim-notify",
 		config = function()
-			vim.notify = require("notify")
+			-- vim.notify = require("notify")
 		end,
 	})
 
@@ -230,10 +246,8 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use("nvim-treesitter/playground") -- Treesitter
 
 	use("sindrets/winshift.nvim") -- Move windows around
-
 	use("rmagatti/goto-preview") -- Preview goto
-
-	use({ "stevearc/dressing.nvim" }) -- UI niceties
+	use("stevearc/dressing.nvim") -- UI niceties
 	use("mbbill/undotree") -- Undo tree
 
 	use("folke/which-key.nvim") -- Keybindings
@@ -247,13 +261,12 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		},
 	})
 	use("tpope/vim-surround") -- surround text with brackets
-
 	use({
 		"nvim-telescope/telescope.nvim", -- Telescope
 		requires = { { "nvim-lua/plenary.nvim", "nvim-telescope/telescope-live-grep-args.nvim" } },
 	})
 	use("nvim-telescope/telescope-live-grep-args.nvim") -- Telescope
-	use({ "nvim-telescope/telescope-ui-select.nvim" }) -- Telescope
+	use("nvim-telescope/telescope-ui-select.nvim") -- Telescope
 	use({
 		"nvim-telescope/telescope-fzf-native.nvim", -- Telescope
 		run = "make",
@@ -279,7 +292,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 
 	use({
 		"s1n7ax/nvim-window-picker", -- window picker
-		tag = "v1.*",
 		config = function()
 			require("window-picker").setup()
 		end,

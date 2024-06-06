@@ -199,4 +199,180 @@ end, {})
 --
 -- vim.keymap.set("n", "<leader>gl", populate_qf_list_with_changed_files, { noremap = true, silent = true })
 
+-- Function to open a floating window
+local function open_floating_window()
+	local buf = vim.api.nvim_create_buf(false, true) -- Create a new, unlisted, scratch buffer.
+	local width = vim.o.columns
+	local height = vim.o.lines
+
+	local win = vim.api.nvim_open_win(buf, true, {
+		relative = "editor",
+		width = math.ceil(width * 0.8),
+		height = math.ceil(height * 0.8),
+		col = math.ceil(width * 0.1),
+		row = math.ceil(height * 0.1),
+		border = "rounded",
+	})
+
+	return buf, win
+end
+
+-- Function to gather parent references
+local function gather_parents(buf)
+	local params = vim.lsp.util.make_position_params()
+	vim.lsp.buf_request(0, "textDocument/references", params, function(err, result, _, _)
+		if err or not result or vim.tbl_isempty(result) then
+			return
+		end
+
+		vim.api.nvim_buf_set_lines(buf, 0, 1, false, { "Parents:" })
+		for _, ref in ipairs(result) do
+			local row = ref.range.start.line
+			local line = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
+			vim.api.nvim_buf_set_lines(buf, -1, -1, false, { line })
+		end
+	end)
+end
+
+local function get_all_symbols()
+	local parsers = require("nvim-treesitter.parsers")
+
+	local bufnr = vim.api.nvim_get_current_buf()
+	local parser = parsers.get_parser(bufnr)
+	if not parser then
+		print("Parser not found for current buffer")
+		return
+	end
+
+	local tree = parser:parse()[1]
+	local root = tree:root()
+
+	-- Define a query to match all identifiers (symbols)
+	-- local query = vim.treesitter.parse_query(
+	-- 	"lua",
+	-- 	[[
+	--        (identifier) @symbol
+	--    ]]
+	-- )
+	--
+	-- local symbols = {}
+	-- for id, node, _ in query:iter_captures(root, bufnr, 0, -1) do
+	-- 	local symbol_name = vim.treesitter.query.get_node_text(node, bufnr)
+	-- 	table.insert(symbols, symbol_name)
+	-- end
+	--
+	-- return symbols
+end
+
+-- Function to print the symbols
+local function print_symbols()
+	local symbols = get_all_symbols()
+	if symbols then
+		print("Symbols found in the buffer:")
+		for _, symbol in ipairs(symbols) do
+			print(symbol)
+		end
+	end
+end
+
+-- Function to gather child symbols
+local function gather_children(buf)
+	vim.api.nvim_buf_set_lines(buf, -1, -1, false, { "", "Children:" })
+
+	print("gather children")
+	local current_buf = vim.api.nvim_get_current_buf()
+	local params = vim.lsp.util.make_position_params()
+
+	vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(err, result)
+		if err or not result or vim.tbl_isempty(result) then
+			return
+		end
+
+		local function process_symbol(symbol)
+			if symbol.kind == 6 then -- 6 is the LSP kind for constructors
+				local row = symbol.range.start.line
+				local line = vim.api.nvim_buf_get_lines(current_buf, row, row + 1, false)[1]
+				vim.api.nvim_buf_set_lines(buf, -1, -1, false, { line })
+			end
+			if symbol.children then
+				for _, child in ipairs(symbol.children) do
+					process_symbol(child)
+				end
+			end
+		end
+
+		for _, item in ipairs(result) do
+			process_symbol(item)
+		end
+	end)
+end
+
+-- Main function to show references in a floating window
+local function show_references()
+	local buf, win = open_floating_window()
+	-- gather_parents(buf)
+	gather_children(buf)
+	-- Optionally set the focus to the floating window
+	vim.api.nvim_set_current_win(win)
+end
+
+-- Function to print all keys and their value types of a Lua object
+function _G.printK(obj)
+	if obj == nil then
+		print("nil")
+		return
+	end
+
+	if type(obj) == "function" then
+		print("function")
+		return
+	end
+
+	if type(obj) ~= "table" then
+		print(obj)
+		return
+	end
+
+	local keys = {}
+	for key, value in pairs(obj) do
+		table.insert(keys, { key = key, value_type = type(value) })
+	end
+
+	table.sort(keys, function(a, b)
+		if a.value_type == b.value_type then
+			return a.key < b.key
+		else
+			return a.value_type > b.value_type
+		end
+	end)
+
+	print("Keys and their value types of the object:")
+	for _, item in ipairs(keys) do
+		print(item.key .. " (" .. item.value_type .. ")")
+	end
+end
+
+-- Map the function to a key combination, e.g., <leader>rf
+vim.keymap.set("n", "<leader>rf", print_symbols, { noremap = true, silent = true })
+
+-- function M.buf_update_diagnostics()
+-- 	local clients = vim.lsp.get_clients()
+-- 	local buf = vim.api.nvim_get_current_buf()
+--
+-- 	for _, client in pairs(clients) do
+-- 		local diagnostics = vim.lsp.diagnostic.get(buf, client.id)
+-- 		vim.lsp.diagnostic.display(diagnostics, buf, client.id)
+-- 	end
+-- end
+--
+-- vim.api.nvim_exec(
+-- 	[[
+-- au CursorHold <buffer> lua require("bdub.commands").buf_update_diagnostics()
+-- ]],
+-- 	false
+-- )
+
+-- Map the function to a key combination, e.g., <leader>rf
+-- vim.api.nvim_set_keymap("n", "<leader>rf", show_references, { noremap = true, silent = true })
+
 return M

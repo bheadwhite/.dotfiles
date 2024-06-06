@@ -10,14 +10,6 @@ local function add_desc(description, bufnr)
 end
 
 lsp_zero.preset("recommended")
-
--- lsp_zero.ensure_installed({
--- 	"eslint",
--- 	"lua_ls",
--- 	"rust_analyzer",
--- })
-
--- Fix Undefined global 'vim'
 lsp_zero.configure("lua_ls", {
 	settings = {
 		Lua = {
@@ -29,34 +21,23 @@ lsp_zero.configure("lua_ls", {
 	},
 })
 
-local function goToConstructor()
-	local found = vim.fn.search("constructor(")
-
-	if found == 0 then
-		print("no constructor found")
-	else
-		vim.cmd([[/constructor]])
-		vim.cmd([[nohl| normal ^]])
-	end
-end
-
--- make me a function that will traverse up the lines of the current buffer
--- look for the word "export"
--- it will move the cursor to the line that contains the word "export"
--- and look up references for said line
-
-local function jump_to_parent_class()
+local function cursorToParent()
 	--find constructor if none found then notify such and return
 	local found = vim.fn.search("constructor(")
 
 	if found == 0 then
 		local exportFound = vim.fn.search("export", "bW")
+		vim.cmd("normal! ww")
 
 		if exportFound == 0 then
 			notify.notify("No constructor, or export found", "error", { title = "Jump to Parent", timeout = 200 })
 			return
 		end
 	end
+end
+
+local function jump_to_parent_class()
+	cursorToParent()
 
 	local current_buf = vim.api.nvim_get_current_buf()
 	local params = vim.lsp.util.make_position_params()
@@ -81,7 +62,6 @@ local function jump_to_parent_class()
 		local added_uris = {}
 		for _, ref in ipairs(result or {}) do
 			local uri = ref.uri or ""
-			print(vim.inspect(ref))
 			if
 				not added_uris[uri]
 				and uri ~= current_uri
