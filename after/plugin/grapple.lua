@@ -25,10 +25,12 @@ end
 vim.keymap.set("n", "<leader>a", function()
 	local name = getName()
 	grapple.tag({ name = name })
+	vim.cmd("normal! mf")
 end, { silent = true, desc = "grapple tag" })
 vim.keymap.set("n", "<leader>A", function()
 	local name = getName()
 	grapple.tag({ name = name, scope = "global" })
+	vim.cmd("normal! mf")
 end, { silent = true, desc = "grapple global tag" })
 
 local function create_finder(opts)
@@ -93,7 +95,6 @@ local function telescope_grapple_tags(grapple_opts)
 	require("telescope.pickers")
 		.new(grapple_opts or {}, {
 			finder = create_finder(grapple_opts),
-			previewer = conf.grep_previewer({}),
 			sorter = conf.file_sorter({}),
 			results_title = "Grapple Tags",
 			prompt_title = "Find Grappling Tags",

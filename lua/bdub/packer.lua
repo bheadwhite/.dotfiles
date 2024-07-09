@@ -50,13 +50,23 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use({
-		"laytan/tailwind-sorter.nvim",
-		requires = { "nvim-treesitter/nvim-treesitter", "nvim-lua/plenary.nvim" },
-		config = function()
-			require("tailwind-sorter").setup()
-		end,
-		run = "cd formatter && npm ci && npm run build",
+		"utilyre/barbecue.nvim",
+		tag = "*",
+		requires = {
+			"SmiteshP/nvim-navic",
+			"nvim-tree/nvim-web-devicons", -- optional dependency
+		},
+		after = "nvim-web-devicons", -- keep this if you're using NvChad
 	})
+
+	-- use({
+	-- 	"laytan/tailwind-sorter.nvim",
+	-- 	requires = { "nvim-treesitter/nvim-treesitter", "nvim-lua/plenary.nvim" },
+	-- 	config = function()
+	-- 		require("tailwind-sorter").setup()
+	-- 	end,
+	-- 	run = "cd formatter && npm ci && npm run build",
+	-- })
 
 	use({
 		"kevinhwang91/nvim-hlslens", -- Better search
@@ -70,6 +80,22 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		requires = { "nvim-lua/plenary.nvim" },
 		-- commit = "12172536620464f8cc124e07c6e3ccd306ea3c5c",
 	})
+
+	-- use({
+	-- 	"romgrk/barbar.nvim",
+	-- 	config = function()
+	-- 		local barbar = require("barbar")
+	-- 		barbar.setup({
+	-- 			icons = {
+	-- 				gitsigns = {
+	-- 					added = { enabled = true, icon = "+" },
+	-- 					changed = { enabled = true, icon = "~" },
+	-- 					deleted = { enabled = true, icon = "-" },
+	-- 				},
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- }) -- Bufferline
 
 	-- use({
 	-- 	"theprimeagen/harpoon",
@@ -98,13 +124,13 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 	use("github/copilot.vim") -- copilot
 
-	use("tpope/vim-dadbod") -- db
-	use({
-		"kristijanhusak/vim-dadbod-ui", -- db
-		config = function()
-			vim.g.db_ui_auto_execute_table_helpers = 1
-		end,
-	})
+	-- use("tpope/vim-dadbod") -- db
+	-- use({
+	-- 	"kristijanhusak/vim-dadbod-ui", -- db
+	-- 	config = function()
+	-- 		vim.g.db_ui_auto_execute_table_helpers = 1
+	-- 	end,
+	-- })
 	-- use("nvim-telescope/telescope-dap.nvim") -- Debugging
 	-- use({
 	--     "mfussenegger/nvim-dap", -- Debugging
@@ -115,16 +141,15 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	-- })
 
 	use("stevearc/oil.nvim") -- file explorer
-	use({
-		"nvim-neo-tree/neo-tree.nvim", -- file explorer
-		branch = "v3.x",
-		requires = {
-			"nvim-lua/plenary.nvim",
-			"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-			"MunifTanjim/nui.nvim",
-			"s1n7ax/nvim-window-picker",
-		},
-	})
+	-- use({
+	-- 	"nvim-neo-tree/neo-tree.nvim", -- file explorer
+	-- 	requires = {
+	-- 		"nvim-lua/plenary.nvim",
+	-- 		"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+	-- 		"MunifTanjim/nui.nvim",
+	-- 		"s1n7ax/nvim-window-picker",
+	-- 	},
+	-- })
 	use({
 		"stevearc/aerial.nvim", -- file outline
 		requires = {
@@ -149,38 +174,36 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use("f-person/git-blame.nvim") -- Git blame
 	use("lewis6991/gitsigns.nvim") -- Git signs
 	use("sindrets/diffview.nvim") -- Git diff
+	use({
+		"chentoast/marks.nvim",
+		config = function()
+			require("marks").setup()
+		end,
+	}) -- marks
 
 	use("Pocco81/HighStr.nvim") -- Highlight strings
-	use("RRethy/vim-illuminate") -- Highlight word under cursor
+	-- use("RRethy/vim-illuminate") -- Highlight word under cursor
 	use("kyazdani42/nvim-web-devicons") -- Icons
 
+	use("neovim/nvim-lspconfig")
+	use("williamboman/mason.nvim")
+	use("williamboman/mason-lspconfig.nvim")
+
+	use("hrsh7th/cmp-nvim-lsp-signature-help")
+
+	use("jose-elias-alvarez/null-ls.nvim")
+
+	use({ "hrsh7th/nvim-cmp" })
+	use({ "hrsh7th/cmp-nvim-lsp" })
 	use({
-		"VonHeikemen/lsp-zero.nvim", -- LSP
-		requires = {
-			-- LSP Support
-			{ "neovim/nvim-lspconfig" },
-			{ "williamboman/mason.nvim" },
-			{ "williamboman/mason-lspconfig.nvim" },
-			{ "hrsh7th/cmp-nvim-lsp-signature-help" },
-			{ "jose-elias-alvarez/nvim-lsp-ts-utils" },
-			{ "jose-elias-alvarez/null-ls.nvim" },
-
-			-- Autocompletion
-			{ "hrsh7th/nvim-cmp", commit = "3874e09e80f5fd97ae941442f1dc433317298ae9" },
-			{ "hrsh7th/cmp-buffer" },
-			{ "hrsh7th/cmp-path" },
-			{ "saadparwaiz1/cmp_luasnip" },
-			{ "hrsh7th/cmp-nvim-lsp" },
-			{ "hrsh7th/cmp-nvim-lua" },
-
-			-- Snippets
-			{ "L3MON4D3/LuaSnip" },
-			{ "rafamadriz/friendly-snippets" },
-		},
+		"hrsh7th/cmp-nvim-lua",
 	})
+	use({ "hrsh7th/cmp-buffer" })
+	use({ "hrsh7th/cmp-path" })
 
 	use({
 		"pmizio/typescript-tools.nvim",
+		branch = "bugfix/202",
 		requires = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
 	})
 

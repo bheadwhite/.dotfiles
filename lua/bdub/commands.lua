@@ -131,6 +131,52 @@ M.format_jq = function()
 	vim.cmd("%!jq .")
 end
 
+M.list_buffers = function()
+	local function run_picker()
+		pickers
+			.new({
+				initial_mode = "normal",
+			}, {
+				prompt_title = "Buffers",
+				finder = finders.new_table({
+					results = vim.fn.getbufinfo({ buflisted = 1 }),
+					entry_maker = function(entry)
+						return {
+							value = entry.bufnr,
+							display = entry.name,
+							ordinal = entry.bufnr .. " : " .. entry.name,
+						}
+					end,
+				}),
+				sorter = conf.generic_sorter({}),
+				attach_mappings = function(prompt_bufnr, map)
+					local make_current_buffer = function()
+						local selection = action_state.get_selected_entry()
+						if selection then
+							actions.close(prompt_bufnr)
+							vim.cmd("buffer " .. selection.value)
+						end
+					end
+					local delete_buffer = function()
+						local selection = action_state.get_selected_entry()
+						if selection then
+							vim.api.nvim_buf_delete(selection.value, { force = true })
+							run_picker()
+						end
+					end
+
+					map("i", "<CR>", make_current_buffer)
+					map("n", "<CR>", make_current_buffer)
+					map("n", "q", delete_buffer)
+					return true
+				end,
+			})
+			:find()
+	end
+
+	run_picker()
+end
+
 vim.api.nvim_create_user_command("ApplyLastSubstitute", function()
 	-- Get the last substitute command from the command history
 	local last_cmd = vim.fn.histget(":", -2)

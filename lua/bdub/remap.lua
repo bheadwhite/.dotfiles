@@ -24,36 +24,6 @@ function vSplit()
 	vim.cmd([[vsplit | wincmd p]])
 end
 
--- local function goToConstructor()
--- 	local found = vim.fn.search("constructor(")
--- 	if found == 0 then
--- 		error("constructor not found")
--- 	else
--- 		vim.cmd([[/constructor]])
--- 		vim.cmd([[nohl| normal ^]])
--- 	end
--- end
---
--- local function goToExport()
--- 	local found = vim.fn.search("export")
--- 	if found == 0 then
--- 		error("export not found")
--- 	else
--- 		vim.cmd([[/export]])
--- 		vim.cmd([[nohl| normal ^]])
--- 	end
--- end
---
--- local function goToNextExportOrConstructor()
--- 	if pcall(goToConstructor) then
--- 		print("constructor found")
--- 	elseif pcall(goToExport) then
--- 		print("export found")
--- 	else
--- 		print("no constructor or export found")
--- 	end
--- end
-
 local function goToConstructor()
 	local pattern = [[\v(export|constructor\()]]
 	local constructor = [[\v(constructor\()]]
@@ -71,6 +41,41 @@ local function goToConstructor()
 	vim.cmd("nohlsearch")
 end
 
+-- Function to check if the previous character is a whitespace
+local function is_previous_char_whitespace()
+	-- Get the current cursor position
+	local _, col = unpack(vim.api.nvim_win_get_cursor(0))
+	-- If the cursor is at the start of a line, there's no previous character
+	if col == 0 then
+		return false
+	end
+	-- Get the previous character
+	local line = vim.api.nvim_get_current_line()
+	local prev_char = line:sub(col, col)
+	-- Check if the previous character is a whitespace
+	return prev_char:match("%s") ~= nil
+end
+
+local highlight_under_cursor = function()
+	local current_word = vim.fn.expand("<cword>")
+	local found = vim.fn.search(current_word, "nw")
+
+	if found == 0 then
+		error("word not found")
+	else
+		--highlight the word and set as search register
+		vim.fn.setreg("/", current_word)
+		vim.cmd("set hlsearch")
+		require("hlslens").start()
+
+		--if previous character is alphanumeric, hit the "b" key to go back one word
+		local isPreviousCharWhitespace = is_previous_char_whitespace()
+		if not isPreviousCharWhitespace then
+			vim.cmd("normal! b")
+		end
+	end
+end
+
 local normal_keymaps = {
 	{ "gj", "mzJ`z", "join" },
 	{ "<c-d>", "<c-d>zz", "half page down" },
@@ -85,6 +90,8 @@ local normal_keymaps = {
 	{ "<leader>>", "<cmd>lnext<CR>zz", "next location" },
 	{ "<leader><", "<cmd>lprev<CR>zz", "prev location" },
 	{ "<leader>Ofj", commands.format_jq, "format json" },
+	{ "<C-S-h>", "<cmd>bprev<CR>", "prev buffer" },
+	{ "<C-S-l>", "<cmd>bnext<CR>", "next buffer" },
 	{ "<leader>S", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "substitue under cursor" },
 	{ "<leader>X", "<cmd>!chmod +x %<CR>", "make file executable" },
 	{ "<leader>w", ":w<CR>", "write" },
@@ -100,7 +107,7 @@ local normal_keymaps = {
 	{ "<C-Right>", ":vertical resize +2<CR>", "resize vertical split +2" },
 	{ "<C-,>", ":WinShift<CR>h<esc>", "move window left" },
 	{ "<C-.>", ":WinShift<CR>l<esc>", "move window right" },
-	{ "*", ":keepjumps normal! mi*`iN<CR>", "for jumps" },
+	{ "*", highlight_under_cursor, "for jumps" },
 	{ "gn", goToConstructor, "go to constructor" },
 }
 
@@ -179,6 +186,7 @@ vim.keymap.set({ "n", "v" }, "L", "$", options)
 vim.keymap.set({ "n", "v" }, "H", "_", options)
 vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("move to top window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", add_desc("move to right window"))
+vim.keymap.set("n", "<leader>q", vim.cmd.q, add_desc("close buffer"))
 vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", add_desc("move to bottom window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("move to left window"))
 vim.keymap.set({ "n", "v" }, "<leader><tab>l", vim.cmd.tabn, add_desc("next tab"))

@@ -15,7 +15,7 @@ local mappings = {
 		s = { commands.grep_string_within_directories, "Grep String in Directory" },
 		h = { "<cmd>Telescope help_tags<cr>", "Help Tags" },
 	},
-	b = { "<cmd>Telescope buffers<cr>", "which_key_ignore" },
+	b = { commands.list_buffers, "which_key_ignore" },
 	q = { "which_key_ignore" },
 	e = { "which_key_ignore" },
 	f = { "which_key_ignore" },

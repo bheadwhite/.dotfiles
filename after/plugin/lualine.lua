@@ -1,4 +1,5 @@
 local status_ok, lualine = pcall(require, "lualine")
+local colors = require("bdub.everforest_colors")
 if not status_ok then
 	return
 end
@@ -21,22 +22,34 @@ local function get_branch()
 	return string.sub(branch, 1, 40)
 end
 
-local function maximize_status()
-	return vim.t.maximized and "   " or ""
-end
-
 lualine.setup({
 	options = {
 		icons_enabled = true,
 		theme = "auto",
 		component_separators = { left = "", right = "" },
-		section_separators = { left = "", right = "" },
+		section_separators = "",
 		disabled_filetypes = { "alpha", "dashboard", "NvimTree", "Outline" },
-		always_divide_middle = true,
+		globalstatus = true,
 	},
 	sections = {
 		lualine_a = {
 			get_branch,
+		},
+		lualine_b = {
+			{
+				"mode",
+				fmt = function(mode)
+					return "-- " .. mode .. " --"
+				end,
+			},
+		},
+		lualine_c = {
+			{
+				"diff",
+				colored = true,
+				symbols = { added = " ", modified = " ", removed = " " }, -- changes diff symbols
+				cond = hide_in_width,
+			},
 			{
 				"diagnostics",
 				sources = { "nvim_diagnostic" },
@@ -47,29 +60,6 @@ lualine.setup({
 				always_visible = true,
 			},
 		},
-		lualine_b = {
-			{
-				"mode",
-				fmt = function(mode)
-					return "-- " .. mode .. " --"
-				end,
-			},
-		},
-		lualine_x = {
-			{
-				"diff",
-				colored = false,
-				symbols = { added = " ", modified = " ", removed = " " }, -- changes diff symbols
-				cond = hide_in_width,
-			},
-			"encoding",
-			{
-				"filetype",
-				icons_enabled = false,
-				icon = nil,
-			},
-		},
-		lualine_y = { "location" },
 		lualine_z = {
 			function()
 				local current_line = vim.fn.line(".")
@@ -81,45 +71,29 @@ lualine.setup({
 			end,
 		},
 	},
-	inactive_sections = {
-		lualine_a = {},
-		lualine_b = {},
-		lualine_c = { { "filename", fmt = full_path } },
-		lualine_x = { "location" },
-		lualine_y = {},
-		lualine_z = {},
-	},
-	tabline = {
-		lualine_a = {
-			{
-				"filename",
-				fmt = full_path_minus_filename,
-				path = 1,
-				color = { fg = "#fffff", bg = "" },
-			},
-			{
-				"filename",
-				modified = true,
-				show_modified_status = true,
-				symbols = {
-					modified = " ●", -- Text to show when the buffer is modified
-					color = {},
-					alternate_file = "#", -- Text to show to identify the alternate file
-					directory = "", -- Text to show when the buffer is a directory
-				},
-			},
-			{
-				maximize_status,
-				color = { fg = "#fffff", bg = "" },
-			},
-		},
-		lualine_b = {
-			function()
-				local lsp_status = require("lsp-status")
 
-				return lsp_status.status()
-			end,
+	tabline = {
+		lualine_a = {},
+		lualine_b = {
+			{
+				full_path_minus_filename,
+				padding = 3,
+				color = function(section)
+					local bg = colors.bg1
+					local fg = colors.gray2
+					if vim.bo.modified then
+						bg = colors.red
+						fg = "#ffffff"
+					end
+
+					return {
+						fg = fg,
+						bg = bg,
+					}
+				end,
+			},
 		},
+		lualine_y = {},
 		lualine_z = {
 			"tabs",
 		},
