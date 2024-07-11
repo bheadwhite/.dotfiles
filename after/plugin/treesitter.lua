@@ -55,35 +55,3 @@ require("nvim-treesitter.configs").setup({
 		},
 	},
 })
-
--- background color of the current buffer
-
--- Function to set the background color of the current buffer
-local function set_current_buffer_highlight()
-	local bufnr = vim.api.nvim_get_current_buf()
-	vim.api.nvim_buf_set_option(bufnr, "winhighlight", "Normal:NormalSB")
-end
-
--- Function to clear the background color of non-current buffers
-local function clear_buffer_highlight()
-	local buffers = vim.api.nvim_list_bufs()
-	for _, bufnr in ipairs(buffers) do
-		vim.api.nvim_buf_set_option(bufnr, "winhighlight", "")
-	end
-end
-
--- Function to update buffer highlights
-local function update_buffer_highlights()
-	clear_buffer_highlight()
-	set_current_buffer_highlight()
-end
-
--- Autocommand to update buffer highlights when changing buffer
-vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
-	callback = function()
-		update_buffer_highlights()
-	end,
-})
-
--- Set initial highlight
-update_buffer_highlights()

@@ -1,5 +1,6 @@
 require("bdub.options")
 require("bdub.remap")
+require("bdub.inactive_backgrounds")
 
 local augroup = vim.api.nvim_create_augroup
 local bdubsGroup = augroup("bdub", {})

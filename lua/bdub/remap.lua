@@ -123,53 +123,6 @@ end
 
 set_custom_highlight()
 
-local function open_in_floating_window()
-	-- Get the current file path
-	local file_path = vim.api.nvim_buf_get_name(0)
-
-	-- Get the dimensions of the current Neovim window
-	local width = vim.api.nvim_get_option("columns")
-	local height = vim.api.nvim_get_option("lines")
-
-	-- Calculate the size and position of the floating window
-	local win_width = math.ceil(width * 0.9)
-	local win_height = math.ceil(height * 0.9)
-	local row = math.ceil((height - win_height) / 2 - 2)
-	local col = math.ceil((width - win_width) / 2)
-
-	-- Create a new buffer
-	local new_buf = vim.api.nvim_create_buf(false, true)
-
-	-- get the file name and set it as the buffer title
-	local file_name = vim.fn.fnamemodify(file_path, ":t")
-
-	-- Create floating window with the new buffer
-	local opts = {
-		relative = "editor",
-		width = win_width,
-		height = win_height,
-		row = row,
-		col = col,
-		style = "minimal",
-		border = "rounded",
-		zindex = 1,
-		title = file_name,
-	}
-
-	local new_win = vim.api.nvim_open_win(new_buf, true, opts)
-	-- Open the file in the floating window
-	vim.api.nvim_command("edit " .. file_path)
-
-	-- Enable line numbers in the floating window
-	vim.api.nvim_win_set_option(new_win, "number", true)
-	vim.api.nvim_win_set_option(new_win, "winhl", "Normal:CustomFloating")
-
-	vim.keymap.set("n", "<leader>q", function()
-		vim.api.nvim_win_close(new_win, true)
-		vim.keymap.set("n", "<leader>q", vim.cmd.q, add_desc("close buffer"))
-	end, { noremap = true, silent = true })
-end
-
 -- You can then call this function with `:lua open_buffer_in_floating_window()`
 
 -- system clipboard
@@ -193,9 +146,6 @@ vim.keymap.set({ "n", "v" }, "<leader><tab>l", vim.cmd.tabn, add_desc("next tab"
 vim.keymap.set({ "n", "v" }, "<leader><tab>h", vim.cmd.tabp, add_desc("prev tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><tab>", vim.cmd.tabe, add_desc("new tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><leader>", vim.cmd.tabc, add_desc("close tab"))
-vim.keymap.set("n", "<leader>z", function()
-	open_in_floating_window()
-end, { noremap = true, silent = true, desc = "zoom" })
 
 vim.keymap.set("n", "<esc>", "<cmd>noh<cr><esc>", add_desc("esc normal"))
 

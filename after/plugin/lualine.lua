@@ -1,5 +1,6 @@
 local status_ok, lualine = pcall(require, "lualine")
 local colors = require("bdub.everforest_colors")
+
 if not status_ok then
 	return
 end
@@ -31,47 +32,6 @@ lualine.setup({
 		disabled_filetypes = { "alpha", "dashboard", "NvimTree", "Outline" },
 		globalstatus = true,
 	},
-	sections = {
-		lualine_a = {
-			get_branch,
-		},
-		lualine_b = {
-			{
-				"mode",
-				fmt = function(mode)
-					return "-- " .. mode .. " --"
-				end,
-			},
-		},
-		lualine_c = {
-			{
-				"diff",
-				colored = true,
-				symbols = { added = " ", modified = " ", removed = " " }, -- changes diff symbols
-				cond = hide_in_width,
-			},
-			{
-				"diagnostics",
-				sources = { "nvim_diagnostic" },
-				sections = { "error", "warn" },
-				symbols = { error = " ", warn = " " },
-				colored = false,
-				update_in_insert = false,
-				always_visible = true,
-			},
-		},
-		lualine_z = {
-			function()
-				local current_line = vim.fn.line(".")
-				local total_lines = vim.fn.line("$")
-				local chars = { "__", "▁▁", "▂▂", "▃▃", "▄▄", "▅▅", "▆▆", "▇▇", "██" }
-				local line_ratio = current_line / total_lines
-				local index = math.ceil(line_ratio * #chars)
-				return chars[index]
-			end,
-		},
-	},
-
 	tabline = {
 		lualine_a = {},
 		lualine_b = {
@@ -93,9 +53,51 @@ lualine.setup({
 				end,
 			},
 		},
+		lualine_c = {
+			{
+				"diff",
+				colored = true,
+				symbols = { added = " ", modified = " ", removed = " " }, -- changes diff symbols
+				cond = hide_in_width,
+			},
+			{
+				"diagnostics",
+				sources = { "nvim_diagnostic" },
+				sections = { "error", "warn" },
+				symbols = { error = " ", warn = " " },
+				colored = false,
+				update_in_insert = false,
+				always_visible = true,
+			},
+		},
 		lualine_y = {},
 		lualine_z = {
 			"tabs",
+		},
+	},
+
+	sections = {
+		lualine_a = {
+			get_branch,
+		},
+		lualine_b = {
+			{
+				"mode",
+				fmt = function(mode)
+					return "-- " .. mode .. " --"
+				end,
+			},
+		},
+		lualine_c = {},
+		lualine_z = {
+			function()
+				local current_line = vim.fn.line(".")
+				local total_lines = vim.fn.line("$")
+				local chars = { "__", "▁▁", "▂▂", "▃▃", "▄▄", "▅▅", "▆▆", "▇▇", "██" }
+				local line_ratio = current_line / total_lines
+				local index = math.ceil(line_ratio * #chars)
+				return chars[index]
+			end,
 		},
 	},
 	extensions = {},

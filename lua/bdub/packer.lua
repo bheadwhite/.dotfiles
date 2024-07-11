@@ -50,6 +50,15 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use({
+		"echasnovski/mini.nvim",
+		config = function()
+			require("mini.misc").setup()
+		end,
+	})
+
+	use({ "nvim-zh/better-escape.vim", event = "InsertEnter" })
+
+	use({
 		"utilyre/barbecue.nvim",
 		tag = "*",
 		requires = {
@@ -224,24 +233,24 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		end,
 	})
 	use("booperlv/nvim-gomove") -- move lines around
-	-- use("abecodes/tabout.nvim") -- move cursor between brackets
-	use({
-		"kawre/neotab.nvim",
-		config = function()
-			require("neotab").setup({
-				enable_persistant_history = true,
-				auto_insert = true,
-				act_as_tab = false,
-				disable_default_keybindings = false,
-				keys = {
-					next = "<Tab>",
-					prev = "<S-Tab>",
-					close = "<C-c>",
-					toggle = "<C-t>",
-				},
-			})
-		end,
-	})
+	use("abecodes/tabout.nvim") -- move cursor between brackets
+	-- use({
+	-- 	"kawre/neotab.nvim",
+	-- 	config = function()
+	-- 		require("neotab").setup({
+	-- 			enable_persistant_history = true,
+	-- 			auto_insert = true,
+	-- 			act_as_tab = false,
+	-- 			disable_default_keybindings = true,
+	-- 			keys = {
+	-- 				next = "<Tab>",
+	-- 				prev = "<S-Tab>",
+	-- 				close = "<C-c>",
+	-- 				toggle = "<C-t>",
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- })
 
 	use({
 		"rcarriga/nvim-notify",
