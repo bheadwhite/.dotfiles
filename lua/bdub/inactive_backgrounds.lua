@@ -1,4 +1,5 @@
 local colors = require("bdub.everforest_colors")
+local utils = require("bdub.win_utils")
 
 vim.cmd([[highlight MyInactiveBufferColor guibg=]] .. colors.bg2)
 vim.cmd([[highlight MyZoomedBufferColor guibg=]] .. colors.bg0)
@@ -12,32 +13,15 @@ function set_window_backgrounds()
 	-- Get a list of all window IDs
 	local windows = vim.api.nvim_list_wins()
 
-	-- Create a table to keep track of buffer names
-	local buffer_names = {}
-
-	-- Iterate through each buffer
-	for _, win in ipairs(windows) do
-		local win_buf = vim.api.nvim_win_get_buf(win)
-		local buf_name = vim.api.nvim_buf_get_name(win_buf)
-		-- local buf_name = vim.api.nvim_buf_get_name(win)
-		-- If the buffer name is already in the table, mark it as a duplicate
-		if buffer_names[buf_name] then
-			buffer_names[buf_name] = "duplicate"
-		else
-			buffer_names[buf_name] = "unique"
-		end
-	end
+	-- get duplicate win buffers
+	local duplicates = utils.get_duplicate_win_buffers()
 
 	-- Iterate through each window
 	for _, win in ipairs(windows) do
-		-- Get the buffer displayed in the window
-		local win_buf = vim.api.nvim_win_get_buf(win)
-		local win_buf_name = vim.api.nvim_buf_get_name(win_buf)
-
 		if win == current_win then
 			-- Set highlight for the focused window
 			vim.api.nvim_win_set_option(win, "winhighlight", "Normal:MyNormalColor")
-		elseif buffer_names[win_buf_name] == "duplicate" then
+		elseif utils.is_duplicate_win(win, duplicates) then
 			-- Set highlight for windows displaying duplicate buffers
 			vim.api.nvim_win_set_option(win, "winhighlight", "Normal:DuplicateBuffer")
 		else
