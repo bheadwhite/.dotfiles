@@ -50,6 +50,17 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use({
+		"CopilotC-Nvim/CopilotChat.nvim",
+		requires = {
+			"github/copilot.vim",
+			"nvim-lua/plenary.nvim",
+		},
+		config = function()
+			require("CopilotChat").setup()
+		end,
+	})
+
+	use({
 		"echasnovski/mini.nvim",
 		config = function()
 			require("mini.misc").setup()
@@ -305,14 +316,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 	use("akinsho/toggleterm.nvim") -- Terminal
 
-	-- use({
-	-- 	"sainnhe/everforest", -- Theme
-	-- 	as = "everforest",
-	-- 	config = function()
-	-- 		vim.g.everforest_background = "hard"
-	-- 		vim.cmd("colorscheme everforest")
-	-- 	end,
-	-- })
 	use({
 		"dmmulroy/tsc.nvim", -- Typescript
 		config = function()

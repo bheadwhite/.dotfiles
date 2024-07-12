@@ -70,4 +70,50 @@ function! BufOnly(buffer, bang)
 
 endfunction]])
 
-vim.keymap.set("n", "<leader>o", vim.cmd.BufOnly, { desc = "Close All Except this one", noremap = true })
+function CloseDuplicateBuffers()
+  -- Get a list of all window IDs
+  local windows = vim.api.nvim_list_wins()
+
+  -- Get the name of the current buffer
+  local current_buffer = vim.api.nvim_get_current_buf()
+  local current_buffer_name = vim.api.nvim_buf_get_name(current_buffer)
+
+  -- Get the current window ID
+  local current_window = vim.api.nvim_get_current_win()
+
+  local didClose = false
+
+  local i = 1
+  while i <= #windows do
+    -- Get the buffer displayed in the window
+    local win = windows[i]
+    local buffer = vim.api.nvim_win_get_buf(win)
+    local win_buf_name = vim.api.nvim_buf_get_name(buffer)
+
+    -- If the buffer is not the current buffer and its name matches the current buffer's name
+    -- and the window is not the current window
+    if win_buf_name == current_buffer_name and win ~= current_window then
+      didClose = true
+      -- Close the window
+      vim.api.nvim_win_close(win, true)
+
+      -- Refresh the list of windows
+      windows = vim.api.nvim_list_wins()
+    else
+      i = i + 1
+    end
+  end
+
+  vim.api.nvim_set_current_buf(current_buffer)
+  return didClose
+end
+
+function CloseAllExceptCurrent()
+  local didCloseDuplicates = CloseDuplicateBuffers()
+
+  if not didCloseDuplicates then
+    vim.cmd([[BufOnly]])
+  end
+end
+
+vim.keymap.set("n", "<leader>o", CloseAllExceptCurrent, { desc = "Close All Except this one", noremap = true })

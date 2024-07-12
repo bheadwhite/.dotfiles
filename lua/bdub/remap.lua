@@ -105,6 +105,7 @@ local normal_keymaps = {
 	{ "<C-Down>", ":resize +2<CR>", "resize split +2" },
 	{ "<C-Left>", ":vertical resize -2<CR>", "resize vertical split -2" },
 	{ "<C-Right>", ":vertical resize +2<CR>", "resize vertical split +2" },
+	{ "<leader>GPT", "<cmd>CopilotChat<CR>", "new gpt split" },
 	{ "<C-,>", ":WinShift<CR>h<esc>", "move window left" },
 	{ "<C-.>", ":WinShift<CR>l<esc>", "move window right" },
 	{ "*", highlight_under_cursor, "for jumps" },
@@ -128,7 +129,7 @@ set_custom_highlight()
 -- system clipboard
 vim.keymap.set("x", "<leader>P", [["_dP]], add_desc("Paste over selection"))
 vim.keymap.set("v", "p", '"_dP', options)
-vim.keymap.set("v", "c", '"_di', options)
+vim.keymap.set("x", "c", '"_c', options)
 vim.keymap.set({ "n", "v" }, "<C-M-c>", [["+y]], add_desc("Copy to system clipboard"))
 
 vim.keymap.set("c", "<M-k>", "\\(.*\\)", { desc = "one eyed fighting kirby" })
