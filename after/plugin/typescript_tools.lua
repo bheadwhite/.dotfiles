@@ -16,15 +16,18 @@ require("typescript-tools").setup({
 		tsserver_file_preferences = {
 			importModuleSpecifierPreference = "non-relative",
 		},
+		jsx_close_tag = {
+			enabled = true,
+		},
 	},
 	handlers = {
-		["textDocument/publishDiagnostics"] = api.filter_diagnostics({
-			2311,
-			80006,
-			80001,
-			7044,
-			7043,
-		}),
+		-- ["textDocument/publishDiagnostics"] = api.filter_diagnostics({
+		-- 	2311,
+		-- 	80006,
+		-- 	80001,
+		-- 	7044,
+		-- 	7043,
+		-- }),
 	},
 })
 
@@ -48,14 +51,5 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 		if has_missing_imports then
 			pcall(vim.cmd, [[TSToolsAddMissingImports sync]])
 		end
-	end,
-})
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-	group = vim.api.nvim_create_augroup("TSFormat", { clear = true }),
-	desc = "Format buffer on save",
-	pattern = { "*.ts", "*.tsx" },
-	callback = function()
-		vim.lsp.buf.format()
 	end,
 })

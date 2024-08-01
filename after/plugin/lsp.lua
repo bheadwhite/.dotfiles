@@ -32,8 +32,15 @@ local handlers = {
 				python = {
 					analysis = {
 						typeCheckingMode = "basic",
+						diagnosticSeverityOverrides = {
+							reportArgumentType = false,
+							reportAssignmentType = false,
+							reportAttributeAccessIssue = false,
+							reportReturnType = false,
+							reportIndexIssue = "warning",
+						},
 					},
-					venvPath = "/Users/brent.whitehead/Library/Caches/pypoetry/virtualenvs",
+					venvPath = "/Users/brent.whitehead/.python_env/envs/tcn-python",
 				},
 			},
 		})
@@ -58,7 +65,3 @@ require("lspconfig").pyright.setup({})
 require("mason-lspconfig").setup({
 	handlers = handlers,
 })
-
--- vim.diagnostic.config({
---   virtual_text = true,
--- })

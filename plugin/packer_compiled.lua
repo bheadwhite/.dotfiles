@@ -140,6 +140,11 @@ _G.packer_plugins = {
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/cmp-path",
     url = "https://github.com/hrsh7th/cmp-path"
   },
+  ["conform.nvim"] = {
+    loaded = true,
+    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/conform.nvim",
+    url = "https://github.com/stevearc/conform.nvim"
+  },
   ["copilot.vim"] = {
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/copilot.vim",
@@ -180,11 +185,6 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/glance.nvim",
     url = "https://github.com/dnlhc/glance.nvim"
-  },
-  ["goto-preview"] = {
-    loaded = true,
-    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/goto-preview",
-    url = "https://github.com/rmagatti/goto-preview"
   },
   ["grapple.nvim"] = {
     loaded = true,
@@ -294,7 +294,6 @@ _G.packer_plugins = {
     url = "https://github.com/SmiteshP/nvim-navic"
   },
   ["nvim-notify"] = {
-    config = { "\27LJ\2\n\v\0\0\1\0\0\0\1K\0\1\0\0" },
     loaded = true,
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/nvim-notify",
     url = "https://github.com/rcarriga/nvim-notify"
@@ -386,11 +385,6 @@ _G.packer_plugins = {
     path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/telescope.nvim",
     url = "https://github.com/nvim-telescope/telescope.nvim"
   },
-  ["toggleterm.nvim"] = {
-    loaded = true,
-    path = "/Users/brent.whitehead/.local/share/nvim/site/pack/packer/start/toggleterm.nvim",
-    url = "https://github.com/akinsho/toggleterm.nvim"
-  },
   ["tsc.nvim"] = {
     config = { "\27LJ\2\nI\0\0\3\0\4\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0B\0\2\1K\0\1\0\1\0\1\20use_diagnostics\2\nsetup\btsc\frequire\0" },
     loaded = true,
@@ -445,22 +439,34 @@ _G.packer_plugins = {
 }
 
 time([[Defining packer_plugins]], false)
+-- Config for: Comment.nvim
+time([[Config for Comment.nvim]], true)
+try_loadstring("\27LJ\2\n,\0\0\1\0\3\0\0046\0\0\0009\0\1\0009\0\2\0L\0\2\0\18commentstring\abo\bvimX\1\0\4\0\6\0\t6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\4\0003\3\3\0=\3\5\2B\0\2\1K\0\1\0\rpre_hook\1\0\1\rpre_hook\0\0\nsetup\fComment\frequire\0", "config", "Comment.nvim")
+time([[Config for Comment.nvim]], false)
 -- Config for: everforest-nvim
 time([[Config for everforest-nvim]], true)
 try_loadstring("\27LJ\2\n8\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\15everforest\frequire\0", "config", "everforest-nvim")
 time([[Config for everforest-nvim]], false)
+-- Config for: CopilotChat.nvim
+time([[Config for CopilotChat.nvim]], true)
+try_loadstring("\27LJ\2\n9\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\16CopilotChat\frequire\0", "config", "CopilotChat.nvim")
+time([[Config for CopilotChat.nvim]], false)
 -- Config for: lsp-status.nvim
 time([[Config for lsp-status.nvim]], true)
 try_loadstring("\27LJ\2\nD\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\22register_progress\15lsp-status\frequire\0", "config", "lsp-status.nvim")
 time([[Config for lsp-status.nvim]], false)
+-- Config for: messages.nvim
+time([[Config for messages.nvim]], true)
+try_loadstring("\27LJ\2\n6\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\rmessages\frequire\0", "config", "messages.nvim")
+time([[Config for messages.nvim]], false)
+-- Config for: nvim-ts-context-commentstring
+time([[Config for nvim-ts-context-commentstring]], true)
+try_loadstring("\27LJ\2\nJ\0\0\3\0\3\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0004\2\0\0B\0\2\1K\0\1\0\nsetup\29ts_context_commentstring\frequire\0", "config", "nvim-ts-context-commentstring")
+time([[Config for nvim-ts-context-commentstring]], false)
 -- Config for: nvim-hlslens
 time([[Config for nvim-hlslens]], true)
 try_loadstring("\27LJ\2\n5\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\fhlslens\frequire\0", "config", "nvim-hlslens")
 time([[Config for nvim-hlslens]], false)
--- Config for: mini.nvim
-time([[Config for mini.nvim]], true)
-try_loadstring("\27LJ\2\n7\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\14mini.misc\frequire\0", "config", "mini.nvim")
-time([[Config for mini.nvim]], false)
 -- Config for: marks.nvim
 time([[Config for marks.nvim]], true)
 try_loadstring("\27LJ\2\n3\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\nmarks\frequire\0", "config", "marks.nvim")
@@ -469,30 +475,14 @@ time([[Config for marks.nvim]], false)
 time([[Config for tsc.nvim]], true)
 try_loadstring("\27LJ\2\nI\0\0\3\0\4\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0B\0\2\1K\0\1\0\1\0\1\20use_diagnostics\2\nsetup\btsc\frequire\0", "config", "tsc.nvim")
 time([[Config for tsc.nvim]], false)
--- Config for: Comment.nvim
-time([[Config for Comment.nvim]], true)
-try_loadstring("\27LJ\2\n,\0\0\1\0\3\0\0046\0\0\0009\0\1\0009\0\2\0L\0\2\0\18commentstring\abo\bvimX\1\0\4\0\6\0\t6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\4\0003\3\3\0=\3\5\2B\0\2\1K\0\1\0\rpre_hook\1\0\1\rpre_hook\0\0\nsetup\fComment\frequire\0", "config", "Comment.nvim")
-time([[Config for Comment.nvim]], false)
--- Config for: messages.nvim
-time([[Config for messages.nvim]], true)
-try_loadstring("\27LJ\2\n6\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\rmessages\frequire\0", "config", "messages.nvim")
-time([[Config for messages.nvim]], false)
 -- Config for: nvim-window-picker
 time([[Config for nvim-window-picker]], true)
 try_loadstring("\27LJ\2\n;\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\18window-picker\frequire\0", "config", "nvim-window-picker")
 time([[Config for nvim-window-picker]], false)
--- Config for: CopilotChat.nvim
-time([[Config for CopilotChat.nvim]], true)
-try_loadstring("\27LJ\2\n9\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\16CopilotChat\frequire\0", "config", "CopilotChat.nvim")
-time([[Config for CopilotChat.nvim]], false)
--- Config for: nvim-ts-context-commentstring
-time([[Config for nvim-ts-context-commentstring]], true)
-try_loadstring("\27LJ\2\nJ\0\0\3\0\3\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0004\2\0\0B\0\2\1K\0\1\0\nsetup\29ts_context_commentstring\frequire\0", "config", "nvim-ts-context-commentstring")
-time([[Config for nvim-ts-context-commentstring]], false)
--- Config for: nvim-notify
-time([[Config for nvim-notify]], true)
-try_loadstring("\27LJ\2\n\v\0\0\1\0\0\0\1K\0\1\0\0", "config", "nvim-notify")
-time([[Config for nvim-notify]], false)
+-- Config for: mini.nvim
+time([[Config for mini.nvim]], true)
+try_loadstring("\27LJ\2\n7\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\14mini.misc\frequire\0", "config", "mini.nvim")
+time([[Config for mini.nvim]], false)
 -- Load plugins in order defined by `after`
 time([[Sequenced loading]], true)
 vim.cmd [[ packadd nvim-web-devicons ]]

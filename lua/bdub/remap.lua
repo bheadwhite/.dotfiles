@@ -1,5 +1,6 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
+local column_jumper = require("bdub.column_jumper")
 
 local function add_desc(desc, table)
 	local opts = {}
@@ -56,6 +57,27 @@ local function is_previous_char_whitespace()
 	return prev_char:match("%s") ~= nil
 end
 
+local function handleClose()
+	-- Get a list of all windows
+	local windows = vim.api.nvim_list_wins()
+
+	-- Count only the listed and loaded buffers in all windows
+	local listed_buffers = 0
+	for _, win in ipairs(windows) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buflisted then
+			listed_buffers = listed_buffers + 1
+		end
+	end
+
+	-- If only one buffer is listed and loaded, use :bd, else use :q
+	if listed_buffers == 1 then
+		vim.cmd("bd")
+	else
+		vim.cmd("q")
+	end
+end
+
 local highlight_under_cursor = function()
 	local current_word = vim.fn.expand("<cword>")
 	local found = vim.fn.search(current_word, "nw")
@@ -84,8 +106,8 @@ local normal_keymaps = {
 	{ "N", "Nzzzv", "prev with cursor centered" },
 	{ "S", "vg_", "select until EOL" },
 	{ "Q", "<nop>", "disable ex mode" },
-	{ "<leader>j", "<C-w>J", "move split down" },
-	{ "<leader>k", "<C-w>K", "move split up" },
+	{ "<leader>j", column_jumper.go_next_column, "next column" },
+	{ "<leader>k", column_jumper.go_to_previous_column, "prev column" },
 	{ "<C-M-g>", ToggleGit, "git" },
 	{ "<leader>>", "<cmd>lnext<CR>zz", "next location" },
 	{ "<leader><", "<cmd>lprev<CR>zz", "prev location" },
@@ -99,7 +121,7 @@ local normal_keymaps = {
 	{ "<C-M-S-j>", "<cmd>cnext<CR>zz", "next quickfix" },
 	{ "<C-M-S-k>", "<cmd>cprev<CR>zz", "prev quickfix" },
 	{ "<C-M-S-q>", "<cmd>cclose<CR>", "close quickfix" },
-	{ "<leader>q", vim.cmd.q, "close buffer" },
+	{ "<leader>q", handleClose, "close buffer" },
 	{ "<C-M-r>", commands.copy_file_path, "copy file path" },
 	{ "<C-Up>", ":resize -2<CR>", "resize split -2" },
 	{ "<C-Down>", ":resize +2<CR>", "resize split +2" },
@@ -140,7 +162,6 @@ vim.keymap.set({ "n", "v" }, "L", "$", options)
 vim.keymap.set({ "n", "v" }, "H", "_", options)
 vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("move to top window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", add_desc("move to right window"))
-vim.keymap.set("n", "<leader>q", vim.cmd.q, add_desc("close buffer"))
 vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", add_desc("move to bottom window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("move to left window"))
 vim.keymap.set({ "n", "v" }, "<leader><tab>l", vim.cmd.tabn, add_desc("next tab"))

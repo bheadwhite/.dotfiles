@@ -23,6 +23,8 @@ local function get_branch()
 	return string.sub(branch, 1, 40)
 end
 
+local anchor_icon = vim.fn.nr2char(0xf13d)
+
 lualine.setup({
 	options = {
 		icons_enabled = true,
@@ -70,7 +72,17 @@ lualine.setup({
 				always_visible = true,
 			},
 		},
-		lualine_y = {},
+		lualine_y = {
+			function()
+				local grapple = require("grapple")
+				local app = grapple.app()
+				if app == nil then
+					return ""
+				end
+				local scope = app.scope_manager:get(app.settings.scope)
+				return anchor_icon .. " " .. scope.name
+			end,
+		},
 		lualine_z = {
 			"tabs",
 		},

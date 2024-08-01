@@ -13,7 +13,7 @@ local function showFilterNotify(shouldFindTests)
 		message = "Filtering Tests, Mocks and Stories ([leader+t] to clear)"
 	end
 
-	notify.notify(message, (shouldFindTests and "info" or "warn"), { title = "Filter References", timeout = 200 })
+	notify.notify(message, (shouldFindTests and "info" or "warn"), { title = "Filter References" })
 end
 
 local function gatherFilteredResults(results)
@@ -35,6 +35,7 @@ local function gatherFilteredResults(results)
 end
 
 glance.setup({
+	height = 50,
 	-- your configuration
 	detached = true,
 	hooks = {

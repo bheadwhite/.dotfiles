@@ -61,15 +61,18 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use({
-		"echasnovski/mini.nvim",
+		"echasnovski/mini.nvim", -- mini. using for zooming in and out of windows
 		config = function()
 			require("mini.misc").setup()
 		end,
 	})
 
-	use({ "nvim-zh/better-escape.vim", event = "InsertEnter" })
+	use("stevearc/conform.nvim")
+	-- use("mfussenegger/nvim-lint")
 
-	use({
+	use({ "nvim-zh/better-escape.vim", event = "InsertEnter" }) -- better escape from insert mode
+
+	use({ -- uses navic - vscode like bookmarks in the winbar
 		"utilyre/barbecue.nvim",
 		tag = "*",
 		requires = {
@@ -78,15 +81,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		},
 		after = "nvim-web-devicons", -- keep this if you're using NvChad
 	})
-
-	-- use({
-	-- 	"laytan/tailwind-sorter.nvim",
-	-- 	requires = { "nvim-treesitter/nvim-treesitter", "nvim-lua/plenary.nvim" },
-	-- 	config = function()
-	-- 		require("tailwind-sorter").setup()
-	-- 	end,
-	-- 	run = "cd formatter && npm ci && npm run build",
-	-- })
 
 	use({
 		"kevinhwang91/nvim-hlslens", -- Better search
@@ -101,30 +95,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		-- commit = "12172536620464f8cc124e07c6e3ccd306ea3c5c",
 	})
 
-	-- use({
-	-- 	"romgrk/barbar.nvim",
-	-- 	config = function()
-	-- 		local barbar = require("barbar")
-	-- 		barbar.setup({
-	-- 			icons = {
-	-- 				gitsigns = {
-	-- 					added = { enabled = true, icon = "+" },
-	-- 					changed = { enabled = true, icon = "~" },
-	-- 					deleted = { enabled = true, icon = "-" },
-	-- 				},
-	-- 			},
-	-- 		})
-	-- 	end,
-	-- }) -- Bufferline
-
-	-- use({
-	-- 	"theprimeagen/harpoon",
-	-- 	branch = "harpoon2",
-	-- 	config = function()
-	-- 		require("harpoon"):setup()
-	-- 	end,
-	-- 	requires = { { "nvim-lua/plenary.nvim" } },
-	-- }) -- Bookmarks
 	use("tpope/vim-abolish") -- case conversion / substitution
 	use({
 		"numToStr/Comment.nvim",
@@ -144,32 +114,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 	use("github/copilot.vim") -- copilot
 
-	-- use("tpope/vim-dadbod") -- db
-	-- use({
-	-- 	"kristijanhusak/vim-dadbod-ui", -- db
-	-- 	config = function()
-	-- 		vim.g.db_ui_auto_execute_table_helpers = 1
-	-- 	end,
-	-- })
-	-- use("nvim-telescope/telescope-dap.nvim") -- Debugging
-	-- use({
-	--     "mfussenegger/nvim-dap", -- Debugging
-	--     requires = {
-	--         "ravenxrz/DAPInstall.nvim",
-	--         "rcarriga/nvim-dap-ui",
-	--     },
-	-- })
-
 	use("stevearc/oil.nvim") -- file explorer
-	-- use({
-	-- 	"nvim-neo-tree/neo-tree.nvim", -- file explorer
-	-- 	requires = {
-	-- 		"nvim-lua/plenary.nvim",
-	-- 		"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-	-- 		"MunifTanjim/nui.nvim",
-	-- 		"s1n7ax/nvim-window-picker",
-	-- 	},
-	-- })
 	use({
 		"stevearc/aerial.nvim", -- file outline
 		requires = {
@@ -204,22 +149,17 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use("Pocco81/HighStr.nvim") -- Highlight strings
 	-- use("RRethy/vim-illuminate") -- Highlight word under cursor
 	use("kyazdani42/nvim-web-devicons") -- Icons
+	use("jose-elias-alvarez/null-ls.nvim")
 
 	use("neovim/nvim-lspconfig")
 	use("williamboman/mason.nvim")
 	use("williamboman/mason-lspconfig.nvim")
-
 	use("hrsh7th/cmp-nvim-lsp-signature-help")
-
-	use("jose-elias-alvarez/null-ls.nvim")
-
-	use({ "hrsh7th/nvim-cmp" })
-	use({ "hrsh7th/cmp-nvim-lsp" })
-	use({
-		"hrsh7th/cmp-nvim-lua",
-	})
-	use({ "hrsh7th/cmp-buffer" })
-	use({ "hrsh7th/cmp-path" })
+	use("hrsh7th/nvim-cmp")
+	use("hrsh7th/cmp-nvim-lsp")
+	use("hrsh7th/cmp-nvim-lua")
+	use("hrsh7th/cmp-buffer")
+	use("hrsh7th/cmp-path")
 
 	use({
 		"pmizio/typescript-tools.nvim",
@@ -228,7 +168,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use("dnlhc/glance.nvim") -- LSP
-
 	use("camilledejoye/nvim-lsp-selection-range") -- LSP
 	use({
 		"nvim-lua/lsp-status.nvim", -- LSP
@@ -236,7 +175,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 			require("lsp-status").register_progress()
 		end,
 	})
-
 	use({
 		"AckslD/messages.nvim", -- messages
 		config = function()
@@ -245,30 +183,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 	use("booperlv/nvim-gomove") -- move lines around
 	use("abecodes/tabout.nvim") -- move cursor between brackets
-	-- use({
-	-- 	"kawre/neotab.nvim",
-	-- 	config = function()
-	-- 		require("neotab").setup({
-	-- 			enable_persistant_history = true,
-	-- 			auto_insert = true,
-	-- 			act_as_tab = false,
-	-- 			disable_default_keybindings = true,
-	-- 			keys = {
-	-- 				next = "<Tab>",
-	-- 				prev = "<S-Tab>",
-	-- 				close = "<C-c>",
-	-- 				toggle = "<C-t>",
-	-- 			},
-	-- 		})
-	-- 	end,
-	-- })
-
-	use({
-		"rcarriga/nvim-notify",
-		config = function()
-			-- vim.notify = require("notify")
-		end,
-	})
+	use("rcarriga/nvim-notify")
 
 	use({
 		"folke/noice.nvim", -- nice notifications
@@ -282,6 +197,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		},
 	})
 
+	-- tree sitter
 	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" }) -- Treesitter
 	use("nvim-treesitter/nvim-treesitter-context") -- Treesitter
 	use("RRethy/nvim-treesitter-textsubjects") -- Treesitter
@@ -289,12 +205,10 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	use("nvim-treesitter/playground") -- Treesitter
 
 	use("sindrets/winshift.nvim") -- Move windows around
-	use("rmagatti/goto-preview") -- Preview goto
+	-- use("rmagatti/goto-preview")                                  -- Preview goto
 	use("stevearc/dressing.nvim") -- UI niceties
 	use("mbbill/undotree") -- Undo tree
-
 	use("folke/which-key.nvim") -- Keybindings
-
 	use("sbulav/nredir.nvim") -- Redirects output
 	use("dstein64/vim-startuptime") -- startup time
 	use({
@@ -304,6 +218,8 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		},
 	})
 	use("tpope/vim-surround") -- surround text with brackets
+
+	-- telescope
 	use({
 		"nvim-telescope/telescope.nvim", -- Telescope
 		requires = { { "nvim-lua/plenary.nvim", "nvim-telescope/telescope-live-grep-args.nvim" } },
@@ -314,7 +230,6 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		"nvim-telescope/telescope-fzf-native.nvim", -- Telescope
 		run = "make",
 	})
-	use("akinsho/toggleterm.nvim") -- Terminal
 
 	use({
 		"dmmulroy/tsc.nvim", -- Typescript
@@ -332,8 +247,70 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		end,
 	})
 
+	--graveyard
+
+	-- use("tpope/vim-dadbod") -- db
+	-- use({
+	-- 	"kristijanhusak/vim-dadbod-ui", -- db
+	-- 	config = function()
+	-- 		vim.g.db_ui_auto_execute_table_helpers = 1
+	-- 	end,
+	-- })
+	-- use("nvim-telescope/telescope-dap.nvim") -- Debugging
+	-- use({
+	--     "mfussenegger/nvim-dap", -- Debugging
+	--     requires = {
+	--         "ravenxrz/DAPInstall.nvim",
+	--         "rcarriga/nvim-dap-ui",
+	--     },
+	-- })
+	-- use({
+	-- 	"nvim-neo-tree/neo-tree.nvim", -- file explorer
+	-- 	requires = {
+	-- 		"nvim-lua/plenary.nvim",
+	-- 		"nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+	-- 		"MunifTanjim/nui.nvim",
+	-- 		"s1n7ax/nvim-window-picker",
+	-- 	},
+	-- })
+
+	-- use({
+	-- 	"romgrk/barbar.nvim",
+	-- 	config = function()
+	-- 		local barbar = require("barbar")
+	-- 		barbar.setup({
+	-- 			icons = {
+	-- 				gitsigns = {
+	-- 					added = { enabled = true, icon = "+" },
+	-- 					changed = { enabled = true, icon = "~" },
+	-- 					deleted = { enabled = true, icon = "-" },
+	-- 				},
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- }) -- Bufferline
+
+	-- use({
+	-- 	"theprimeagen/harpoon",
+	-- 	branch = "harpoon2",
+	-- 	config = function()
+	-- 		require("harpoon"):setup()
+	-- 	end,
+	-- 	requires = { { "nvim-lua/plenary.nvim" } },
+	-- }) -- Bookmarks
+	-- use({
+	-- 	"laytan/tailwind-sorter.nvim",
+	-- 	requires = { "nvim-treesitter/nvim-treesitter", "nvim-lua/plenary.nvim" },
+	-- 	config = function()
+	-- 		require("tailwind-sorter").setup()
+	-- 	end,
+	-- 	run = "cd formatter && npm ci && npm run build",
+	-- })
+	-- use("akinsho/toggleterm.nvim") -- Terminal
+
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
+
 	if PACKER_BOOTSTRAP then
 		require("packer").sync()
 	end
