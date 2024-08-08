@@ -4,7 +4,7 @@ local utils = require("bdub.win_utils")
 vim.cmd([[highlight MyInactiveBufferColor guibg=]] .. colors.bg2)
 vim.cmd([[highlight MyZoomedBufferColor guibg=]] .. colors.bg0)
 vim.cmd([[highlight MyNormalColor guibg=]] .. colors.bg0)
-vim.cmd([[highlight DuplicateBuffer guibg=]] .. "#121212")
+vim.cmd([[highlight DuplicateBuffer guibg=]] .. colors.bg_green)
 
 vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
 	callback = function()

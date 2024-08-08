@@ -34,9 +34,8 @@ local cmp_mappings = {
 cmp.setup({
 	mapping = cmp_mappings,
 	sources = {
-		{
-			name = "nvim_lsp",
-		},
+		{ name = "nvim_lsp" },
+		{ name = "nvim_lsp_signature_help" },
 	},
 })
 -- disable completion with tab

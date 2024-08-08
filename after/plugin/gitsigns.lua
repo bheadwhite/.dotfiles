@@ -1,4 +1,20 @@
-local gitsigns = require"gitsigns"
+local gitsigns = require("gitsigns")
+-- text = "�",
+-- , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
+-- , , , , , , , , , , , , , �, , , , , , , , , , , , , , , , , , , , , , ,
+-- , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , ,
+-- , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , 
+-- , , , ,
+--             a                 
+-- 
+-- 
+-- 
+-- 
+-- 
+--      
+--            �                     
+
+-- local trash_can_icon = ""
 
 gitsigns.setup({
 	attach_to_untracked = true,
@@ -8,9 +24,18 @@ gitsigns.setup({
 		virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
 		delay = 1000,
 		ignore_whitespace = false,
-        virt_text_priority = 100,
+		virt_text_priority = 3000,
 	},
-	sign_priority = 6,
+
+	signs = {
+		delete = {
+			text = "",
+		},
+		topdelete = {
+			text = "",
+		},
+	},
+	sign_priority = 10,
 	update_debounce = 100,
 	status_formatter = nil, -- Use default
 	max_file_length = 40000,
@@ -67,3 +92,4 @@ vim.keymap.set("n", "<leader>gb", "<cmd>lua require 'gitsigns'.blame_line()<cr>"
 vim.keymap.set("n", "<leader>gr", "<cmd>lua require 'gitsigns'.reset_hunk()<cr>", { desc = "reset hunk" })
 vim.keymap.set("n", "<leader>gR", "<cmd>lua require 'gitsigns'.reset_buffer()<cr>", { desc = "reset buffer" })
 vim.keymap.set("n", "<leader>gp", "<cmd>lua require 'gitsigns'.preview_hunk()<cr>", { desc = "preview hunk" })
+vim.keymap.set("n", "<leader>gs", "<cmd>lua require 'gitsigns'.stage_hunk()<cr>", { desc = "stage hunk" })

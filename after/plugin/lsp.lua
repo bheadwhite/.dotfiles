@@ -25,26 +25,41 @@ local handlers = {
 	["pyright"] = function()
 		local lspconfig = require("lspconfig")
 		lspconfig.pyright.setup({
-			on_attach = function(_, bufnr)
+			on_attach = function(client, bufnr)
+				client.capabilities = capabilities
+
 				helpers.on_attach(bufnr)
 			end,
 			settings = {
 				python = {
 					analysis = {
-						typeCheckingMode = "basic",
+						typeCheckingMode = "standard",
 						diagnosticSeverityOverrides = {
-							reportArgumentType = false,
-							reportAssignmentType = false,
-							reportAttributeAccessIssue = false,
-							reportReturnType = false,
-							reportIndexIssue = "warning",
+							-- reportArgumentType = "information",
+							-- reportUnusedFunction = "warning",
+							-- reportUnusedVariable = "information",
+							-- reportUnusedExpression = "information",
+							-- reportAssignmentType = "information",
+							-- reportUnknownVariableType = false,
+							-- reportMissingTypeStubs = false,
+							-- reportUnknownMemberType = "warning",
+							-- reportUnknownParameterType = false,
+							-- reportMissingTypeArgument = false,
+							-- reportUnknownArgumentType = false,
+							-- reportAttributeAccessIssue = "warning",
+							-- reportReturnType = "information",
+							-- reportIndexIssue = "information",
+							-- reportOperatorIssue = "information",
+							-- reportGeneralTypeIssues = "information",
+							-- reportOptionalIterable = "information",
 						},
 					},
-					venvPath = "/Users/brent.whitehead/.python_env/envs/tcn-python",
+					venvPath = "/Users/brent.whitehead/.python_env/envs/python-3-11",
 				},
 			},
 		})
 	end,
+
 	function(serverName)
 		local server = require("lspconfig")[serverName]
 		server.capabilities = vim.tbl_deep_extend("force", capabilities, server.capabilities or {})
@@ -59,8 +74,6 @@ local handlers = {
 		require("lspconfig")[serverName].setup(server)
 	end,
 }
-
-require("lspconfig").pyright.setup({})
 
 require("mason-lspconfig").setup({
 	handlers = handlers,

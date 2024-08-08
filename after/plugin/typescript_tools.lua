@@ -1,12 +1,11 @@
-local api = require("typescript-tools.api")
 local helpers = require("bdub.lsp_helpers")
 
 require("typescript-tools").setup({
 	on_attach = function(client, bufnr)
-		client.server_capabilities.documentFormattingProvider = false
-		client.server_capabilities.documentRangeFormattingProvider = false
-
-		-- set up typescript jump to parent class helper
+		client.server_capabilities = vim.tbl_deep_extend("force", client.server_capabilities, {
+			documentFormattingProvider = false,
+			documentRangeFormattingProvider = false,
+		})
 		vim.keymap.set("n", "gp", helpers.jump_to_parent_class, { noremap = true, silent = true })
 		vim.keymap.set("n", "<leader>r", "<cmd>TSToolsRenameFile<CR>", { noremap = true, silent = true })
 

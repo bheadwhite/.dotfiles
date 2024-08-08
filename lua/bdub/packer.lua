@@ -50,6 +50,19 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use({
+		"rachartier/tiny-inline-diagnostic.nvim",
+		config = function()
+			require("tiny-inline-diagnostic").setup({
+				options = {
+					show_source = true,
+				},
+			})
+		end,
+	})
+
+	use("jeetsukumaran/vim-indentwise") -- indent movements
+
+	use({
 		"CopilotC-Nvim/CopilotChat.nvim",
 		requires = {
 			"github/copilot.vim",
@@ -68,7 +81,7 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 	})
 
 	use("stevearc/conform.nvim")
-	-- use("mfussenegger/nvim-lint")
+	use("mfussenegger/nvim-lint")
 
 	use({ "nvim-zh/better-escape.vim", event = "InsertEnter" }) -- better escape from insert mode
 
@@ -136,7 +149,9 @@ return packer.startup(function(use) -- Packer can manage itself use 'wbthomason/
 		tag = "*",
 	})
 	use("tpope/vim-fugitive") -- Git
-	use("f-person/git-blame.nvim") -- Git blame
+	-- use("f-person/git-blame.nvim") -- Git blame
+
+	use({ "nvimdev/lspsaga.nvim" })
 	use("lewis6991/gitsigns.nvim") -- Git signs
 	use("sindrets/diffview.nvim") -- Git diff
 	use({

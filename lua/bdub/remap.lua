@@ -1,6 +1,7 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 local column_jumper = require("bdub.column_jumper")
+local diagnostics = require("bdub.diagnostics")
 
 local function add_desc(desc, table)
 	local opts = {}
@@ -26,8 +27,8 @@ function vSplit()
 end
 
 local function goToConstructor()
-	local pattern = [[\v(export|constructor\()]]
-	local constructor = [[\v(constructor\()]]
+	local after_search_pattern = [[\v(export|constructor\(|__init__)]]
+	local constructor = [[\v(constructor\(|__init__)]]
 
 	local found = vim.fn.search(constructor, "nw")
 
@@ -38,7 +39,7 @@ local function goToConstructor()
 		vim.cmd("normal! n")
 		vim.cmd("normal! zz")
 	end
-	vim.fn.setreg("/", pattern)
+	vim.fn.setreg("/", after_search_pattern)
 	vim.cmd("nohlsearch")
 end
 
@@ -145,6 +146,48 @@ local function set_custom_highlight()
 end
 
 set_custom_highlight()
+
+function printWindows()
+	-- local activated = open_diff_view()
+	-- if not activated then
+	-- 	vim.cmd([[DiffviewOpen]])
+	-- end
+
+	local windows = vim.api.nvim_list_wins()
+	for _, win in ipairs(windows) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		local buf_name = vim.api.nvim_buf_get_name(buf)
+		local cursor = vim.api.nvim_win_get_cursor(win)
+		local width = vim.api.nvim_win_get_width(win)
+		local height = vim.api.nvim_win_get_height(win)
+		local position = vim.api.nvim_win_get_position(win)
+		local config = vim.api.nvim_win_get_config(win)
+
+		print("Window ID: " .. win)
+		print("Buffer: " .. buf_name)
+		print("Cursor Position: Row " .. cursor[1] .. ", Col " .. cursor[2])
+		print("Size: " .. width .. "x" .. height)
+		print("Position: Row " .. position[1] .. ", Col " .. position[2])
+		print("Config: " .. vim.inspect(config))
+		print("----------------------")
+	end
+end
+
+vim.keymap.set("n", "<leader>rr", printWindows, add_desc("print windows"))
+local tiny_diagnostics_enabled = true
+vim.keymap.set("n", "gd", function()
+	if tiny_diagnostics_enabled then
+		vim.notify("Inline diagnostics disabled", "error", { title = "Tiny Inline Diagnostic" })
+		tiny_diagnostics_enabled = false
+	else
+		vim.notify("Inline diagnostics enabled", "info", { title = "Tiny Inline Diagnostic" })
+		tiny_diagnostics_enabled = true
+	end
+
+	vim.diagnostic.config(diagnostics.GetDiagnosticConfig(tiny_diagnostics_enabled and "on" or "off"))
+
+	require("tiny-inline-diagnostic").toggle()
+end, add_desc("toggle inline diagnostics"))
 
 -- You can then call this function with `:lua open_buffer_in_floating_window()`
 

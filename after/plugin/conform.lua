@@ -1,13 +1,27 @@
 local conform = require("conform")
 
 conform.setup({
+	-- log_level = vim.log.levels.DEBUG,
 	formatters = {
+		blackd = {
+			command = "blackd-client",
+			args = {
+				"--line-length",
+				"120",
+			},
+			stdin = true,
+			require_cwd = false,
+			exit_codes = { 0 },
+		},
 		black = {
-			append_args = { "--line-length", "120", "--preview" },
+			prepend_args = {
+				"--line-length",
+				"120",
+			},
 		},
 	},
 	formatters_by_ft = {
-		python = { "black" },
+		python = { "blackd" },
 		lua = { "stylua" },
 		javascript = { "prettierd" },
 		javascriptreact = { "prettierd" },
@@ -15,11 +29,7 @@ conform.setup({
 		typescriptreact = { "prettierd" },
 		json = { "prettierd" },
 	},
-})
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-	pattern = "*",
-	callback = function(args)
-		conform.format({ bufnr = args.bufnr })
-	end,
+	format_on_save = {
+		timeout_ms = 3000,
+	},
 })

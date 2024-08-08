@@ -2,7 +2,7 @@ local grapple = require("grapple")
 local action_state = require("telescope.actions.state")
 local actions = require("telescope.actions")
 
-local scopes = { "git_branch", "cwd", "global" }
+local scopes = { "cwd", "git_branch", "global" }
 local active_index = 1
 local active_grapple_win_id = ""
 
@@ -73,7 +73,6 @@ grapple.setup({
 		relative = "editor",
 		title_pos = "center",
 		focusable = true,
-		title = "hello world",
 	},
 })
 
@@ -162,20 +161,20 @@ vim.keymap.set("n", "<leader>a", function()
 	local name = getNameFromInput()
 	grapple.tag({ name = name, scope = get_active_scope() })
 	vim.cmd("normal! mf")
-end, { silent = true, desc = "grapple tag" })
+end, { silent = true, desc = "tag file in current scope" })
 
 vim.keymap.set("n", "<C-S-M-p>", function()
 	grapple.toggle_tags({ scope = get_active_scope() })
-end, { silent = true, desc = "toggle global tags" })
+end, { silent = true, desc = "toggle active tags in grapple window" })
 
 vim.keymap.set("n", "<C-M-p>", function()
 	open_grapple_telescope_picker({ scope = get_active_scope() })
-end, { silent = true, desc = "toggle tags" })
+end, { silent = true, desc = "telescope tags" })
 
-vim.keymap.set("n", "<C-M-]>", function()
+vim.keymap.set("n", "<C-S-M-]>", function()
 	cycle_scope()
-end, { silent = true, desc = "toggle global tags" })
+end, { silent = true, desc = "next scope" })
 
-vim.keymap.set("n", "<C-M-[>", function()
+vim.keymap.set("n", "<C-S-M-[>", function()
 	cycle_scope_reverse()
-end, { silent = true, desc = "toggle tags" })
+end, { silent = true, desc = "prev scope" })
