@@ -1,6 +1,3 @@
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-local column_jumper = require("bdub.column_jumper")
 local diagnostics = require("bdub.diagnostics")
 
 local function add_desc(desc, table)
@@ -10,8 +7,10 @@ local function add_desc(desc, table)
 	return opts
 end
 
-local commands = require("bdub.commands")
-local options = { noremap = true, silent = true }
+local options = {
+	noremap = true,
+	silent = true,
+}
 
 function ToggleGit()
 	if vim.bo.filetype == "fugitive" then
@@ -22,7 +21,7 @@ function ToggleGit()
 end
 
 function vSplit()
-	--vertically split the window and jump back to the original window
+	-- vertically split the window and jump back to the original window
 	vim.cmd([[vsplit | wincmd p]])
 end
 
@@ -86,12 +85,12 @@ local highlight_under_cursor = function()
 	if found == 0 then
 		error("word not found")
 	else
-		--highlight the word and set as search register
+		-- highlight the word and set as search register
 		vim.fn.setreg("/", current_word)
 		vim.cmd("set hlsearch")
 		require("hlslens").start()
 
-		--if previous character is alphanumeric, hit the "b" key to go back one word
+		-- if previous character is alphanumeric, hit the "b" key to go back one word
 		local isPreviousCharWhitespace = is_previous_char_whitespace()
 		if not isPreviousCharWhitespace then
 			vim.cmd("normal! b")
@@ -107,12 +106,30 @@ local normal_keymaps = {
 	{ "N", "Nzzzv", "prev with cursor centered" },
 	{ "S", "vg_", "select until EOL" },
 	{ "Q", "<nop>", "disable ex mode" },
-	{ "<leader>j", column_jumper.go_next_column, "next column" },
-	{ "<leader>k", column_jumper.go_to_previous_column, "prev column" },
+	{
+		"<leader>j",
+		function()
+			require("bdub.column_jumper").go_next_column()
+		end,
+		"next column",
+	},
+	{
+		"<leader>k",
+		function()
+			require("bdub.column_jumper").go_to_previous_column()
+		end,
+		"prev column",
+	},
 	{ "<C-M-g>", ToggleGit, "git" },
 	{ "<leader>>", "<cmd>lnext<CR>zz", "next location" },
 	{ "<leader><", "<cmd>lprev<CR>zz", "prev location" },
-	{ "<leader>Ofj", commands.format_jq, "format json" },
+	{
+		"<leader>Ofj",
+		function()
+			require("bdub.commands").format_jq()
+		end,
+		"format json",
+	},
 	{ "<C-S-h>", "<cmd>bprev<CR>", "prev buffer" },
 	{ "<C-S-l>", "<cmd>bnext<CR>", "next buffer" },
 	{ "<leader>S", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "substitue under cursor" },
@@ -123,7 +140,13 @@ local normal_keymaps = {
 	{ "<C-M-S-k>", "<cmd>cprev<CR>zz", "prev quickfix" },
 	{ "<C-M-S-q>", "<cmd>cclose<CR>", "close quickfix" },
 	{ "<leader>q", handleClose, "close buffer" },
-	{ "<C-M-r>", commands.copy_file_path, "copy file path" },
+	{
+		"<C-M-r>",
+		function()
+			require("bdub.commands").copy_file_path()
+		end,
+		"copy file path",
+	},
 	{ "<C-Up>", ":resize -2<CR>", "resize split -2" },
 	{ "<C-Down>", ":resize +2<CR>", "resize split +2" },
 	{ "<C-Left>", ":vertical resize -2<CR>", "resize vertical split -2" },
@@ -177,10 +200,14 @@ vim.keymap.set("n", "<leader>rr", printWindows, add_desc("print windows"))
 local tiny_diagnostics_enabled = true
 vim.keymap.set("n", "gd", function()
 	if tiny_diagnostics_enabled then
-		vim.notify("Inline diagnostics disabled", "error", { title = "Tiny Inline Diagnostic" })
+		vim.notify("Inline diagnostics disabled", "error", {
+			title = "Tiny Inline Diagnostic",
+		})
 		tiny_diagnostics_enabled = false
 	else
-		vim.notify("Inline diagnostics enabled", "info", { title = "Tiny Inline Diagnostic" })
+		vim.notify("Inline diagnostics enabled", "info", {
+			title = "Tiny Inline Diagnostic",
+		})
 		tiny_diagnostics_enabled = true
 	end
 
@@ -197,7 +224,9 @@ vim.keymap.set("v", "p", '"_dP', options)
 vim.keymap.set("x", "c", '"_c', options)
 vim.keymap.set({ "n", "v" }, "<C-M-c>", [["+y]], add_desc("Copy to system clipboard"))
 
-vim.keymap.set("c", "<M-k>", "\\(.*\\)", { desc = "one eyed fighting kirby" })
+vim.keymap.set("c", "<M-k>", "\\(.*\\)", {
+	desc = "one eyed fighting kirby",
+})
 vim.keymap.set({ "n", "v" }, "j", "gj", options)
 vim.keymap.set({ "n", "v" }, "k", "gk", options)
 vim.keymap.set({ "n", "v" }, "J", function() end, options)
@@ -211,6 +240,8 @@ vim.keymap.set({ "n", "v" }, "<leader><tab>l", vim.cmd.tabn, add_desc("next tab"
 vim.keymap.set({ "n", "v" }, "<leader><tab>h", vim.cmd.tabp, add_desc("prev tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><tab>", vim.cmd.tabe, add_desc("new tab"))
 vim.keymap.set({ "n", "v" }, "<leader><tab><leader>", vim.cmd.tabc, add_desc("close tab"))
+vim.keymap.set("n", "<leader>c", ":Bdelete<cr>", { noremap = true, desc = "close buffer" })
+vim.keymap.set("n", "<leader>C", ":Bdelete!<cr>", { noremap = true, desc = "close buffer" })
 
 vim.keymap.set("n", "<esc>", "<cmd>noh<cr><esc>", add_desc("esc normal"))
 

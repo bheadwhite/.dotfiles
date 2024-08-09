@@ -78,7 +78,13 @@ function M.jump_to_parent_class()
 	end)
 end
 
-function M.on_attach(bufnr)
+function M.on_attach(client, bufnr)
+	local capabilities = vim.lsp.protocol.make_client_capabilities()
+	capabilities =
+		vim.tbl_deep_extend("force", capabilities, client.capabilities, require("cmp_nvim_lsp").default_capabilities())
+
+	client.capabilities = capabilities
+
 	local function goToDefinition()
 		telescope.lsp_definitions({ show_line = false })
 	end
