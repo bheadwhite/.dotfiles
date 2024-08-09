@@ -135,7 +135,7 @@ M.config = function()
 		},
 	})
 
-	require("bdub._telescope")
+	require("bdub.telescope_config")
 end
 
 return M

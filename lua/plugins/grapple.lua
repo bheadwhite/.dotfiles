@@ -2,7 +2,7 @@ return {
 	"cbochs/grapple.nvim", -- Bookmarks / tags
 	dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope.nvim" },
 	opts = function()
-		local helpers = require("bdub._grapple")
+		local helpers = require("bdub.grapple_config")
 		return {
 			scope = helpers.get_active_scope(),
 			name_pos = "start",
