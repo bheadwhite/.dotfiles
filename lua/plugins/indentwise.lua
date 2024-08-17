@@ -1,3 +1,21 @@
+-- Function to call the IndentWisePreviousEqualIndent mapping
+local function call_indentwise_previous_equal_indent()
+	vim.api.nvim_feedkeys(
+		vim.api.nvim_replace_termcodes("<Plug>(IndentWisePreviousEqualIndent)", true, true, true),
+		"n",
+		true
+	)
+end
+
+-- Function to call the IndentWiseNextEqualIndent mapping
+local function call_indentwise_next_equal_indent()
+	vim.api.nvim_feedkeys(
+		vim.api.nvim_replace_termcodes("<Plug>(IndentWiseNextEqualIndent)", true, true, true),
+		"n",
+		true
+	)
+end
+
 return {
 	"jeetsukumaran/vim-indentwise",
 	dependencies = { "nvim-treesitter/nvim-treesitter" },
@@ -50,7 +68,7 @@ return {
 				return
 			end
 
-			vim.cmd('call <SNR>56_move_to_indent_depth(1, "==", 0, "n")')
+			call_indentwise_next_equal_indent()
 
 			local next = ts_utils.get_node_at_cursor()
 			-- if column index is 0 then return
@@ -80,7 +98,8 @@ return {
 				return
 			end
 
-			vim.cmd('call <SNR>56_move_to_indent_depth(0, "==", 0, "n")')
+			call_indentwise_previous_equal_indent()
+
 			-- if column index is 0 then return
 			if vim.fn.col(".") == 1 then
 				vim.cmd([[normal! zz]])

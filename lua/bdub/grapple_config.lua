@@ -2,7 +2,7 @@ local grapple = require("grapple")
 local action_state = require("telescope.actions.state")
 local actions = require("telescope.actions")
 
-local scopes = { "cwd", "git_branch", "global" }
+local scopes = { "git_branch", "cwd", "global" }
 local active_index = 1
 local active_grapple_win_id = ""
 
@@ -38,32 +38,11 @@ vim.api.nvim_create_autocmd("WinClosed", {
 
 local function activate_scope()
 	grapple.use_scope(M.get_active_scope())
-end
-
-function cycle_scope()
-	if active_index == #scopes then
-		active_index = 1
-	else
-		active_index = active_index + 1
-	end
-
 	handle_grapple_win_sync()
-	activate_scope()
 end
 
 function M.get_active_scope()
 	return scopes[active_index]
-end
-
-function cycle_scope_reverse()
-	if active_index == 1 then
-		active_index = #scopes
-	else
-		active_index = active_index - 1
-	end
-
-	handle_grapple_win_sync()
-	activate_scope()
 end
 
 grapple.setup()
@@ -155,20 +134,25 @@ vim.keymap.set("n", "<leader>a", function()
 	vim.cmd("normal! mf")
 end, { silent = true, desc = "tag file in current scope" })
 
-vim.keymap.set("n", "<C-S-M-p>", function()
-	grapple.toggle_tags({ scope = M.get_active_scope() })
-end, { silent = true, desc = "toggle active tags in grapple window" })
+-- vim.keymap.set("n", "<C-S-M-p>", function()
+-- 	grapple.toggle_tags({ scope = M.get_active_scope() })
+-- end, { silent = true, desc = "toggle active tags in grapple window" })
 
-vim.keymap.set("n", "<C-M-p>", function()
+vim.keymap.set("n", "<C-q>", function()
 	open_grapple_telescope_picker({ scope = M.get_active_scope() })
 end, { silent = true, desc = "telescope tags" })
 
-vim.keymap.set("n", "<C-S-M-]>", function()
-	cycle_scope()
-end, { silent = true, desc = "next scope" })
-
-vim.keymap.set("n", "<C-S-M-[>", function()
-	cycle_scope_reverse()
-end, { silent = true, desc = "prev scope" })
+vim.keymap.set("n", "<C-M-1>", function()
+	active_index = 1
+	activate_scope()
+end, { silent = true, desc = "activate index 1" })
+vim.keymap.set("n", "<C-M-2>", function()
+	active_index = 2
+	activate_scope()
+end, { silent = true, desc = "activeate index 2" })
+vim.keymap.set("n", "<C-M-3>", function()
+	active_index = 3
+	activate_scope()
+end, { silent = true, desc = "activate index 3" })
 
 return M

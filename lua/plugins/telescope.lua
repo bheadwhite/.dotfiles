@@ -30,7 +30,7 @@ M.config = function()
 	local plenary = require("plenary")
 	local action_state = require("telescope.actions.state")
 	local actions = require("telescope.actions")
-	local winshift_lib = require("winshift.lib")
+	-- local winshift_lib = require("winshift.lib")
 
 	local function copy_path_from_selection(bufnr)
 		local commands = require("bdub.commands")
@@ -45,7 +45,6 @@ M.config = function()
 
 	local function openAndSwap(selection)
 		actions.file_vsplit(selection)
-		winshift_lib.start_swap_mode()
 	end
 
 	local default_opts = {
@@ -124,6 +123,9 @@ M.config = function()
 				override_generic_sorter = true,
 				override_file_sorter = true,
 				case_mode = "smart_case",
+			},
+			aerial = {
+				sorting_strategy = "ascending",
 			},
 			["ui-select"] = {
 				require("telescope.themes").get_dropdown({

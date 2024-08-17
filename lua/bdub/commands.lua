@@ -139,7 +139,9 @@ M.list_buffers = function()
 			}, {
 				prompt_title = "Buffers",
 				finder = finders.new_table({
-					results = vim.fn.getbufinfo({ buflisted = 1 }),
+					results = vim.fn.getbufinfo({
+						buflisted = 1,
+					}),
 					entry_maker = function(entry)
 						return {
 							value = entry.bufnr,
@@ -160,7 +162,9 @@ M.list_buffers = function()
 					local delete_buffer = function()
 						local selection = action_state.get_selected_entry()
 						if selection then
-							vim.api.nvim_buf_delete(selection.value, { force = true })
+							vim.api.nvim_buf_delete(selection.value, {
+								force = true,
+							})
 							run_picker()
 						end
 					end
@@ -325,7 +329,7 @@ end
 local function gather_children(buf)
 	vim.api.nvim_buf_set_lines(buf, -1, -1, false, { "", "Children:" })
 
-	print("gather children")
+	-- print("gather children")
 	local current_buf = vim.api.nvim_get_current_buf()
 	local params = vim.lsp.util.make_position_params()
 
@@ -381,7 +385,10 @@ function _G.printK(obj)
 
 	local keys = {}
 	for key, value in pairs(obj) do
-		table.insert(keys, { key = key, value_type = type(value) })
+		table.insert(keys, {
+			key = key,
+			value_type = type(value),
+		})
 	end
 
 	table.sort(keys, function(a, b)
@@ -399,7 +406,10 @@ function _G.printK(obj)
 end
 
 -- Map the function to a key combination, e.g., <leader>rf
-vim.keymap.set("n", "<leader>rf", print_symbols, { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>rf", print_symbols, {
+	noremap = true,
+	silent = true,
+})
 
 -- function M.buf_update_diagnostics()
 -- 	local clients = vim.lsp.get_clients()

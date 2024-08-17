@@ -7,6 +7,7 @@ return {
 
 		vim.api.nvim_create_autocmd({
 			"BufEnter",
+			"WinEnter",
 			"BufWritePost",
 			"TextChanged",
 			"InsertLeave",

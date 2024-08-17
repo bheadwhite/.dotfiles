@@ -37,8 +37,7 @@ return {
 				lualine_b = {
 					{
 						full_path_minus_filename,
-						padding = 3,
-						color = function(section)
+						color = function() -- arg:  section
 							local bg = colors.bg1
 							local fg = colors.gray2
 							if vim.bo.modified then
@@ -70,24 +69,36 @@ return {
 						always_visible = true,
 					},
 				},
-				lualine_y = {
-					function()
-						local grapple = require("grapple")
-						local app = grapple.app()
-						if app == nil then
-							return ""
-						end
-						local scope = app.scope_manager:get(app.settings.scope)
-						return anchor_icon .. " " .. scope.name
-					end,
+				lualine_x = {
+					--current working directory
 				},
+				lualine_y = {},
 				lualine_z = {
 					"tabs",
 				},
 			},
-
 			sections = {
 				lualine_a = {
+					{
+						function()
+							return vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
+						end,
+						padding = 1,
+						color = { fg = "#ffffff", bg = colors.aqua },
+					},
+					{
+
+						function()
+							local grapple = require("grapple")
+							local app = grapple.app()
+							if app == nil then
+								return ""
+							end
+							local scope = app.scope_manager:get(app.settings.scope)
+							return anchor_icon .. " " .. scope.name
+						end,
+						color = { fg = "#ffffff", bg = colors.bg1 },
+					},
 					get_branch,
 				},
 				lualine_b = {

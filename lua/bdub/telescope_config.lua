@@ -7,6 +7,7 @@ telescope.load_extension("fzf")
 telescope.load_extension("ui-select")
 telescope.load_extension("live_grep_args")
 telescope.load_extension("grapple")
+telescope.load_extension("aerial")
 
 local delta_bcommits = previewers.new_termopen_previewer({
 	get_command = function(entry)
@@ -65,7 +66,7 @@ Delta_git_bcommits = function(opts)
 end
 
 vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "find files" })
-vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "git files" })
+-- vim.keymap.set("n", "<C-p>", builtin.git_files, { desc = "git files" })
 vim.keymap.set("n", "<leader>p", builtin.oldfiles, { desc = "recent files" })
 vim.keymap.set("n", "<leader>Tr", builtin.registers, { desc = "registers" })
 vim.keymap.set("n", "<leader>Tq", builtin.quickfixhistory, { desc = "qfhistory" })

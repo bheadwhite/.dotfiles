@@ -1,8 +1,25 @@
+-- filter diagnostics
+-- see codes and names at https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
+local filtered_diagnostics_table = {
+	[2311] = "Did you mean to write this in an async function?",
+	[80006] = "This may be converted to an async function.",
+	[80001] = "File is a CommonJS module; it may be converted to an ES module.",
+	[7044] = "Parameter '{0}' implicitly has an '{1}' type, but a better type may be inferred from usage.",
+	[7043] = "Variable '{0}' implicitly has an '{1}' type, but a better type may be inferred from usage.",
+}
+
+local diagnostic_filters = {}
+
+for code, _message in pairs(filtered_diagnostics_table) do
+	table.insert(diagnostic_filters, code)
+end
+
 return {
 	"pmizio/typescript-tools.nvim",
 	branch = "bugfix/202",
 	dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
 	config = function()
+		local api = require("typescript-tools.api")
 		local helpers = require("bdub.lsp_helpers")
 		require("typescript-tools").setup({
 			on_attach = function(client, bufnr)
@@ -24,13 +41,7 @@ return {
 				},
 			},
 			handlers = {
-				-- ["textDocument/publishDiagnostics"] = api.filter_diagnostics({
-				-- 	2311,
-				-- 	80006,
-				-- 	80001,
-				-- 	7044,
-				-- 	7043,
-				-- }),
+				["textDocument/publishDiagnostics"] = api.filter_diagnostics(diagnostic_filters),
 			},
 		})
 

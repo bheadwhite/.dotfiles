@@ -7,7 +7,7 @@ return {
 			{
 				mode = { "v", "n" },
 				{
-					"<leader>P",
+					"<leader>r",
 					function()
 						local path = vim.fn.expand("%:.")
 						print(path)

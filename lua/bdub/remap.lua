@@ -152,8 +152,8 @@ local normal_keymaps = {
 	{ "<C-Left>", ":vertical resize -2<CR>", "resize vertical split -2" },
 	{ "<C-Right>", ":vertical resize +2<CR>", "resize vertical split +2" },
 	{ "<leader>GPT", "<cmd>CopilotChat<CR>", "new gpt split" },
-	{ "<C-,>", ":WinShift<CR>h<esc>", "move window left" },
-	{ "<C-.>", ":WinShift<CR>l<esc>", "move window right" },
+	{ "<C-,>", vim.cmd.tabp, "prev tab" },
+	{ "<C-.>", vim.cmd.tabn, "next tab" },
 	{ "*", highlight_under_cursor, "for jumps" },
 	{ "gn", goToConstructor, "go to constructor" },
 }
@@ -216,7 +216,15 @@ vim.keymap.set("n", "gd", function()
 	require("tiny-inline-diagnostic").toggle()
 end, add_desc("toggle inline diagnostics"))
 
+function split_line_by()
+	local split_by_value = vim.fn.input("Split line by: (default is:, ) ", ", ")
+	local expression = string.format([[s/\v(%s)/\1\r/g]], split_by_value)
+	vim.cmd(expression)
+end
+
 -- You can then call this function with `:lua open_buffer_in_floating_window()`
+
+-- vim.keymap.set("n", "<leader>os", split_line_by, add_desc("split line by"))
 
 -- system clipboard
 vim.keymap.set("x", "<leader>P", [["_dP]], add_desc("Paste over selection"))
@@ -227,6 +235,7 @@ vim.keymap.set({ "n", "v" }, "<C-M-c>", [["+y]], add_desc("Copy to system clipbo
 vim.keymap.set("c", "<M-k>", "\\(.*\\)", {
 	desc = "one eyed fighting kirby",
 })
+
 vim.keymap.set({ "n", "v" }, "j", "gj", options)
 vim.keymap.set({ "n", "v" }, "k", "gk", options)
 vim.keymap.set({ "n", "v" }, "J", function() end, options)
@@ -236,10 +245,11 @@ vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("move to top windo
 vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", add_desc("move to right window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", add_desc("move to bottom window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("move to left window"))
-vim.keymap.set({ "n", "v" }, "<leader><tab>l", vim.cmd.tabn, add_desc("next tab"))
-vim.keymap.set({ "n", "v" }, "<leader><tab>h", vim.cmd.tabp, add_desc("prev tab"))
-vim.keymap.set({ "n", "v" }, "<leader><tab><tab>", vim.cmd.tabe, add_desc("new tab"))
-vim.keymap.set({ "n", "v" }, "<leader><tab><leader>", vim.cmd.tabc, add_desc("close tab"))
+-- vim.keymap.set({ "n", "v" }, "<leader><tab>l", vim.cmd.tabn, add_desc("next tab"))
+vim.keymap.set({ "n", "v" }, "<C-5>", vim.cmd.tabp, add_desc("prev tab"))
+vim.keymap.set({ "n", "v" }, "<C-9>", vim.cmd.tabn, add_desc("next tab"))
+vim.keymap.set({ "n", "v" }, "<leader><tab>", vim.cmd.tabe, add_desc("new tab"))
+-- vim.keymap.set({ "n", "v" }, "<leader><tab><leader>", vim.cmd.tabc, add_desc("close tab"))
 vim.keymap.set("n", "<leader>c", ":Bdelete<cr>", { noremap = true, desc = "close buffer" })
 vim.keymap.set("n", "<leader>C", ":Bdelete!<cr>", { noremap = true, desc = "close buffer" })
 

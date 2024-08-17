@@ -22,6 +22,7 @@ return {
 		},
 		formatters_by_ft = {
 			python = { "blackd" },
+			go = { "gofmt" },
 			lua = { "stylua" },
 			javascript = { "prettierd" },
 			javascriptreact = { "prettierd" },
