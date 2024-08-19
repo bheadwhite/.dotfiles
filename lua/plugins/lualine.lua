@@ -86,6 +86,9 @@ return {
 						padding = 1,
 						color = { fg = "#ffffff", bg = colors.aqua },
 					},
+					function()
+						return require("auto-session.lib").current_session_name(true)
+					end,
 					{
 
 						function()

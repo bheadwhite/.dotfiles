@@ -184,7 +184,7 @@ end
 vim.api.nvim_create_user_command("ApplyLastSubstitute", function()
 	-- Get the last substitute command from the command history
 	local last_cmd = vim.fn.histget(":", -2)
-	print(last_cmd)
+	print("last sub: " .. last_cmd)
 
 	-- Extract the substitute command if it exists
 	local substitute_cmd = last_cmd:match("^%%?s/.*$")

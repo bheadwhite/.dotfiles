@@ -63,14 +63,14 @@ local function open_oil()
 	oil.open()
 end
 
-vim.keymap.set("n", "<leader>e", toggle_oil, {
-	noremap = true,
-	desc = "toggle oil",
-})
+-- vim.keymap.set("n", "<leader>e", toggle_oil, {
+-- 	noremap = true,
+-- 	desc = "toggle oil",
+-- })
 
-vim.keymap.set("n", "-", open_oil, {
-	noremap = true,
-	desc = "open oil",
-})
+-- vim.keymap.set("n", "-", open_oil, {
+-- 	noremap = true,
+-- 	desc = "open oil",
+-- })
 
 return M

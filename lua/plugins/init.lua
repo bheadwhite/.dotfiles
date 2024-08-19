@@ -1,22 +1,3 @@
-local current_loaded_bookmarks = ""
-
-local invoke_bookmark_show_all = function()
-	local cwd = vim.fn.getcwd()
-	-- append .vim-bookmarks to the cwd
-	cwd = cwd .. "/.vim-bookmarks"
-	if current_loaded_bookmarks == cwd then
-		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>BookmarkShowAll", true, true, true), "n", true)
-
-		vim.defer_fn(function()
-			vim.cmd("wincmd p")
-		end, 0) -- delay in milliseconds
-		return
-	end
-
-	vim.api.nvim_command("BookmarkLoad " .. cwd)
-	current_loaded_bookmarks = cwd
-end
-
 return {
 	{ "mileszs/ack.vim" },
 	{ "windwp/nvim-ts-autotag" },
@@ -40,6 +21,13 @@ return {
 			require("auto-session").setup({
 				cwd_change_handling = {
 					restore_upcoming_session = true,
+					post_cwd_changed_hook = function()
+						local cwd = vim.fn.getcwd()
+						-- append .vim-bookmarks to the cwd
+						cwd = cwd .. "/.vim-bookmarks"
+						vim.api.nvim_command("BookmarkLoad " .. cwd)
+						require("lualine").refresh()
+					end,
 				},
 			})
 			vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
@@ -85,16 +73,33 @@ return {
 	{ "nvim-telescope/telescope-ui-select.nvim" },
 	{ "echasnovski/mini.nvim" }, -- mini. using for zooming in and out of windows
 	{
-		"MattesGroeger/vim-bookmarks",
+		"bheadwhite/vim-bookmarks",
 		config = function()
 			vim.keymap.set({ "n", "x" }, "<C-M-p>", function()
-				invoke_bookmark_show_all()
+				require("bdub.bookmarks").telescope_bookmarks()
 			end)
 		end,
 		init = function()
 			vim.g.bookmark_annotation_sign = "🔖"
 			vim.g.bookmark_save_per_working_dir = 1
 			vim.g.bookmark_manage_per_buffer = 1
+		end,
+	},
+	{
+		"echasnovski/mini.files",
+		version = false,
+		config = function()
+			local mini_files = require("mini.files")
+			mini_files.setup({
+				mappings = {
+					go_in = "",
+				},
+				windows = {
+					preview = false,
+				},
+			})
+
+			require("bdub.mini_files").setup()
 		end,
 	},
 	{ "tpope/vim-abolish", "tpope/vim-surround" },

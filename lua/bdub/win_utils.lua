@@ -1,6 +1,24 @@
 local lua_utils = require("bdub.lua_utils")
 local WinUtils = {}
 
+local function printWin(win)
+	local buf = vim.api.nvim_win_get_buf(win)
+	local buf_name = vim.api.nvim_buf_get_name(buf)
+	local cursor = vim.api.nvim_win_get_cursor(win)
+	local width = vim.api.nvim_win_get_width(win)
+	local height = vim.api.nvim_win_get_height(win)
+	local position = vim.api.nvim_win_get_position(win)
+	local config = vim.api.nvim_win_get_config(win)
+
+	print("Window ID: " .. win)
+	print("Buffer: " .. buf_name)
+	print("Cursor Position: Row " .. cursor[1] .. ", Col " .. cursor[2])
+	print("Size: " .. width .. "x" .. height)
+	print("Position: Row " .. position[1] .. ", Col " .. position[2])
+	print("Config: " .. vim.inspect(config))
+	print("----------------------")
+end
+
 function WinUtils.get_duplicate_win_buffers()
 	-- Get a list of all window IDs
 	local windows = vim.api.nvim_list_wins()
@@ -70,6 +88,18 @@ function WinUtils.get_win_buffers_with_duplicates()
 	end
 
 	return duplicates_table
+end
+
+function WinUtils.printWindows()
+	local windows = vim.api.nvim_list_wins()
+	for _, win in ipairs(windows) do
+		printWin(win)
+	end
+end
+
+function WinUtils.printCurrentWindow()
+	local win = vim.api.nvim_get_current_win()
+	printWin(win)
 end
 
 function WinUtils.close_all_duplicates()
