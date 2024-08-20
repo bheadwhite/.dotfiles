@@ -2,12 +2,19 @@ return {
 	setup = function()
 		local mini_files = require("mini.files")
 		local PlenaryPath = require("plenary.path")
+		local activeWinId = nil
 
 		local commands = {
 			{
 				"n",
 				"<CR>",
 				function()
+					local entry = mini_files.get_fs_entry()
+					if entry.fs_type == "directory" then
+						mini_files.go_in()
+						return
+					end
+
 					mini_files.go_in()
 					mini_files.close()
 				end,
@@ -75,24 +82,20 @@ return {
 			},
 			{
 				"n",
-				"l",
+				"-",
 				function()
-					local entry = mini_files.get_fs_entry()
-					if entry.fs_type == "directory" then
-						mini_files.go_in()
-					end
+					mini_files.go_out()
 				end,
 			},
 		}
 		-- nvim event
 		local augroup = vim.api.nvim_create_augroup("MyMiniFilesGroup", { clear = true })
-		local winId = nil
 
 		vim.api.nvim_create_autocmd("User", {
 			pattern = "MiniFilesExplorerOpen",
 			group = augroup,
 			callback = function()
-				winId = vim.api.nvim_get_current_win()
+				activeWinId = vim.api.nvim_get_current_win()
 			end,
 		})
 
@@ -110,25 +113,31 @@ return {
 			pattern = "MiniFilesExplorerClose",
 			group = augroup,
 			callback = function()
-				winId = nil
+				activeWinId = nil
 			end,
 		})
 
 		local get_open_or_cb = function(cb)
 			return function()
-				if winId then
-					cb()
+				local win = vim.api.nvim_get_current_win()
+				local buf = vim.api.nvim_win_get_buf(win)
+				local buf_name = vim.api.nvim_buf_get_name(buf)
+				if buf_name:match("oil") then
+					require("oil").close()
 					return
 				end
 
-				require("mini.files").open()
+				if activeWinId then
+					return cb()
+				end
+
+				-- current buffer directory
+				local bufname = vim.fn.expand("%:p")
+				-- if the current buffer is a file, then open the current directory
+
+				require("mini.files").open(bufname)
 			end
 		end
-
-		vim.keymap.set("n", "-", get_open_or_cb(mini_files.go_out), {
-			noremap = true,
-			desc = "open mini files",
-		})
 
 		vim.keymap.set("n", "<leader>e", get_open_or_cb(mini_files.close), {
 			noremap = true,

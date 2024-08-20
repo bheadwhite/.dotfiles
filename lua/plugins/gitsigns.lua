@@ -59,13 +59,20 @@ return {
 		end
 
 		local nextHunk = function_decorator(function()
+			local current_line_nr = vim.fn.line(".")
 			require("gitsigns").next_hunk()
-			vim.cmd([[normal! zz]])
+			local did_change = vim.fn.line(".") ~= current_line_nr
+			if did_change then
+				vim.cmd([[normal! zz]])
+			end
 		end)
 
 		local prevHunk = function_decorator(function()
+			local current_line_nr = vim.fn.line(".")
 			require("gitsigns").prev_hunk()
-			vim.cmd([[normal! zz]])
+			if vim.fn.line(".") ~= current_line_nr then
+				vim.cmd([[normal! zz]])
+			end
 		end)
 
 		vim.keymap.set("n", "<C-M-Enter>", use_last_func, { noremap = true, silent = true, desc = "use last func" })

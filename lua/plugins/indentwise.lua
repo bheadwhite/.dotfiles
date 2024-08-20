@@ -1,19 +1,11 @@
 -- Function to call the IndentWisePreviousEqualIndent mapping
 local function call_indentwise_previous_equal_indent()
-	vim.api.nvim_feedkeys(
-		vim.api.nvim_replace_termcodes("<Plug>(IndentWisePreviousEqualIndent)", true, true, true),
-		"n",
-		true
-	)
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(IndentWisePreviousEqualIndent)", true, true, true), "n", true)
 end
 
 -- Function to call the IndentWiseNextEqualIndent mapping
 local function call_indentwise_next_equal_indent()
-	vim.api.nvim_feedkeys(
-		vim.api.nvim_replace_termcodes("<Plug>(IndentWiseNextEqualIndent)", true, true, true),
-		"n",
-		true
-	)
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(IndentWiseNextEqualIndent)", true, true, true), "n", true)
 end
 
 return {
@@ -59,7 +51,7 @@ return {
 			return found
 		end
 
-		vim.keymap.set({ "x", "n" }, "<C-M-]>", function()
+		vim.keymap.set({ "x", "n" }, "<leader>j", function()
 			vim.cmd("normal! ^")
 			local start_line = vim.fn.line(".")
 			local start_col = vim.fn.col(".")
@@ -91,7 +83,8 @@ return {
 				end
 			end
 		end, { silent = true, desc = "next indent" })
-		vim.keymap.set({ "x", "n" }, "<C-M-[>", function()
+
+		vim.keymap.set({ "x", "n" }, "<leader>k", function()
 			vim.cmd("normal! ^")
 			local node = ts_utils.get_node_at_cursor()
 			if node == nil then

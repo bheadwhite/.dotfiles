@@ -37,24 +37,24 @@ function in_neo_tree_buffer()
 	return vim.bo.filetype == "neo-tree"
 end
 
-local function toggle_oil()
-	if in_neo_tree_buffer() then
-		vim.cmd([[Neotree toggle]])
-		return
-	end
-
-	if in_oil_buffer() then
-		oil.close()
-	else
-		oil.open()
-	end
-end
+-- local function toggle_oil()
+-- 	if in_neo_tree_buffer() then
+-- 		vim.cmd([[Neotree toggle]])
+-- 		return
+-- 	end
+--
+-- 	if in_oil_buffer() then
+-- 		oil.close()
+-- 	else
+-- 		oil.open()
+-- 	end
+-- end
 
 local function open_oil()
-	if vim.api.nvim_win_get_option(0, "diff") then
-		vim.cmd([[diffput]])
-		return
-	end
+	-- if vim.api.nvim_win_get_option(0, "diff") then
+	-- 	vim.cmd([[diffput]])
+	-- 	return
+	-- end
 
 	if in_oil_buffer() then
 		return
@@ -68,9 +68,9 @@ end
 -- 	desc = "toggle oil",
 -- })
 
--- vim.keymap.set("n", "-", open_oil, {
--- 	noremap = true,
--- 	desc = "open oil",
--- })
+vim.keymap.set("n", "-", open_oil, {
+	noremap = true,
+	desc = "open oil",
+})
 
 return M
