@@ -37,8 +37,13 @@ vim.api.nvim_create_autocmd("WinClosed", {
 })
 
 local function activate_scope()
+  originalNotify = vim.notify
+  vim.notify = function() end -- Override print to do nothing
   grapple.use_scope(M.get_active_scope())
   handle_grapple_win_sync()
+  require("lualine").refresh()
+
+  vim.notify = originalNotify
 end
 
 function M.get_active_scope()

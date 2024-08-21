@@ -11,9 +11,9 @@ return {
       return vim.fn.winwidth(0) > 80
     end
 
-    local full_path_minus_filename = function()
-      return vim.fn.expand("%:.:h") .. "/"
-    end
+    -- local full_path_minus_filename = function()
+    --   return vim.fn.expand("%:.:h") .. "/"
+    -- end
 
     local function get_branch()
       require("lualine.components.branch.git_branch").init()
@@ -33,11 +33,30 @@ return {
         globalstatus = true,
       },
       tabline = {
-        lualine_a = {},
+        lualine_a = {
+          "buffers",
+        },
+        lualine_b = {},
+        lualine_c = {},
+        lualine_x = {
+          --current working directory
+        },
+        lualine_y = {},
+        lualine_z = {
+          "tabs",
+        },
+      },
+      sections = {
+        lualine_a = {
+          get_branch,
+        },
         lualine_b = {
           {
-            full_path_minus_filename,
-            color = function() -- arg:  section
+            "mode",
+            fmt = function(mode)
+              return "-- " .. mode .. " --"
+            end,
+            color = function()
               local bg = colors.bg1
               local fg = colors.gray2
               if vim.bo.modified then
@@ -51,59 +70,15 @@ return {
               }
             end,
           },
-        },
-        lualine_c = {
           {
-            "diff",
-            colored = true,
-            symbols = { added = " ", modified = " ", removed = " " }, -- changes diff symbols
-            cond = hide_in_width,
+            function()
+              local sesh = " "
+              sesh = sesh .. require("auto-session.lib").current_session_name(true)
+              return sesh
+            end,
+            color = { bg = colors.bg1, fg = "#FFFFFF" },
           },
           {
-            "diagnostics",
-            sources = { "nvim_diagnostic" },
-            sections = { "error", "warn" },
-            symbols = { error = " ", warn = " " },
-            colored = false,
-            update_in_insert = false,
-            always_visible = true,
-          },
-
-          function()
-            local files = vim.fn.sort(vim.fn["bm#all_files"]())
-            local matching_files = {}
-            local current_file = vim.fn.expand("%:p")
-            for _, file in ipairs(files) do
-              if file == current_file then
-                local line_nrs = vim.fn.sort(vim.fn["bm#all_lines"](file), "bm#compare_lines")
-                for _, line_nr in ipairs(line_nrs) do
-                  table.insert(matching_files, file)
-                end
-              end
-            end
-
-            if #matching_files == 0 then
-              return ""
-            end
-
-            return "🔖 " .. #matching_files
-          end,
-        },
-        lualine_x = {
-          --current working directory
-        },
-        lualine_y = {},
-        lualine_z = {
-          "tabs",
-        },
-      },
-      sections = {
-        lualine_a = {
-          function()
-            return require("auto-session.lib").current_session_name(true)
-          end,
-          {
-
             function()
               local grapple = require("grapple")
               local app = grapple.app()
@@ -115,14 +90,45 @@ return {
             end,
             color = { fg = "#ffffff", bg = colors.bg1 },
           },
-          get_branch,
-        },
-        lualine_b = {
           {
-            "mode",
-            fmt = function(mode)
-              return "-- " .. mode .. " --"
+            "diff",
+            colored = true,
+            symbols = { added = " ", modified = " ", removed = " " }, -- changes diff symbols
+            cond = hide_in_width,
+            color = { bg = colors.bg1 },
+          },
+          {
+            "diagnostics",
+            sources = { "nvim_diagnostic" },
+            sections = { "error", "warn" },
+            symbols = { error = " ", warn = " " },
+            colored = false,
+            update_in_insert = false,
+            always_visible = true,
+            color = { bg = colors.bg1 },
+          },
+
+          {
+            function()
+              local files = vim.fn.sort(vim.fn["bm#all_files"]())
+              local matching_files = {}
+              local current_file = vim.fn.expand("%:p")
+              for _, file in ipairs(files) do
+                if file == current_file then
+                  local line_nrs = vim.fn.sort(vim.fn["bm#all_lines"](file), "bm#compare_lines")
+                  for _, line_nr in ipairs(line_nrs) do
+                    table.insert(matching_files, file)
+                  end
+                end
+              end
+
+              if #matching_files == 0 then
+                return ""
+              end
+
+              return "🔖 " .. #matching_files
             end,
+            color = { bg = colors.bg1 },
           },
         },
         lualine_c = {},

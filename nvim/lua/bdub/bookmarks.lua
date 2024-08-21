@@ -133,7 +133,7 @@ function M.telescope_bookmarks(opts)
         results = bookmarks,
         entry_maker = make_entry,
       }),
-      sorter = conf.generic_sorter({}),
+      sorter = conf.file_sorter({}),
       previewer = conf.grep_previewer({}),
     })
     :find()

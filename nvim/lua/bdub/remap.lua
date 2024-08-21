@@ -185,7 +185,7 @@ end
 function wezterm_cmd(cmd)
   -- local curWin = vim.api.nvim_get_current_win()
   local curTab = vim.api.nvim_get_current_tabpage()
-  vim.cmd("!" .. cmd)
+  vim.cmd("silent ! " .. cmd .. " > /dev/null 2>&1")
   vim.defer_fn(function()
     vim.api.nvim_set_current_tabpage(curTab)
   end, 0)
