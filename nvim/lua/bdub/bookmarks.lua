@@ -9,7 +9,7 @@ local PlenaryPath = require("plenary.path")
 ---@field content string: The file path of the bookmark
 ---@field line_nr number: The line number in the file
 ---@field sign_idx number: The index of the sign
----@field file string: The file path of the bookmark
+---@field file string: absolute file path of the bookmark
 
 local show_global = true
 local M = {}
@@ -36,18 +36,17 @@ local function getBookmarkFromLine(file, line_nr)
   return mark
 end
 
+local filter_by_current_file = true
+
 ---@return Bookmark[]: all bookmarks
 function M.get_all_bookmarks()
   local files = vim.fn.sort(vim.fn["bm#all_files"]())
   local bookmarks = {} -- {content, file, line_nr, column_nr}[]
 
   for _, file in ipairs(files) do
-    local current_file = vim.fn.expand("%:p")
-    if current_file == file then
-      local line_nrs = vim.fn.sort(vim.fn["bm#all_lines"](file), "bm#compare_lines")
-      for _, line_nr in ipairs(line_nrs) do
-        table.insert(bookmarks, getBookmarkFromLine(file, line_nr))
-      end
+    local line_nrs = vim.fn.sort(vim.fn["bm#all_lines"](file), "bm#compare_lines")
+    for _, line_nr in ipairs(line_nrs) do
+      table.insert(bookmarks, getBookmarkFromLine(file, line_nr))
     end
   end
 
@@ -71,6 +70,21 @@ function M.get_project_bookmarks()
   end
 
   return projectBookmarks
+end
+
+function M.get_current_file_bookmarks()
+  local currentFile = vim.fn.expand("%:p")
+  local bookmarks = M.get_all_bookmarks()
+
+  local currentFileBookmarks = {}
+
+  for _, bookmark in ipairs(bookmarks) do
+    if bookmark.file == currentFile then
+      table.insert(currentFileBookmarks, bookmark)
+    end
+  end
+
+  return currentFileBookmarks
 end
 
 ---bookmark display
@@ -123,11 +137,37 @@ end
 ---@param opts table: telescope options
 function M.telescope_bookmarks(opts)
   opts = opts or {}
-  local bookmarks = M.get_project_bookmarks()
+  local bookmarks
+
+  if filter_by_current_file then
+    bookmarks = M.get_current_file_bookmarks()
+  else
+    bookmarks = M.get_project_bookmarks()
+  end
+
+  local title = "Bookmarks"
+  if filter_by_current_file then
+    title = title .. " (current file)"
+  else
+    title = title .. " (project)"
+  end
+
+  local function custom_mappings(prompt_bufnr, map)
+    local actions = require("telescope.actions")
+
+    -- Toggle filter and reload picker
+    map("n", "m", function()
+      actions.close(prompt_bufnr)
+      filter_by_current_file = not filter_by_current_file
+      M.telescope_bookmarks(opts)
+    end)
+
+    return true
+  end
 
   pickers
     .new({}, {
-      prompt_title = "Bookmarks",
+      prompt_title = title,
       initial_mode = "normal",
       finder = finders.new_table({
         results = bookmarks,
@@ -135,6 +175,7 @@ function M.telescope_bookmarks(opts)
       }),
       sorter = conf.file_sorter({}),
       previewer = conf.grep_previewer({}),
+      attach_mappings = custom_mappings,
     })
     :find()
 end

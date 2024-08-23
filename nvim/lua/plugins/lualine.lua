@@ -32,20 +32,7 @@ return {
         disabled_filetypes = { "alpha", "dashboard", "NvimTree", "Outline" },
         globalstatus = true,
       },
-      tabline = {
-        lualine_a = {
-          "buffers",
-        },
-        lualine_b = {},
-        lualine_c = {},
-        lualine_x = {
-          --current working directory
-        },
-        lualine_y = {},
-        lualine_z = {
-          "tabs",
-        },
-      },
+      tabline = {},
       sections = {
         lualine_a = {
           get_branch,
@@ -130,6 +117,7 @@ return {
             end,
             color = { bg = colors.bg1 },
           },
+          "buffers",
         },
         lualine_c = {},
         lualine_z = {
@@ -141,6 +129,7 @@ return {
             local index = math.ceil(line_ratio * #chars)
             return chars[index]
           end,
+          "tabs",
         },
       },
       extensions = {},

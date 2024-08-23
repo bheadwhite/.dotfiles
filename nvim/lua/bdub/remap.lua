@@ -98,6 +98,24 @@ local highlight_under_cursor = function()
   end
 end
 
+local active_tab = 1
+
+vim.api.nvim_create_autocmd("TabEnter", {
+  pattern = "*",
+  callback = function()
+    active_tab = vim.api.nvim_get_current_tabpage()
+  end,
+})
+vim.api.nvim_create_autocmd("FocusGained", {
+  pattern = "*",
+  callback = function()
+    local current = vim.api.nvim_get_current_tabpage()
+    if current ~= active_tab then
+      vim.cmd("tabnext " .. active_tab)
+    end
+  end,
+})
+
 local normal_keymaps = {
   { "gj", "mzJ`z", "join" },
   { "<c-d>", "<c-d>zz", "half page down" },
@@ -160,9 +178,9 @@ vim.keymap.set("n", "<leader>rr", require("bdub.win_utils").printCurrentWindow, 
 local tiny_dkagnostics_enabled = true
 vim.keymap.set("n", "gd", function()
   if tiny_diagnostics_enabled then
-    vim.notify("Inline diagnostics disabled", "error", {
-      title = "Tiny Inline Diagnostic",
-    })
+    -- vim.notify("Inline diagnostics disabled", "error", {
+    --   title = "Tiny Inline Diagnostic",
+    -- })
     tiny_diagnostics_enabled = false
   else
     vim.notiky("Inline diagnostics enabled", "info", {
