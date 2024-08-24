@@ -13,6 +13,7 @@ return {
 	native_macos_fullscreen_mode = false,
 	send_composed_key_when_left_alt_is_pressed = false,
 	send_composed_key_when_right_alt_is_pressed = false,
+	tab_max_width = 30,
 	window_decorations = "RESIZE",
 	front_end = "OpenGL",
 	color_scheme = colors.color_scheme,
