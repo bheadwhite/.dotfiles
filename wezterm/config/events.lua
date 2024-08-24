@@ -15,7 +15,7 @@ function M.movePrevPane(window, pane)
 end
 
 function M.zoomToggle(window, pane)
-	local action = nvim.wez_nvim_actions.zoom_toggle
+	local action = nvim.wez_nvim_actions.zoom_toggle.wez
 	if nvim.is_nvim_process(window) then
 		action = nvim.wez_nvim_actions.zoom_toggle.nvim
 	end
@@ -73,11 +73,12 @@ function M.formatTabTitle(tab, tabs, panes, config, hover, max_width)
 	local is_nvim = contains(title, "NVIM")
 
 	if is_nvim then
-		local vimDisplay = title
-		local projectPath = title:match("%(~/Projects/(.-)%)")
-		if projectPath then
-			local project = projectPath:match("([^/]+)/")
-			vimDisplay = project
+		local vimDisplay = title or ""
+		-- local projectPath = title:match("%(~/Projects(.-)%)")
+		local project = title:match("/Projects/([^/%)]+)") or title:match("/code/([^/%)]+)")
+
+		if project then
+			vimDisplay = project or ""
 		end
 		title = "☠  " .. vimDisplay
 	end

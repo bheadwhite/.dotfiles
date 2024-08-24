@@ -8,7 +8,7 @@ return {
   config = function()
     local barbecue = require("barbecue")
     barbecue.setup({
-      show_navic = true,
+      show_navic = false,
       show_modified = true,
       show_dirname = false,
       theme = {

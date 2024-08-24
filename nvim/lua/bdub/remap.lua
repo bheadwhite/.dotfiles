@@ -174,6 +174,7 @@ end
 
 set_custom_highlight()
 
+vim.api.nvim_set_keymap("v", "p", 'p:let @+=@0<CR>gv"0P', { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>rr", require("bdub.win_utils").printCurrentWindow, add_desc("print windows"))
 local tiny_dkagnostics_enabled = true
 vim.keymap.set("n", "gd", function()
@@ -227,7 +228,6 @@ end, add_desc("new split"))
 
 -- system clipboard
 vim.keymap.set("x", "<leader>P", [["_dP]], add_desc("Paste over selection"))
-vim.keymap.set("v", "p", '"_dP', options)
 vim.keymap.set("x", "c", '"_c', options)
 vim.keymap.set({ "n", "v" }, "<C-M-c>", [["+y]], add_desc("Copy to system clipboard"))
 

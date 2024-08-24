@@ -43,19 +43,19 @@ return {
             fmt = function(mode)
               return "-- " .. mode .. " --"
             end,
-            color = function()
-              local bg = colors.bg1
-              local fg = colors.gray2
-              if vim.bo.modified then
-                bg = colors.red
-                fg = "#ffffff"
-              end
-
-              return {
-                fg = fg,
-                bg = bg,
-              }
-            end,
+            -- color = function()
+            --   local bg = colors.bg1
+            --   local fg = colors.gray2
+            --   if vim.bo.modified then
+            --     bg = colors.red
+            --     fg = "#ffffff"
+            --   end
+            --
+            --   return {
+            --     fg = fg,
+            --     bg = bg,
+            --   }
+            -- end,
           },
           {
             function()
@@ -117,7 +117,7 @@ return {
             end,
             color = { bg = colors.bg1 },
           },
-          "buffers",
+          -- "buffers",
         },
         lualine_c = {},
         lualine_z = {

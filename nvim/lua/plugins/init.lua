@@ -1,8 +1,8 @@
 return {
-  { "mileszs/ack.vim" },
-  { "windwp/nvim-ts-autotag" },
-  { "stevearc/dressing.nvim" }, -- UI niceties
-  { "sbulav/nredir.nvim" }, -- Redirects output
+  { "mileszs/ack.vim" }, -- Integrates 'ack' search tool
+  { "windwp/nvim-ts-autotag" }, -- Auto-closes HTML tags
+  { "stevearc/dressing.nvim" }, -- Improved UI components
+  { "sbulav/nredir.nvim" }, -- Redirects command output
   { "dstein64/vim-startuptime" }, -- startup time
   -- treesitter
   {
@@ -19,7 +19,7 @@ return {
     },
     config = function()
       require("auto-session").setup({
-        silent_restore = false,
+        silent_restore = true,
         cwd_change_handling = {
           restore_upcoming_session = true,
           post_cwd_changed_hook = function()
@@ -111,6 +111,25 @@ return {
   { "nvim-zh/better-escape.vim", event = "InsertEnter" }, -- better escape from insert mode
   { "JoosepAlviste/nvim-ts-context-commentstring" }, -- comments
   { "williamboman/mason.nvim", "camilledejoye/nvim-lsp-selection-range" },
+  {
+    "bloznelis/before.nvim",
+    config = function()
+      local before = require("before")
+      before.setup()
+
+      -- Jump to previous entry in the edit history
+      vim.keymap.set("n", "<leader>k", before.jump_to_last_edit, {})
+
+      -- Jump to next entry in the edit history
+      vim.keymap.set("n", "<leader>j", before.jump_to_next_edit, {})
+
+      -- -- Look for previous edits in quickfix list
+      -- vim.keymap.set("n", "<leader>oq", before.show_edits_in_quickfix, {})
+      --
+      -- -- Look for previous edits in telescope (needs telescope, obviously)
+      -- vim.keymap.set("n", "<leader>oe", before.show_edits_in_telescope, {})
+    end,
+  },
   {
     "nvim-lua/lsp-status.nvim", -- LSP
     config = function()

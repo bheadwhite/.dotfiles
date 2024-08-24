@@ -1,6 +1,12 @@
 local colors = require("config.colors")
 local wezterm = require("wezterm")
 
+local window_frame = {
+	border_left_width = "1cell",
+	border_left_color = colors.everforestGreen,
+	border_top_color = colors.bg1,
+}
+
 return {
 	font_size = 16,
 	command_palette_font_size = 19,
@@ -27,9 +33,5 @@ return {
 		["dark"] = colors.dark,
 		["dark_focus"] = colors.dark_focus,
 	},
-	window_frame = {
-		border_left_width = "1cell",
-		border_left_color = colors.everforestGreen,
-		border_top_color = colors.bg1,
-	},
+	window_frame = window_frame,
 }
