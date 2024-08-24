@@ -128,7 +128,16 @@ return {
       "nvim-telescope/telescope.nvim", -- optional
       "neovim/nvim-lspconfig", -- optional
     },
-    opts = {}, -- your configuration
+    config = function()
+      require("tailwind-tools").setup()
+
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        pattern = "*.css,*.scss,*.sass,*.less,*.styl,*.html,*.js,*.ts,*.jsx,*.tsx,*.vue",
+        callback = function()
+          vim.cmd("TailwindSortSync")
+        end,
+      })
+    end,
   },
   -- {
   -- 	"numToStr/Comment.nvim",

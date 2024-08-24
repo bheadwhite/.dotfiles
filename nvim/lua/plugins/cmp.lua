@@ -1,5 +1,9 @@
 return {
   "hrsh7th/nvim-cmp",
+  dependencies = {
+    "luckasRanarison/tailwind-tools.nvim",
+    "onsails/lspkind-nvim",
+  },
   config = function()
     local cmp = require("cmp")
     local cmp_select = { behavior = cmp.SelectBehavior.Select }
@@ -22,7 +26,6 @@ return {
 
     local cmp_mappings = {
       ["<CR>"] = cmp.mapping(function(fallback)
-        print("hit enter")
         if cmp.visible() then
           cmp.confirm({
             select = true,
@@ -30,18 +33,8 @@ return {
         else
           fallback()
         end
+        fallback()
       end),
-      ["<Right>"] = cmp.mapping(function(fallback)
-        print("hi there l")
-        if cmp.visible() then
-          cmp.confirm({
-            select = true,
-          })
-        else
-          fallback()
-        end
-      end),
-
       ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "s" }),
       ["<C-e>"] = cmp.mapping.close(),
       ["<C-f>"] = cmp.mapping.scroll_docs(4),
@@ -64,25 +57,36 @@ return {
         { name = "nvim_lsp" },
         { name = "nvim_lsp_signature_help" },
       },
+      formatting = {
+        format = require("lspkind").cmp_format({
+          before = require("tailwind-tools.cmp").lspkind_format,
+        }),
+      },
       sorting = {
         priority_weight = 2,
         comparators = {
-          cmp.config.compare.sort_text,
-          function(entry1, entry2)
-            local _, entry1_kind = entry1.completion_item.label:find("=$")
-            local _, entry2_kind = entry2.completion_item.label:find("=$")
-
-            if entry1_kind and not entry2_kind then
-              return true
-            elseif not entry1_kind and entry2_kind then
-              return false
-            end
-          end,
-          cmp.config.compare.offset,
-          cmp.config.compare.exact,
           cmp.config.compare.score,
-          cmp.config.compare.recently_used,
           cmp.config.compare.kind,
+          cmp.config.compare.sort_text,
+          cmp.config.compare.exact,
+          function(entry1, entry2)
+            local filetype = vim.bo.filetype
+            if filetype == "python" then
+              -- Existing kind comparison logic
+              local _, entry1_kind = entry1.completion_item.label:find("=$")
+              local _, entry2_kind = entry2.completion_item.label:find("=$")
+
+              if entry1_kind and not entry2_kind then
+                return true
+              elseif not entry1_kind and entry2_kind then
+                return false
+              end
+            end
+
+            return nil
+          end,
+          cmp.config.compare.recently_used,
+          cmp.config.compare.offset,
           cmp.config.compare.length,
           cmp.config.compare.order,
         },
