@@ -11,12 +11,7 @@ local PlenaryPath = require("plenary.path")
 ---@field sign_idx number: The index of the sign
 ---@field file string: absolute file path of the bookmark
 
-local show_global = true
 local M = {}
-
-function M.toggle_global()
-  show_global = not show_global
-end
 
 ---@return string: the root of the git repository
 local function getGitRoot()
@@ -36,7 +31,7 @@ local function getBookmarkFromLine(file, line_nr)
   return mark
 end
 
-local filter_by_current_file = true
+local filter_by_current_file = false
 
 ---@return Bookmark[]: all bookmarks
 function M.get_all_bookmarks()

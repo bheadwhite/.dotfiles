@@ -8,7 +8,7 @@ local window_frame = {
 }
 
 return {
-	font_size = 16,
+	font_size = 15,
 	command_palette_font_size = 19,
 	native_macos_fullscreen_mode = false,
 	send_composed_key_when_left_alt_is_pressed = false,
