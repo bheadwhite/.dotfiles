@@ -7,6 +7,14 @@ vim.keymap.set("v", hyper_key, function()
   vim.cmd("CopilotChat")
 end, { noremap = true, silent = true })
 
+vim.keymap.set("i", "<C-v>", function()
+  if require("copilot.suggestion").is_visible() then
+    require("copilot.suggestion").accept()
+  else
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, false, true), "n", true)
+  end
+end, { noremap = true, silent = true })
+
 return {
   "zbirenbaum/copilot.lua",
   init = function()
@@ -23,7 +31,7 @@ return {
         enabled = true,
         auto_trigger = true,
         keymap = {
-          accept = "<C-V>",
+          accept = "<C-M-;>",
         },
       },
     })

@@ -31,6 +31,12 @@ local function getBookmarkFromLine(file, line_nr)
   return mark
 end
 
+-- for _, fn in ipairs(vim.fn.getcompletion("bm#", "function")) do
+--   if string.find(fn, "bm#") then
+--     vim.print(fn)
+--   end
+-- end
+
 local filter_by_current_file = false
 
 ---@return Bookmark[]: all bookmarks
@@ -94,7 +100,7 @@ local function displayBookmark(mark)
     display = mark["content"]
   end
   -- Define the desired length for content
-  local stringPadding = 40
+  local stringPadding = 35
 
   -- Calculate the number of spaces needed to pad content
   local padding_length = stringPadding - #display
@@ -174,5 +180,7 @@ function M.telescope_bookmarks(opts)
     })
     :find()
 end
+
+-- vim.print(conf)
 
 return M

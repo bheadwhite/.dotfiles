@@ -46,6 +46,12 @@ return {
       },
     },
   },
+  {
+    "troydm/zoomwintab.vim",
+    config = function()
+      vim.g.zoomwintab = 1
+    end,
+  },
   { "nanotee/zoxide.vim" },
   {
     "CopilotC-Nvim/CopilotChat.nvim",
@@ -69,6 +75,7 @@ return {
   { "nvim-telescope/telescope-live-grep-args.nvim" },
   { "nvim-telescope/telescope-ui-select.nvim" },
   { "echasnovski/mini.nvim" }, -- mini. using for zooming in and out of windows
+  { "echasnovski/mini.splitjoin", version = false, config = true },
   {
     "bheadwhite/vim-bookmarks",
     init = function()
@@ -79,11 +86,11 @@ return {
         require("bdub.bookmarks").telescope_bookmarks({})
       end)
 
-      vim.keymap.set({ "n", "x" }, "<C-M-]>", function()
+      vim.keymap.set({ "n", "x" }, "<C-M-.>", function()
         vim.cmd("BookmarkNext")
       end)
 
-      vim.keymap.set({ "n", "x" }, "<C-M-[>", function()
+      vim.keymap.set({ "n", "x" }, "<C-M-,>", function()
         vim.cmd("BookmarkPrev")
       end)
     end,
@@ -118,10 +125,10 @@ return {
       before.setup()
 
       -- Jump to previous entry in the edit history
-      vim.keymap.set("n", "<leader>k", before.jump_to_last_edit, {})
+      vim.keymap.set("n", "<c-s-h>", before.jump_to_last_edit, {})
 
       -- Jump to next entry in the edit history
-      vim.keymap.set("n", "<leader>j", before.jump_to_next_edit, {})
+      vim.keymap.set("n", "<c-s-l>", before.jump_to_next_edit, {})
 
       -- -- Look for previous edits in quickfix list
       -- vim.keymap.set("n", "<leader>oq", before.show_edits_in_quickfix, {})

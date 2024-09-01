@@ -21,6 +21,16 @@ return {
       return string.sub(branch, 1, 40)
     end
 
+    local function is_zoomed()
+      local current_tab = vim.api.nvim_get_current_tabpage()
+      local success, zoomwintab = pcall(vim.api.nvim_tabpage_get_var, current_tab, "zoomwintab")
+      if success then
+        return zoomwintab
+      else
+        return false
+      end
+    end
+
     local anchor_icon = vim.fn.nr2char(0xf13d)
 
     lualine.setup({
@@ -35,6 +45,17 @@ return {
       tabline = {},
       sections = {
         lualine_a = {
+          {
+            function()
+              if is_zoomed() then
+                return "ZOOOM"
+              end
+
+              return ""
+            end,
+            color = { bg = colors.red },
+            padding = 20,
+          },
           get_branch,
         },
         lualine_b = {
@@ -94,7 +115,6 @@ return {
             always_visible = true,
             color = { bg = colors.bg1 },
           },
-
           {
             function()
               local files = vim.fn.sort(vim.fn["bm#all_files"]())
@@ -129,7 +149,28 @@ return {
             local index = math.ceil(line_ratio * #chars)
             return chars[index]
           end,
-          "tabs",
+          {
+            "tabs",
+            tabs_color = {
+              -- Same values as the general color option can be used here.
+              active = { bg = colors.blue, fg = "#ffffff" },
+            },
+            mode = 2,
+            cond = function()
+              -- if only one buffer is open, don't show tabs
+              return vim.fn.tabpagenr("$") > 1
+            end,
+          },
+          {
+            function()
+              if is_zoomed() then
+                return "ZOOOM"
+              end
+              return ""
+            end,
+            color = { bg = colors.red },
+            padding = 20,
+          },
         },
       },
       extensions = {},

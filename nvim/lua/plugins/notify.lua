@@ -1,11 +1,15 @@
 return {
   "rcarriga/nvim-notify",
-  opts = {
-    stages = "static",
-    render = "wrapped-compact",
-    timeout = 1000,
-  },
   config = function()
-    vim.notify = require("notify")
+    notify = require("notify")
+
+    notify.setup({
+      stages = "static",
+      render = "compact",
+      timeout = 2000,
+      top_down = false,
+    })
+
+    vim.notify = notify
   end,
 }
