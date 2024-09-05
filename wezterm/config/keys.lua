@@ -25,12 +25,12 @@ return {
 	{
 		key = ",",
 		mods = "CMD",
-		action = wezterm.action({ EmitEvent = "move-prev" }),
+		action = act.ActivatePaneDirection("Prev"),
 	},
 	{
 		key = ".",
 		mods = "CMD",
-		action = wezterm.action({ EmitEvent = "move-prev" }),
+		action = act.ActivatePaneDirection("Next"),
 	},
 	{
 		key = "j",

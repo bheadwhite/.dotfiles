@@ -7,6 +7,7 @@ local window_frame = {
 	border_top_color = colors.bg1,
 }
 
+-- debug_key_events = true,
 return {
 	font_size = 15,
 	command_palette_font_size = 19,

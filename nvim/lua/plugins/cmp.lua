@@ -55,7 +55,6 @@ return {
       mapping = cmp_mappings,
       sources = {
         { name = "nvim_lsp" },
-        { name = "nvim_lsp_signature_help" },
       },
       formatting = {
         format = require("lspkind").cmp_format({
