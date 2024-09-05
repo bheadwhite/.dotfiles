@@ -12,25 +12,35 @@ return {
     "nvim-treesitter/playground",
   },
   {
-    "rmagatti/auto-session",
+    "olimorris/persisted.nvim",
     lazy = false,
-    dependencies = {
-      "nvim-telescope/telescope.nvim", -- Only needed if you want to use sesssion lens
-    },
     config = function()
-      require("auto-session").setup({
-        silent_restore = true,
-        cwd_change_handling = {
-          restore_upcoming_session = true,
-          post_cwd_changed_hook = function()
-            require("lualine").refresh()
-          end,
-        },
+      require("persisted").setup({
+        autoload = true,
       })
-      vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
     end,
   },
+  -- {
+  --   "rmagatti/auto-session",
+  --   lazy = false,
+  --   dependencies = {
+  --     "nvim-telescope/telescope.nvim", -- Only needed if you want to use sesssion lens
+  --   },
+  --   config = function()
+  --     require("auto-session").setup({
+  --       silent_restore = true,
+  --       cwd_change_handling = {
+  --         restore_upcoming_session = true,
+  --         post_cwd_changed_hook = function()
+  --           require("lualine").refresh()
+  --         end,
+  --       },
+  --     })
+  --     -- vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+  --   end,
+  -- },
   --cmp
+
   {
     "hrsh7th/cmp-nvim-lsp-signature-help",
     "hrsh7th/cmp-nvim-lsp",

@@ -174,7 +174,7 @@ end
 
 set_custom_highlight()
 
-vim.api.nvim_set_keymap("v", "p", 'p:let @+=@0<CR>gv"0P', { noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "p", '"_dP', { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>rr", require("bdub.win_utils").printCurrentWindow, add_desc("print windows"))
 local tiny_dkagnostics_enabled = true
 vim.keymap.set("n", "gd", function()
