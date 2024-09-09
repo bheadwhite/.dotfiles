@@ -24,6 +24,13 @@ vim.cmd([[
     autocmd VimResized * tabdo wincmd =
   augroup end
 
+  " on pre buf save, remove trailing whitespace"
+  augroup _remove_trailing_whitespace
+    autocmd!
+    autocmd BufWritePre * :%s/\s\+$//e
+  augroup end
+
+
 
   augroup _help
     autocmd!

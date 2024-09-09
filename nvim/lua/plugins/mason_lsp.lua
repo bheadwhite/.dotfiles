@@ -27,7 +27,7 @@ return {
             settings = {
               python = {
                 analysis = {
-                  typeCheckingMode = "standard",
+                  typeCheckingMode = "standard", --basic, standard, strict
                   diagnosticSeverityOverrides = {
                     -- reportArgumentType = "information",
                     -- reportUnusedFunction = "warning",

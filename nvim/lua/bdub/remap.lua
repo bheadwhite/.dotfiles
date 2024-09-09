@@ -235,6 +235,7 @@ vim.keymap.set("c", "<M-k>", "\\(.*\\)", {
   desc = "one eyed fighting kirby",
 })
 
+vim.keymap.set("v", "/", "<Esc>/\\%V", add_desc("search visual selection"))
 vim.keymap.set({ "n", "v" }, "j", "gj", options)
 vim.keymap.set({ "n", "v" }, "k", "gk", options)
 vim.keymap.set({ "n", "v" }, "J", function() end, options)
