@@ -12,6 +12,13 @@ return {
     "nvim-treesitter/playground",
   },
   {
+    "andymass/vim-matchup",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      vim.g.matchup_matchparen_offscreen = { method = "popup" }
+    end,
+  },
+  {
     "olimorris/persisted.nvim",
     lazy = false,
     config = function()
@@ -75,6 +82,7 @@ return {
     "dmmulroy/tsc.nvim", -- Typescript
     opts = {
       use_diagnostics = true,
+      run_as_monorepo = true,
     },
   },
   { "s1n7ax/nvim-window-picker" }, -- window picker

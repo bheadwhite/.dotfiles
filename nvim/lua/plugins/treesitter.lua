@@ -18,6 +18,9 @@ return {
           },
         },
       },
+      matchup = {
+        enable = true,
+      },
       textsubjects = {
         enable = true,
         prev_selection = "<S-CR>", -- (Optional) keymap to select the previous selection

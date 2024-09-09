@@ -144,7 +144,7 @@ function M.on_attach(client, bufnr)
       function()
         local d = vim.diagnostic.get_next()
         if d then
-          vim.cmd("echo " .. "'" .. formatDiagnostic(d) .. "'")
+          notify.notify(formatDiagnostic(d), "info", { title = "diagnostic" })
         end
         vim.diagnostic.goto_next({ float = false })
       end,
@@ -155,7 +155,7 @@ function M.on_attach(client, bufnr)
       function()
         local d = vim.diagnostic.get_prev()
         if d then
-          vim.cmd("echo " .. "'" .. formatDiagnostic(d) .. "'")
+          notify.notify(formatDiagnostic(d), "info", { title = "diagnostic" })
         end
         vim.diagnostic.goto_prev({ float = false })
       end,

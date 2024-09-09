@@ -60,7 +60,7 @@ local function open_oil()
     return
   end
 
-  oil.open_float()
+  oil.open()
 end
 
 -- vim.keymap.set("n", "<leader>e", toggle_oil, {
