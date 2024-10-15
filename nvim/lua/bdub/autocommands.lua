@@ -30,8 +30,6 @@ vim.cmd([[
     autocmd BufWritePre * :%s/\s\+$//e
   augroup end
 
-
-
   augroup _help
     autocmd!
     autocmd FileType help wincmd L
@@ -42,6 +40,10 @@ vim.cmd([[
     autocmd!
     autocmd User LspProgressUpdate redrawstatus
   augroup END
+
+  "augroup strdr4605
+  "  autocmd FileType typescript,typescriptreact set makeprg=./node_modules/.bin/tsc\ \\\|\ sed\ 's/(\\(.*\\),\\(.*\\)):/:\\1:\\2:/'
+  "augroup END
 
   " augroup _typescript_mkprg
   "   autocmd!

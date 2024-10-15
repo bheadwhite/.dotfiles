@@ -184,7 +184,7 @@ vim.keymap.set("n", "gd", function()
     -- })
     tiny_diagnostics_enabled = false
   else
-    vim.notiky("Inline diagnostics enabled", "info", {
+    require("notify").notify("Inline diagnostics enabled", "info", {
       title = "Tiny Inline Diagnostic",
     })
     tiny_diagnostics_enabled = true
@@ -245,7 +245,7 @@ vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("move to top windo
 vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", add_desc("move to right window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", add_desc("move to bottom window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("move to left window"))
-vim.keymap.set({ "n", "v" }, "<C-t>", vim.cmd.tabe, add_desc("new tab"))
+vim.keymap.set({ "n", "v" }, "<C-M-t>", vim.cmd.tabe, add_desc("new tab"))
 vim.keymap.set("n", "<leader>c", ":Bdelete<cr>", { noremap = true, desc = "close buffer" })
 vim.keymap.set("n", "<leader>C", ":Bdelete!<cr>", { noremap = true, desc = "close buffer" })
 

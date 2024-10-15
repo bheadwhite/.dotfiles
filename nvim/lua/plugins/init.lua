@@ -27,6 +27,71 @@ return {
       })
     end,
   },
+  {
+    "mfussenegger/nvim-dap",
+    lazy = false,
+    config = function()
+      require("dap").adapters.chrome = {
+        type = "executable",
+        command = "node",
+      }
+
+      for _, language in ipairs({ "typescript", "javascript", "typescriptreact", "javascriptreact" }) do
+        require("dap").configurations[language] = {
+          -- launch
+          -- {
+          --   type = "pwa-chrome",
+          --   request = "launch",
+          --   name = "Launch Chrome",
+          --   url = "http://localhost:3000",
+          --   webRoot = "${workspaceFolder}",
+          -- },
+          {
+            type = "pwa-chrome",
+            request = "attach",
+            name = "Attach Chrome",
+            port = 9222,
+            webRoot = "${workspaceFolder}",
+            runtimeExecutable = "canary",
+          },
+        }
+      end
+
+      vim.keymap.set("n", "<leader>dd", "<cmd>lua require('dap').continue()<cr>", { noremap = true, silent = true })
+      vim.keymap.set("n", "<leader>db", "<cmd>lua require('dap').toggle_breakpoint()<cr>", { noremap = true, silent = true })
+      vim.keymap.set("n", "<leader>dc", "<cmd>lua require('dap').run_to_cursor()<cr>", { noremap = true, silent = true })
+      vim.keymap.set("n", "<leader>dr", "<cmd>lua require('dap').repl.toggle()<cr>", { noremap = true, silent = true })
+      vim.keymap.set("n", "<C-M-S-.>", "<cmd>lua require('dap').step_over()<cr>", { noremap = true, silent = true })
+      vim.keymap.set("n", "<C-M-S-i>", "<cmd>lua require('dap').step_into()<cr>", { noremap = true, silent = true })
+      vim.keymap.set("n", "<C-M-S-,>", "<cmd>lua require('dap').step_out()<cr>", { noremap = true, silent = true })
+      vim.keymap.set("n", "<C-M-S-h>", "<cmd>lua require('dap.ui.widgets').hover()<cr>", { noremap = true, silent = true })
+      vim.keymap.set(
+        "n",
+        "<leader>df",
+        "<cmd>lua require('dap.ui.widgets').centered_float(require('dap.ui.widgets').frames)<cr>",
+        { noremap = true, silent = true }
+      )
+      vim.keymap.set(
+        "n",
+        "<leader>ds",
+        "<cmd>lua require('dap.ui.widgets').centered_float(require('dap.ui.widgets').scopes)<cr>",
+        { noremap = true, silent = true }
+      )
+    end,
+  },
+
+  {
+    "mxsdev/nvim-dap-vscode-js",
+    lazy = false,
+    dependencies = { "mfussenegger/nvim-dap" },
+    config = function()
+      local home = os.getenv("HOME")
+      require("dap-vscode-js").setup({
+        adapters = { "pwa-chrome" },
+        debugger_path = home .. "/code/vscode-js-debug",
+      })
+    end,
+  },
   -- {
   --   "rmagatti/auto-session",
   --   lazy = false,
@@ -54,14 +119,14 @@ return {
     "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
   },
-  {
-    "rachartier/tiny-inline-diagnostic.nvim",
-    opts = {
-      options = {
-        show_source = true,
-      },
-    },
-  },
+  -- {
+  --   "rachartier/tiny-inline-diagnostic.nvim",
+  --   opts = {
+  --     options = {
+  --       show_source = true,
+  --     },
+  --   },
+  -- },
   {
     "troydm/zoomwintab.vim",
     config = function()
@@ -78,10 +143,53 @@ return {
     end,
   },
   {
+    "folke/trouble.nvim",
+    keys = {
+      {
+        "<leader>xx",
+        "<cmd>Trouble diagnostics toggle<cr>",
+        desc = "Diagnostics (Trouble)",
+      },
+      {
+        "<leader>xX",
+        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+        desc = "Buffer Diagnostics (Trouble)",
+      },
+      {
+        "<leader>cs",
+        "<cmd>Trouble symbols toggle focus=false<cr>",
+        desc = "Symbols (Trouble)",
+      },
+      {
+        "<leader>cl",
+        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+        desc = "LSP Definitions / references / ... (Trouble)",
+      },
+      {
+        "<leader>xL",
+        "<cmd>Trouble loclist toggle<cr>",
+        desc = "Location List (Trouble)",
+      },
+      {
+        "<leader>xQ",
+        "<cmd>Trouble qflist toggle<cr>",
+        desc = "Quickfix List (Trouble)",
+      },
+    },
+    opts = {},
+  },
+  {
     "dmmulroy/tsc.nvim", -- Typescript
     opts = {
       use_diagnostics = true,
       -- run_as_monorepo = true,
+
+      -- if TSC runs and your expecting results but there arent any..
+      -- it could be that your getting the "this is not the TSC your looking for" error when running TSC
+      -- find the path to the tsc bin by running require("tsc.utils").get_tsc_bin()
+      -- troubleshoot why thats not running as a standalone
+      -- references:
+      -- https://stackoverflow.com/questions/69080861/error-running-a-npx-tsc-command-regarding-typescript-this-is-not-the-tsc-comm
     },
   },
   { "s1n7ax/nvim-window-picker" }, -- window picker
@@ -189,7 +297,7 @@ return {
 
       -- only add this if we have a tailwind.config.js file in the root of the project
       if file_exists(cwd .. "/tailwind.config.js") then
-        print("yes")
+        -- print("yes")
         vim.api.nvim_create_autocmd("BufWritePre", {
           pattern = "*.css,*.scss,*.sass,*.less,*.styl,*.html,*.js,*.ts,*.jsx,*.tsx,*.vue",
           callback = function()
@@ -197,7 +305,7 @@ return {
           end,
         })
       else
-        print("no")
+        -- print("no")
       end
     end,
   },

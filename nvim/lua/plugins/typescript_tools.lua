@@ -1,18 +1,11 @@
--- filter diagnostics
--- see codes and names at https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
-local filtered_diagnostics_table = {
-  [2311] = "Did you mean to write this in an async function?",
-  [80006] = "This may be converted to an async function.",
-  [80001] = "File is a CommonJS module; it may be converted to an ES module.",
-  [7044] = "Parameter '{0}' implicitly has an '{1}' type, but a better type may be inferred from usage.",
-  [7043] = "Variable '{0}' implicitly has an '{1}' type, but a better type may be inferred from usage.",
+local diagnostic_filters = {
+  2311, -- Did you mean to write this in an async function?
+  80006, -- This may be converted to an async function.
+  80001, -- File is a CommonJS module; it may be converted to an ES module.
+  7044, -- Parameter '{0}' implicitly has an '{1}' type, but a better type may be inferred from usage.
+  7043, -- Variable '{0}' implicitly has an '{1}' type, but a better type may be inferred from usage.
 }
-
-local diagnostic_filters = {}
-
-for code, _message in pairs(filtered_diagnostics_table) do
-  table.insert(diagnostic_filters, code)
-end
+-- filter codes list - https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
 
 return {
   "pmizio/typescript-tools.nvim",
@@ -51,6 +44,10 @@ return {
         ["textDocument/publishDiagnostics"] = api.filter_diagnostics(diagnostic_filters),
       },
     })
+
+    vim.keymap.set("n", "<leader>W", function()
+      vim.cmd([[TSToolsOrganizeImports]])
+    end, { noremap = true, silent = true })
 
     vim.api.nvim_create_autocmd("BufWritePre", {
       group = vim.api.nvim_create_augroup("TS", { clear = true }),

@@ -1,25 +1,25 @@
 local colors = require("bdub.everforest_colors")
 
 local default_diagnostic_config = {
-	underline = true,
-	signs = true,
-	update_in_insert = false,
-	virtual_text = false,
-	severity_sort = true,
+  underline = true,
+  signs = true,
+  update_in_insert = false,
+  virtual_text = false,
+  severity_sort = true,
 }
 
 local diagnostics_toggle_config = {
-	on = {
-		underline = true,
-	},
-	off = {
-		underline = {
-			-- only show errors underlined when in off mode
-			severity = {
-				vim.diagnostic.severity.ERROR,
-			},
-		},
-	},
+  on = {
+    underline = true,
+  },
+  off = {
+    underline = {
+      -- only show errors underlined when in off mode
+      severity = {
+        vim.diagnostic.severity.ERROR,
+      },
+    },
+  },
 }
 
 local M = {}
@@ -44,20 +44,20 @@ local M = {}
 -- end
 
 function M.setDiagnosticColorOverrides()
-	vim.cmd([[
+  vim.cmd([[
     highlight DiagnosticHint guifg=#a9a1e1 gui=underline
     highlight DiagnosticInfo guifg=#c0c0c0 gui=underline
     highlight DiagnosticLineHint guifg=#a9a1e1 gui=underline
   ]])
-	vim.cmd("highlight DiagnosticUnnecessary guifg=" .. colors.fg .. " gui=undercurl,bold")
+  vim.cmd("highlight DiagnosticUnnecessary guifg=" .. colors.fg .. " gui=undercurl,bold")
 end
 
 function M.GetDiagnosticConfig(on_or_off)
-	if on_or_off == "on" then
-		return vim.tbl_deep_extend("force", default_diagnostic_config, diagnostics_toggle_config.on)
-	else
-		return vim.tbl_deep_extend("force", default_diagnostic_config, diagnostics_toggle_config.off)
-	end
+  if on_or_off == "on" then
+    return vim.tbl_deep_extend("force", default_diagnostic_config, diagnostics_toggle_config.on)
+  else
+    return vim.tbl_deep_extend("force", default_diagnostic_config, diagnostics_toggle_config.off)
+  end
 end
 
 vim.diagnostic.config(M.GetDiagnosticConfig("on"))

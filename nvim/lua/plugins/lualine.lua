@@ -33,6 +33,17 @@ return {
 
     local anchor_icon = vim.fn.nr2char(0xf13d)
 
+    local dap = require("dap")
+
+    local dap_status = function()
+      -- Check if a debugging session is active
+      if dap.session() ~= nil then
+        return " DAP Active" -- Icon + message when DAP is running
+      else
+        return "" -- Empty when DAP is not active
+      end
+    end
+
     lualine.setup({
       options = {
         icons_enabled = true,
@@ -114,6 +125,9 @@ return {
             update_in_insert = false,
             always_visible = true,
             color = { bg = colors.bg1 },
+          },
+          {
+            dap_status,
           },
           {
             function()

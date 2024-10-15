@@ -7,199 +7,275 @@ local action_state = require("telescope.actions.state")
 local M = {}
 
 local dropdown_theme = require("telescope.themes").get_dropdown({
-	previewer = false,
-	layout_config = {
-		width = 800,
-	},
+  previewer = false,
+  layout_config = {
+    width = 800,
+  },
 })
 
 local function get_vim_path()
-	local file_path = vim.fn.expand("%:.")
-	if file_path == "" then
-		vim.cmd("echoerr 'No file path'")
-	end
+  local file_path = vim.fn.expand("%:.")
+  if file_path == "" then
+    vim.cmd("echoerr 'No file path'")
+  end
 
-	return file_path
+  return file_path
 end
 
-M.set_vim_title = function()
-	local cwd = vim.fn.getcwd()
-	local dir_name = cwd:match("^.+/(.+)$")
+local function populate_quickfix_from_clipboard()
+  -- Get the clipboard content
+  local clipboard_content = vim.fn.getreg("+") -- '+' register is the system clipboard
 
-	vim.cmd("set titlestring=" .. dir_name)
+  -- Split the clipboard content into lines
+  local lines = vim.split(clipboard_content, "\n")
+
+  -- Create an empty quickfix list
+  local qflist = {}
+
+  -- Process each line and extract the file path and line number
+  for _, line in ipairs(lines) do
+    if line ~= "" then
+      -- Match the file path and line number, ignoring the last ':number' part
+      local filepath, lineno, colno = string.match(line, "(.-):(%d+):?(%d*)$")
+      if filepath and lineno then
+        -- Check if the file path contains "src/" and slice off any prefixed characters
+        local src_index = string.find(filepath, "src/")
+        if src_index then
+          filepath = string.sub(filepath, src_index)
+        end
+        table.insert(qflist, {
+          filename = filepath,
+          lnum = tonumber(lineno),
+          col = tonumber(colno) or 1, -- Use column 1 if not specified
+          text = "", -- Optionally, you could add an error message here
+        })
+      else
+        -- If no colon is found, use the whole line as the file path with default line and column
+        local src_index = string.find(line, "src/")
+        if src_index then
+          line = string.sub(line, src_index)
+        end
+        table.insert(qflist, {
+          filename = line,
+          lnum = 1,
+          col = 1,
+          text = "", -- Optionally, you could add an error message here
+        })
+      end
+    end
+  end
+
+  -- Set the quickfix list and open it
+  vim.fn.setqflist(qflist, "r")
+  vim.cmd("copen")
+end
+
+vim.api.nvim_create_user_command("QFListFromClipboard", populate_quickfix_from_clipboard, {})
+
+local function populate_deduplicated_quickfix(directory)
+  -- Use fd to find all files recursively in the given directory
+  local cmd = "fd --type f . " .. directory
+  local files = vim.fn.systemlist(cmd)
+
+  -- Populate the quickfix list
+  local quickfix_list = {}
+  for _, file in ipairs(files) do
+    if vim.fn.filereadable(file) == 1 then
+      table.insert(quickfix_list, { filename = file, lnum = 1, col = 1, text = "" })
+    end
+  end
+
+  -- Set the quickfix list and open it
+  vim.fn.setqflist(quickfix_list, "r")
+  vim.cmd("copen")
+end
+
+-- Example usage: populate_deduplicated_quickfix with a specific directory
+-- Replace '/path/to/directory' with your target directory
+vim.api.nvim_create_user_command("QFListFilesUnderDir", function(opts)
+  populate_deduplicated_quickfix(opts.args)
+end, {
+  nargs = 1,
+})
+
+M.set_vim_title = function()
+  local cwd = vim.fn.getcwd()
+  local dir_name = cwd:match("^.+/(.+)$")
+
+  vim.cmd("set titlestring=" .. dir_name)
 end
 
 local function find_directories()
-	return finders.new_oneshot_job({ "fd", "--type", "d" })
+  return finders.new_oneshot_job({ "fd", "--type", "d" })
 end
 
 local function get_dir_results_from_picker(picker)
-	local selected_entry = action_state.get_selected_entry()
-	local selected = { selected_entry[1] }
+  local selected_entry = action_state.get_selected_entry()
+  local selected = { selected_entry[1] }
 
-	for _, entry in ipairs(picker:get_multi_selection()) do
-		local text = entry.text
-		if not text then
-			if type(entry.value) == "table" then
-				text = entry.value.text
-			else
-				text = entry.value
-			end
-		end
+  for _, entry in ipairs(picker:get_multi_selection()) do
+    local text = entry.text
+    if not text then
+      if type(entry.value) == "table" then
+        text = entry.value.text
+      else
+        text = entry.value
+      end
+    end
 
-		table.insert(selected, text)
-	end
+    table.insert(selected, text)
+  end
 
-	return selected
+  return selected
 end
 
 local function find_files_attach_mapping(prompt_bufnr)
-	actions.select_default:replace(function()
-		local picker = action_state.get_current_picker(prompt_bufnr)
-		local dir_results = get_dir_results_from_picker(picker)
+  actions.select_default:replace(function()
+    local picker = action_state.get_current_picker(prompt_bufnr)
+    local dir_results = get_dir_results_from_picker(picker)
 
-		actions.close(prompt_bufnr)
+    actions.close(prompt_bufnr)
 
-		require("telescope.builtin").find_files({
-			prompt_title = "Find files in dirs",
-			search_dirs = dir_results,
-		})
-	end)
+    require("telescope.builtin").find_files({
+      prompt_title = "Find files in dirs",
+      search_dirs = dir_results,
+    })
+  end)
 
-	return true
+  return true
 end
 
 local function grep_files_attach_mapping(prompt_bufnr)
-	actions.select_default:replace(function()
-		local picker = action_state.get_current_picker(prompt_bufnr)
-		local dir_results = get_dir_results_from_picker(picker)
+  actions.select_default:replace(function()
+    local picker = action_state.get_current_picker(prompt_bufnr)
+    local dir_results = get_dir_results_from_picker(picker)
 
-		actions.close(prompt_bufnr)
+    actions.close(prompt_bufnr)
 
-		require("telescope.builtin").live_grep({
-			prompt_title = "live grep within dirs...",
-			search_dirs = dir_results,
-		})
-	end)
+    require("telescope.builtin").live_grep({
+      prompt_title = "live grep within dirs...",
+      search_dirs = dir_results,
+    })
+  end)
 
-	return true
+  return true
 end
 
 M.copy_operator_file_path = function(file_path)
-	if string.find(file_path, "commons/ui") then
-		file_path = file_path:gsub("^(commons/)ui/(.*).tsx?$", "@neo/%1%2")
-		vim.fn.setreg("+", file_path)
-		print("copied " .. file_path)
-	elseif string.find(file_path, "ui/operator/src") then
-		file_path = file_path:gsub("^ui(.*).tsx?$", "@neo%1")
-		vim.fn.setreg("+", file_path)
-		print("copied " .. file_path)
-	else
-		vim.fn.setreg("+", file_path)
-		print("copied " .. file_path)
-	end
+  if string.find(file_path, "commons/ui") then
+    file_path = file_path:gsub("^(commons/)ui/(.*).tsx?$", "@neo/%1%2")
+    vim.fn.setreg("+", file_path)
+    print("copied " .. file_path)
+  elseif string.find(file_path, "ui/operator/src") then
+    file_path = file_path:gsub("^ui(.*).tsx?$", "@neo%1")
+    vim.fn.setreg("+", file_path)
+    print("copied " .. file_path)
+  else
+    vim.fn.setreg("+", file_path)
+    print("copied " .. file_path)
+  end
 end
 
 M.copy_file_path = function()
-	local file_path = get_vim_path()
-	M.copy_operator_file_path(file_path)
+  local file_path = get_vim_path()
+  M.copy_operator_file_path(file_path)
 end
 
 M.find_files_within_directories = function()
-	local options = {
-		prompt_title = "Select Directories For File Search",
-		sorter = conf.generic_sorter(),
-		finder = find_directories(),
-		attach_mappings = find_files_attach_mapping,
-	}
+  local options = {
+    prompt_title = "Select Directories For File Search",
+    sorter = conf.generic_sorter(),
+    finder = find_directories(),
+    attach_mappings = find_files_attach_mapping,
+  }
 
-	pickers.new(dropdown_theme, options):find()
+  pickers.new(dropdown_theme, options):find()
 end
 
 M.grep_string_within_directories = function()
-	local options = {
-		prompt_title = "Select Dirs to Search",
-		sorter = conf.generic_sorter(),
-		finder = find_directories(),
-		attach_mappings = grep_files_attach_mapping,
-	}
+  local options = {
+    prompt_title = "Select Dirs to Search",
+    sorter = conf.generic_sorter(),
+    finder = find_directories(),
+    attach_mappings = grep_files_attach_mapping,
+  }
 
-	pickers.new(dropdown_theme, options):find()
+  pickers.new(dropdown_theme, options):find()
 end
 
 M.format_jq = function()
-	vim.cmd("%!jq .")
+  vim.cmd("%!jq .")
 end
 
 M.list_buffers = function()
-	local function run_picker()
-		pickers
-			.new({
-				initial_mode = "normal",
-			}, {
-				prompt_title = "Buffers",
-				finder = finders.new_table({
-					results = vim.fn.getbufinfo({
-						buflisted = 1,
-					}),
-					entry_maker = function(entry)
-						return {
-							value = entry.bufnr,
-							display = entry.name,
-							ordinal = entry.bufnr .. " : " .. entry.name,
-						}
-					end,
-				}),
-				sorter = conf.generic_sorter({}),
-				attach_mappings = function(prompt_bufnr, map)
-					local make_current_buffer = function()
-						local selection = action_state.get_selected_entry()
-						if selection then
-							actions.close(prompt_bufnr)
-							vim.cmd("buffer " .. selection.value)
-						end
-					end
-					local delete_buffer = function()
-						local selection = action_state.get_selected_entry()
-						if selection then
-							vim.api.nvim_buf_delete(selection.value, {
-								force = true,
-							})
-							run_picker()
-						end
-					end
+  local function run_picker()
+    pickers
+      .new({
+        initial_mode = "normal",
+      }, {
+        prompt_title = "Buffers",
+        finder = finders.new_table({
+          results = vim.fn.getbufinfo({
+            buflisted = 1,
+          }),
+          entry_maker = function(entry)
+            return {
+              value = entry.bufnr,
+              display = entry.name,
+              ordinal = entry.bufnr .. " : " .. entry.name,
+            }
+          end,
+        }),
+        sorter = conf.generic_sorter({}),
+        attach_mappings = function(prompt_bufnr, map)
+          local make_current_buffer = function()
+            local selection = action_state.get_selected_entry()
+            if selection then
+              actions.close(prompt_bufnr)
+              vim.cmd("buffer " .. selection.value)
+            end
+          end
+          local delete_buffer = function()
+            local selection = action_state.get_selected_entry()
+            if selection then
+              vim.api.nvim_buf_delete(selection.value, {
+                force = true,
+              })
+              run_picker()
+            end
+          end
 
-					map("i", "<CR>", make_current_buffer)
-					map("n", "<CR>", make_current_buffer)
-					map("n", "q", delete_buffer)
-					return true
-				end,
-			})
-			:find()
-	end
+          map("i", "<CR>", make_current_buffer)
+          map("n", "<CR>", make_current_buffer)
+          map("n", "q", delete_buffer)
+          return true
+        end,
+      })
+      :find()
+  end
 
-	run_picker()
+  run_picker()
 end
 
 vim.api.nvim_create_user_command("ApplyLastSubstitute", function()
-	-- Get the last substitute command from the command history
-	local last_cmd = vim.fn.histget(":", -2)
-	print("last sub: " .. last_cmd)
+  -- Get the last substitute command from the command history
+  local last_cmd = vim.fn.histget(":", -2)
+  print("last sub: " .. last_cmd)
 
-	-- Extract the substitute command if it exists
-	local substitute_cmd = last_cmd:match("^%%?s/.*$")
+  -- Extract the substitute command if it exists
+  local substitute_cmd = last_cmd:match("^%%?s/.*$")
 
-	if not substitute_cmd then
-		print("No substitute command found in history.")
-		return
-	end
+  if not substitute_cmd then
+    print("No substitute command found in history.")
+    return
+  end
 
-	local cdo_cmd = "silent! noau cdo " .. substitute_cmd .. " | update"
+  local cdo_cmd = "silent! noau cdo " .. substitute_cmd .. " | update"
 
-	-- Iterate over the quickfix list and apply the substitute command
-	vim.cmd(cdo_cmd)
+  -- Iterate over the quickfix list and apply the substitute command
+  vim.cmd(cdo_cmd)
 
-	print("Applied substitute command to all quickfix list items.")
+  print("Applied substitute command to all quickfix list items.")
 end, {})
 
 -- -- Function to run a shell command and return the output
@@ -251,164 +327,164 @@ end, {})
 
 -- Function to open a floating window
 local function open_floating_window()
-	local buf = vim.api.nvim_create_buf(false, true) -- Create a new, unlisted, scratch buffer.
-	local width = vim.o.columns
-	local height = vim.o.lines
+  local buf = vim.api.nvim_create_buf(false, true) -- Create a new, unlisted, scratch buffer.
+  local width = vim.o.columns
+  local height = vim.o.lines
 
-	local win = vim.api.nvim_open_win(buf, true, {
-		relative = "editor",
-		width = math.ceil(width * 0.8),
-		height = math.ceil(height * 0.8),
-		col = math.ceil(width * 0.1),
-		row = math.ceil(height * 0.1),
-		border = "rounded",
-	})
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    width = math.ceil(width * 0.8),
+    height = math.ceil(height * 0.8),
+    col = math.ceil(width * 0.1),
+    row = math.ceil(height * 0.1),
+    border = "rounded",
+  })
 
-	return buf, win
+  return buf, win
 end
 
 -- Function to gather parent references
 local function gather_parents(buf)
-	local params = vim.lsp.util.make_position_params()
-	vim.lsp.buf_request(0, "textDocument/references", params, function(err, result, _, _)
-		if err or not result or vim.tbl_isempty(result) then
-			return
-		end
+  local params = vim.lsp.util.make_position_params()
+  vim.lsp.buf_request(0, "textDocument/references", params, function(err, result, _, _)
+    if err or not result or vim.tbl_isempty(result) then
+      return
+    end
 
-		vim.api.nvim_buf_set_lines(buf, 0, 1, false, { "Parents:" })
-		for _, ref in ipairs(result) do
-			local row = ref.range.start.line
-			local line = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
-			vim.api.nvim_buf_set_lines(buf, -1, -1, false, { line })
-		end
-	end)
+    vim.api.nvim_buf_set_lines(buf, 0, 1, false, { "Parents:" })
+    for _, ref in ipairs(result) do
+      local row = ref.range.start.line
+      local line = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
+      vim.api.nvim_buf_set_lines(buf, -1, -1, false, { line })
+    end
+  end)
 end
 
 local function get_all_symbols()
-	local parsers = require("nvim-treesitter.parsers")
+  local parsers = require("nvim-treesitter.parsers")
 
-	local bufnr = vim.api.nvim_get_current_buf()
-	local parser = parsers.get_parser(bufnr)
-	if not parser then
-		print("Parser not found for current buffer")
-		return
-	end
+  local bufnr = vim.api.nvim_get_current_buf()
+  local parser = parsers.get_parser(bufnr)
+  if not parser then
+    print("Parser not found for current buffer")
+    return
+  end
 
-	local tree = parser:parse()[1]
-	local root = tree:root()
+  local tree = parser:parse()[1]
+  local root = tree:root()
 
-	-- Define a query to match all identifiers (symbols)
-	-- local query = vim.treesitter.parse_query(
-	-- 	"lua",
-	-- 	[[
-	--        (identifier) @symbol
-	--    ]]
-	-- )
-	--
-	-- local symbols = {}
-	-- for id, node, _ in query:iter_captures(root, bufnr, 0, -1) do
-	-- 	local symbol_name = vim.treesitter.query.get_node_text(node, bufnr)
-	-- 	table.insert(symbols, symbol_name)
-	-- end
-	--
-	-- return symbols
+  -- Define a query to match all identifiers (symbols)
+  -- local query = vim.treesitter.parse_query(
+  -- 	"lua",
+  -- 	[[
+  --        (identifier) @symbol
+  --    ]]
+  -- )
+  --
+  -- local symbols = {}
+  -- for id, node, _ in query:iter_captures(root, bufnr, 0, -1) do
+  -- 	local symbol_name = vim.treesitter.query.get_node_text(node, bufnr)
+  -- 	table.insert(symbols, symbol_name)
+  -- end
+  --
+  -- return symbols
 end
 
 -- Function to print the symbols
 local function print_symbols()
-	local symbols = get_all_symbols()
-	if symbols then
-		print("Symbols found in the buffer:")
-		for _, symbol in ipairs(symbols) do
-			print(symbol)
-		end
-	end
+  local symbols = get_all_symbols()
+  if symbols then
+    print("Symbols found in the buffer:")
+    for _, symbol in ipairs(symbols) do
+      print(symbol)
+    end
+  end
 end
 
 -- Function to gather child symbols
 local function gather_children(buf)
-	vim.api.nvim_buf_set_lines(buf, -1, -1, false, { "", "Children:" })
+  vim.api.nvim_buf_set_lines(buf, -1, -1, false, { "", "Children:" })
 
-	-- print("gather children")
-	local current_buf = vim.api.nvim_get_current_buf()
-	local params = vim.lsp.util.make_position_params()
+  -- print("gather children")
+  local current_buf = vim.api.nvim_get_current_buf()
+  local params = vim.lsp.util.make_position_params()
 
-	vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(err, result)
-		if err or not result or vim.tbl_isempty(result) then
-			return
-		end
+  vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(err, result)
+    if err or not result or vim.tbl_isempty(result) then
+      return
+    end
 
-		local function process_symbol(symbol)
-			if symbol.kind == 6 then -- 6 is the LSP kind for constructors
-				local row = symbol.range.start.line
-				local line = vim.api.nvim_buf_get_lines(current_buf, row, row + 1, false)[1]
-				vim.api.nvim_buf_set_lines(buf, -1, -1, false, { line })
-			end
-			if symbol.children then
-				for _, child in ipairs(symbol.children) do
-					process_symbol(child)
-				end
-			end
-		end
+    local function process_symbol(symbol)
+      if symbol.kind == 6 then -- 6 is the LSP kind for constructors
+        local row = symbol.range.start.line
+        local line = vim.api.nvim_buf_get_lines(current_buf, row, row + 1, false)[1]
+        vim.api.nvim_buf_set_lines(buf, -1, -1, false, { line })
+      end
+      if symbol.children then
+        for _, child in ipairs(symbol.children) do
+          process_symbol(child)
+        end
+      end
+    end
 
-		for _, item in ipairs(result) do
-			process_symbol(item)
-		end
-	end)
+    for _, item in ipairs(result) do
+      process_symbol(item)
+    end
+  end)
 end
 
 -- Main function to show references in a floating window
 local function show_references()
-	local buf, win = open_floating_window()
-	-- gather_parents(buf)
-	gather_children(buf)
-	-- Optionally set the focus to the floating window
-	vim.api.nvim_set_current_win(win)
+  local buf, win = open_floating_window()
+  -- gather_parents(buf)
+  gather_children(buf)
+  -- Optionally set the focus to the floating window
+  vim.api.nvim_set_current_win(win)
 end
 
 -- Function to print all keys and their value types of a Lua object
 function _G.printK(obj)
-	if obj == nil then
-		print("nil")
-		return
-	end
+  if obj == nil then
+    print("nil")
+    return
+  end
 
-	if type(obj) == "function" then
-		print("function")
-		return
-	end
+  if type(obj) == "function" then
+    print("function")
+    return
+  end
 
-	if type(obj) ~= "table" then
-		print(obj)
-		return
-	end
+  if type(obj) ~= "table" then
+    print(obj)
+    return
+  end
 
-	local keys = {}
-	for key, value in pairs(obj) do
-		table.insert(keys, {
-			key = key,
-			value_type = type(value),
-		})
-	end
+  local keys = {}
+  for key, value in pairs(obj) do
+    table.insert(keys, {
+      key = key,
+      value_type = type(value),
+    })
+  end
 
-	table.sort(keys, function(a, b)
-		if a.value_type == b.value_type then
-			return a.key < b.key
-		else
-			return a.value_type > b.value_type
-		end
-	end)
+  table.sort(keys, function(a, b)
+    if a.value_type == b.value_type then
+      return a.key < b.key
+    else
+      return a.value_type > b.value_type
+    end
+  end)
 
-	print("Keys and their value types of the object:")
-	for _, item in ipairs(keys) do
-		print(item.key .. " (" .. item.value_type .. ")")
-	end
+  print("Keys and their value types of the object:")
+  for _, item in ipairs(keys) do
+    print(item.key .. " (" .. item.value_type .. ")")
+  end
 end
 
 -- Map the function to a key combination, e.g., <leader>rf
 vim.keymap.set("n", "<leader>rf", print_symbols, {
-	noremap = true,
-	silent = true,
+  noremap = true,
+  silent = true,
 })
 
 -- function M.buf_update_diagnostics()
