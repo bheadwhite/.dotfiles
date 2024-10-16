@@ -64,12 +64,14 @@ function M.get_project_bookmarks()
 
   local projectBookmarks = {}
 
+  print("gitRoot:", gitRoot)
   for _, bookmark in ipairs(bookmarks) do
-    if string.find(bookmark.file, gitRoot) then
+    if string.sub(bookmark.file, 1, #gitRoot) == gitRoot then
       table.insert(projectBookmarks, bookmark)
     end
   end
 
+  vim.print("projectBookmarks:", projectBookmarks)
   return projectBookmarks
 end
 

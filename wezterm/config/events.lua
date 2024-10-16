@@ -95,17 +95,44 @@ function M.formatTabTitle(tab, tabs, panes, config, hover, max_width)
 	local is_nvim = contains(title, "NVIM")
 
 	if is_nvim then
+		-- (oil:///Users/brent.whitehead/Projects/tcn) - NVIM
 		local vimDisplay = title or ""
-		-- local projectPath = title:match("%(~/Projects(.-)%)")
-		local project = title:match("/Projects/([^/%)]+)") or title:match("/code/([^/%)]+)")
+		local working_directories = { "/Projects/tcn/", "/code/playgrounds/", "/Projects/", "/code/" }
+		local home_directory = "/Users/brent.whitehead"
 
-		if project then
-			vimDisplay = project or ""
+		local project = nil
+
+		-- Check if the title contains "oil" within parentheses
+		local oil_match = title:match("%(oil://.-%)")
+		if oil_match then
+			-- Extract the text within the parentheses
+			vimDisplay = oil_match:match("%((.-)%)"):gsub("oil://", "")
 		else
-			-- grab the inside text of the ()
-			vimDisplay = title:match("%((.-)%)") or title
+			for _, dir in ipairs(working_directories) do
+				project = title:match(dir .. "([^/%)]+)")
+				if project then
+					break
+				end
+			end
+
+			if project then
+				vimDisplay = project
+			else
+				-- grab the inside text of the ()
+				vimDisplay = title:match("%((.-)%)") or title
+			end
 		end
-		title = "☠  " .. vimDisplay
+
+		-- Replace home directory with "~"
+		if vimDisplay:sub(1, #home_directory) == home_directory then
+			vimDisplay = "~" .. vimDisplay:sub(#home_directory + 1)
+		end
+
+		if oil_match then
+			title = "  " .. vimDisplay
+		else
+			title = "☠  " .. vimDisplay
+		end
 	end
 
 	table.insert(result, {
