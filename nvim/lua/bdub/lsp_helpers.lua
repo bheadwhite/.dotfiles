@@ -78,18 +78,118 @@ function M.jump_to_parent_class()
   end)
 end
 
+function getUriFromDefinitionResult(result)
+  if result == nil then
+    return ""
+  end
+
+  if result.targetUri ~= nil then
+    return result.targetUri
+  end
+
+  return result.uri ~= nil and result.uri or ""
+end
+
+function getRangeFromDefinitionResult(result)
+  if result == nil then
+    return nil
+  end
+
+  if result.targetRange ~= nil then
+    return result.targetRange
+  end
+
+  return result.range ~= nil and result.range or nil
+end
+
 function M.on_attach(client, bufnr)
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   capabilities = vim.tbl_deep_extend("force", capabilities, client.capabilities, require("cmp_nvim_lsp").default_capabilities())
 
   client.capabilities = capabilities
 
+  function isDefinitionResultLessThan2WithConstructor(ifYesCb, ifNoCb)
+    local params = vim.lsp.util.make_position_params()
+    vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result, _ctx, _config)
+      if err or not result or vim.tbl_isempty(result) then
+        print("No definitions found")
+        return
+      end
+
+      jump_to_config = nil
+
+      if #result == 2 then
+        for _, config in ipairs(result) do
+          local uri = getUriFromDefinitionResult(config)
+          local path = uri:gsub("^file://", "")
+          local file = io.open(path, "r")
+          if file then
+            local content = file:read("*all")
+            file:close()
+            local range = getRangeFromDefinitionResult(config)
+
+            if range == nil then
+              return
+            end
+
+            local start_line = range.start.line + 1
+            local end_line = range["end"].line + 1
+            local lines = vim.split(content, "\n")
+            local range_content = table.concat(vim.list_slice(lines, start_line, end_line), "\n")
+
+            if range_content:match("constructor") then
+              jump_to_config = config
+            end
+          end
+        end
+      end
+
+      if result and #result == 1 then
+        jump_to_config = result[1]
+      end
+
+      if jump_to_config then
+        -- jump to the constructor in a new vsplit window
+        vim.print(jump_to_config)
+        local uri = getUriFromDefinitionResult(jump_to_config)
+
+        local target_uri = vim.uri_to_fname(uri)
+        local range = getRangeFromDefinitionResult(jump_to_config)
+        if range == nil then
+          return
+        end
+
+        local target_line = range.start.line + 1
+        local target_character = range.start.character
+
+        ifYesCb(target_uri, target_line, target_character)
+      else
+        ifNoCb()
+      end
+    end)
+  end
+
   local function goToDefinition()
-    telescope.lsp_definitions({ show_line = false })
+    local yesFn = function(target_uri, target_line, target_character)
+      vim.cmd("e " .. target_uri)
+      vim.api.nvim_win_set_cursor(0, { target_line, target_character })
+    end
+    local noFn = function()
+      require("telescope.builtin").lsp_definitions({ show_line = false })
+    end
+
+    isDefinitionResultLessThan2WithConstructor(yesFn, noFn)
   end
 
   local function goToSplitDefinition()
-    telescope.lsp_definitions({ show_line = false, jump_type = "vsplit" })
+    local yesFn = function(target_uri, target_line, target_character)
+      vim.cmd("vsplit " .. target_uri)
+      vim.api.nvim_win_set_cursor(0, { target_line, target_character })
+    end
+    local noFn = function(isOnlyOne)
+      require("telescope.builtin").lsp_definitions({ show_line = false, jump_type = "vsplit" })
+    end
+    isDefinitionResultLessThan2WithConstructor(yesFn, noFn)
   end
 
   local function goToTabDefinition()
@@ -127,7 +227,41 @@ function M.on_attach(client, bufnr)
       end
     end
 
+    message = message .. " " .. d.message
+
     return message
+  end
+
+  local current_line_diagnostics = nil
+
+  local function showLineDiagnostic(d)
+    if not d then
+      return
+    end
+
+    current_line_diagnostics = d.lnum
+
+    notify.dismiss()
+    notify.notify(formatDiagnostic(d), "info", {
+      title = "Diagnostic",
+      timeout = 5000,
+      on_close = function()
+        current_line_diagnostics = nil
+      end,
+      keep = function()
+        local line_nr = vim.api.nvim_win_get_cursor(0)[1] - 1 -- Get zero-indexed line number
+        if current_line_diagnostics ~= line_nr then
+          return false
+        end
+
+        local line_diagnostics = vim.diagnostic.get(0, { lnum = line_nr })
+        if #line_diagnostics > 0 then
+          showLineDiagnostic(line_diagnostics[1])
+        end
+
+        return false
+      end,
+    })
   end
 
   local normal_keymaps = {
@@ -140,11 +274,18 @@ function M.on_attach(client, bufnr)
     { "gT", openTypeInSplit, "open type in split" },
     { "g<tab>t", goToTabTypeDefinition, "go to type definition in new tab" },
     {
+      "gd",
+      function()
+        vim.diagnostic.open_float(0, { scope = "line" })
+      end,
+      "open diagnostic float",
+    },
+    {
       "<M-S-l>",
       function()
         local d = vim.diagnostic.get_next()
         if d then
-          notify.notify(formatDiagnostic(d), "info", { title = "diagnostic" })
+          showLineDiagnostic(d)
         end
         vim.diagnostic.goto_next({ float = false })
       end,
@@ -155,7 +296,7 @@ function M.on_attach(client, bufnr)
       function()
         local d = vim.diagnostic.get_prev()
         if d then
-          notify.notify(formatDiagnostic(d), "info", { title = "diagnostic" })
+          showLineDiagnostic(d)
         end
         vim.diagnostic.goto_prev({ float = false })
       end,
@@ -168,14 +309,14 @@ function M.on_attach(client, bufnr)
     {
       "gh",
       function()
-        vim.cmd([[Lspsaga hover_doc]])
+        vim.lsp.buf.hover()
       end,
       "hover",
     },
     {
       "K",
       function()
-        vim.cmd([[Lspsaga peek_type_definition]])
+        -- vim.cmd([[Lspsaga peek_type_definition]])
       end,
       "peek type definition",
     },

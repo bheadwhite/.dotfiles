@@ -55,6 +55,7 @@ return {
       mapping = cmp_mappings,
       sources = {
         { name = "nvim_lsp" },
+        { name = "neorg" },
       },
       formatting = {
         format = require("lspkind").cmp_format({

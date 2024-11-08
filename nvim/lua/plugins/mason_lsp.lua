@@ -6,6 +6,11 @@ return {
     require("mason").setup()
     require("mason-lspconfig").setup({
       handlers = {
+        ["pbls"] = function()
+          require("lspconfig").pbls.setup({
+            on_attach = helpers.on_attach,
+          })
+        end,
         ["lua_ls"] = function()
           local lspconfig = require("lspconfig")
           lspconfig.lua_ls.setup({

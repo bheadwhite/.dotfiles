@@ -67,4 +67,39 @@ vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSig
 vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
 vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
 
+-- -- show diagnostics on cursor hold if no floating window is open
+-- vim.api.nvim_create_autocmd({ "CursorHold" }, {
+--   pattern = "*",
+--   callback = function()
+--     local cursor_pos = vim.api.nvim_win_get_cursor(0)
+--     local cursor_row = cursor_pos[1] - 1 -- Convert to 0-based index
+--
+--     for _, winid in pairs(vim.api.nvim_tabpage_list_wins(0)) do
+--       local config = vim.api.nvim_win_get_config(winid)
+--       if config.zindex then
+--         local win_row = config.row
+--         local win_height = config.height
+--
+--         if cursor_row >= win_row and cursor_row < (win_row + win_height) then
+--           -- Cursor is within the window's range, do not open float
+--           return
+--         end
+--       end
+--     end
+--
+--     -- No overlapping window found, open the diagnostic float
+--     vim.diagnostic.open_float({
+--       scope = "cursor",
+--       focusable = false,
+--       close_events = {
+--         "CursorMoved",
+--         "CursorMovedI",
+--         "BufHidden",
+--         "InsertCharPre",
+--         "WinLeave",
+--       },
+--     })
+--   end,
+-- })
+
 return M

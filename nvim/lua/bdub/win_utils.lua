@@ -79,19 +79,21 @@ function WinUtils.get_win_buffers_with_duplicates()
   local windows = vim.api.nvim_list_wins()
 
   for _, win in ipairs(windows) do
-    local win_buf = vim.api.nvim_win_get_buf(win)
-    local buf_name = vim.api.nvim_buf_get_name(win_buf)
+    local buf = vim.api.nvim_win_get_buf(win)
+    local buf_name = vim.api.nvim_buf_get_name(buf)
+    local tab = vim.api.nvim_win_get_tabpage(win)
+    local winKey = buf_name .. ">" .. tab
 
-    if not duplicates_table[buf_name] then
-      duplicates_table[buf_name] = { win }
+    if not duplicates_table[winKey] then
+      duplicates_table[winKey] = { win }
     end
 
-    table.insert(duplicates_table[buf_name], win)
+    table.insert(duplicates_table[winKey], win)
   end
 
-  for buffer_name, win_list in pairs(duplicates_table) do
+  for key, win_list in pairs(duplicates_table) do
     local deduped = lua_utils.deduplicate_list(win_list)
-    duplicates_table[buffer_name] = deduped
+    duplicates_table[key] = deduped
   end
 
   return duplicates_table
@@ -111,12 +113,17 @@ end
 
 function WinUtils.close_all_duplicates()
   local duplicates_table = WinUtils.get_win_buffers_with_duplicates()
+  local currentTab = vim.api.nvim_get_current_tabpage()
   local didClose = false
   for _, win_list in pairs(duplicates_table) do
     if #win_list > 1 then
       for i = 2, #win_list do
-        didClose = true
-        vim.api.nvim_win_close(win_list[i], true)
+        local win = win_list[i]
+        local isCurrentTab = vim.api.nvim_win_get_tabpage(win) == currentTab
+        if isCurrentTab then
+          didClose = true
+          vim.api.nvim_win_close(win, true)
+        end
       end
     end
   end

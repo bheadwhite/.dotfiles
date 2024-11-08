@@ -1,5 +1,3 @@
-local diagnostics = require("bdub.diagnostics")
-
 local function add_desc(desc, table)
   local opts = {}
   opts.desc = desc
@@ -72,9 +70,15 @@ local function handleClose()
 
   -- If only one buffer is listed and loaded, use :bd, else use :q
   if listed_buffers == 1 then
-    vim.cmd("bd")
+    local success, err = pcall(vim.cmd, "bd")
+    if not success then
+      vim.print("Error closing buffer: " .. err, vim.log.levels.ERROR)
+    end
   else
-    vim.cmd("q")
+    local success, err = pcall(vim.cmd, "q")
+    if not success then
+      vim.print("Error closing window: " .. err, vim.log.levels.ERROR)
+    end
   end
 end
 
@@ -116,6 +120,10 @@ vim.api.nvim_create_autocmd("FocusGained", {
   end,
 })
 
+local handleEnterDropBar = function()
+  require("dropbar.api").pick()
+end
+
 local normal_keymaps = {
   { "gj", "mzJ`z", "join" },
   { "<c-d>", "<c-d>zz", "half page down" },
@@ -127,6 +135,7 @@ local normal_keymaps = {
   { "<C-M-g>", ToggleGit, "git" },
   { "<leader>>", "<cmd>lnext<CR>zz", "next location" },
   { "<leader><", "<cmd>lprev<CR>zz", "prev location" },
+  { "<leader>b", handleEnterDropBar, "enter dropbar" },
   {
     "<leader>Ofj",
     function()
@@ -176,24 +185,6 @@ set_custom_highlight()
 
 vim.api.nvim_set_keymap("v", "p", '"_dP', { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>rr", require("bdub.win_utils").printCurrentWindow, add_desc("print windows"))
-local tiny_dkagnostics_enabled = true
-vim.keymap.set("n", "gd", function()
-  if tiny_diagnostics_enabled then
-    -- vim.notify("Inline diagnostics disabled", "error", {
-    --   title = "Tiny Inline Diagnostic",
-    -- })
-    tiny_diagnostics_enabled = false
-  else
-    require("notify").notify("Inline diagnostics enabled", "info", {
-      title = "Tiny Inline Diagnostic",
-    })
-    tiny_diagnostics_enabled = true
-  end
-
-  vim.diagnostic.config(diagnostics.GetDiagnosticConfig(tiny_diagnostics_enabled and "on" or "off"))
-
-  require("tiny-inline-diagnostic").toggle()
-end, add_desc("toggle inline diagnostics"))
 
 function split_line_by()
   local split_by_value = vim.fn.input("Split line by: (default is:, ) ", ", ")

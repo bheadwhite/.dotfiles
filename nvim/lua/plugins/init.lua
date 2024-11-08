@@ -6,7 +6,7 @@ return {
   { "dstein64/vim-startuptime" }, -- startup time
   -- treesitter
   {
-    "nvim-treesitter/nvim-treesitter-context",
+    -- "nvim-treesitter/nvim-treesitter-context",
     "RRethy/nvim-treesitter-textsubjects",
     "nvim-treesitter/nvim-treesitter-textobjects",
     "nvim-treesitter/playground",
@@ -24,6 +24,32 @@ return {
     config = function()
       require("persisted").setup({
         autoload = true,
+      })
+    end,
+  },
+  {
+    "nvim-neorg/neorg",
+    lazy = false, -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
+    version = "*", -- Pin Neorg to the latest stable release
+    config = function()
+      require("neorg").setup({
+        load = {
+          ["core.defaults"] = {},
+          ["core.concealer"] = {},
+          ["core.completion"] = {
+            config = {
+              engine = "nvim-cmp",
+            },
+          },
+          ["core.dirman"] = {
+            config = {
+              workspaces = {
+                scheduler = "~/Projects/wfm-ui/.norg",
+              },
+              default_workspace = "scheduler",
+            },
+          },
+        },
       })
     end,
   },
@@ -177,6 +203,19 @@ return {
       },
     },
     opts = {},
+  },
+  {
+    "Bekaboo/dropbar.nvim",
+    dependencies = { "nvim-telescope/telescope-fzf-native.nvim" },
+    opts = {
+      icons = {
+        kinds = {
+          symbols = {
+            Folder = "",
+          },
+        },
+      },
+    },
   },
   {
     "dmmulroy/tsc.nvim", -- Typescript
