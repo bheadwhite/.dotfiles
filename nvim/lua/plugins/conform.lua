@@ -1,6 +1,10 @@
 -- local biomefmt = { "biome" }
 local js_formatter = "prettierd" -- "prettierd" or "biome"
 
+if vim.version().minor < 10 then
+  return {}
+end
+
 return {
   "stevearc/conform.nvim",
   opts = {

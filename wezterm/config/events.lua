@@ -18,8 +18,6 @@ local function tab_title(tab_info)
 	-- end
 
 	if title and #title > 0 then
-		-- print(title)
-		print("hit")
 		return title
 	end
 
@@ -97,7 +95,8 @@ function M.formatTabTitle(tab, tabs, panes, config, hover, max_width)
 	if is_nvim then
 		-- (oil:///Users/brent.whitehead/Projects/tcn) - NVIM
 		local vimDisplay = title or ""
-		local working_directories = { "/Projects/tcn/", "/code/playgrounds/", "/Projects/", "/code/" }
+		local working_directories = { "/code/playgrounds/", "/Projects/", "/code/" } -- if found will return child directory name
+		local special_directories = { ".dotfiles" } -- if found will return directory name
 		local home_directory = "/Users/brent.whitehead"
 
 		local project = nil
@@ -106,21 +105,30 @@ function M.formatTabTitle(tab, tabs, panes, config, hover, max_width)
 		local oil_match = title:match("%(oil://.-%)")
 		if oil_match then
 			-- Extract the text within the parentheses
-			vimDisplay = oil_match:match("%((.-)%)"):gsub("oil://", "")
-		else
-			for _, dir in ipairs(working_directories) do
-				project = title:match(dir .. "([^/%)]+)")
+			title = oil_match:match("%((.-)%)"):gsub("oil://", "")
+		end
+
+		for _, working_dir in ipairs(working_directories) do
+			project = title:match(working_dir .. "([^/%)]+)")
+			if project then
+				break
+			end
+		end
+
+		if not project then
+			for _, special_dir in ipairs(special_directories) do
+				project = title:match(special_dir)
 				if project then
 					break
 				end
 			end
+		end
 
-			if project then
-				vimDisplay = project
-			else
-				-- grab the inside text of the ()
-				vimDisplay = title:match("%((.-)%)") or title
-			end
+		if project then
+			vimDisplay = project
+		else
+			-- grab the inside text of the ()
+			vimDisplay = title:match("%((.-)%)") or title
 		end
 
 		-- Replace home directory with "~"

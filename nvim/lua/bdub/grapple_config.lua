@@ -3,7 +3,7 @@ local action_state = require("telescope.actions.state")
 local actions = require("telescope.actions")
 
 local scopes = { "git_branch", "cwd", "global" }
-local active_index = 1
+local active_index = 2
 local active_grapple_win_id = ""
 
 local M = {}

@@ -6,6 +6,20 @@ return {
     require("mason").setup()
     require("mason-lspconfig").setup({
       handlers = {
+        ["gopls"] = function()
+          require("lspconfig").gopls.setup({
+            on_attach = helpers.on_attach,
+            settings = {
+              gopls = {
+                gofumpt = true,
+                analyses = {
+                  unusedparams = true,
+                },
+                staticcheck = true,
+              },
+            },
+          })
+        end,
         ["pbls"] = function()
           require("lspconfig").pbls.setup({
             on_attach = helpers.on_attach,

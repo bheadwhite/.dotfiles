@@ -3,7 +3,7 @@ local M = {}
 local namespace_id = vim.api.nvim_create_namespace("api-linter")
 
 -- Parse the JSON output from api-linter
-local function parse_linter_output(output, bufnr)
+local function parse_linter_output(output)
   local diagnostics = {}
   local ok, results = pcall(vim.json.decode, output)
   if not ok or not results then
@@ -45,7 +45,7 @@ function M.run_linter(bufnr)
   handle:close()
 
   if result and result ~= "" then
-    local diagnostics = parse_linter_output(result, bufnr)
+    local diagnostics = parse_linter_output(result)
     vim.diagnostic.set(namespace_id, bufnr, diagnostics, {})
   end
 end

@@ -19,41 +19,6 @@ return {
   --   end,
   -- },
   {
-    "olimorris/persisted.nvim",
-    lazy = false,
-    config = function()
-      require("persisted").setup({
-        autoload = true,
-      })
-    end,
-  },
-  {
-    "nvim-neorg/neorg",
-    lazy = false, -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
-    version = "*", -- Pin Neorg to the latest stable release
-    config = function()
-      require("neorg").setup({
-        load = {
-          ["core.defaults"] = {},
-          ["core.concealer"] = {},
-          ["core.completion"] = {
-            config = {
-              engine = "nvim-cmp",
-            },
-          },
-          ["core.dirman"] = {
-            config = {
-              workspaces = {
-                scheduler = "~/Projects/wfm-ui/.norg",
-              },
-              default_workspace = "scheduler",
-            },
-          },
-        },
-      })
-    end,
-  },
-  {
     "mfussenegger/nvim-dap",
     lazy = false,
     config = function()
@@ -105,7 +70,6 @@ return {
       )
     end,
   },
-
   {
     "mxsdev/nvim-dap-vscode-js",
     lazy = false,
@@ -118,26 +82,6 @@ return {
       })
     end,
   },
-  -- {
-  --   "rmagatti/auto-session",
-  --   lazy = false,
-  --   dependencies = {
-  --     "nvim-telescope/telescope.nvim", -- Only needed if you want to use sesssion lens
-  --   },
-  --   config = function()
-  --     require("auto-session").setup({
-  --       silent_restore = true,
-  --       cwd_change_handling = {
-  --         restore_upcoming_session = true,
-  --         post_cwd_changed_hook = function()
-  --           require("lualine").refresh()
-  --         end,
-  --       },
-  --     })
-  --     -- vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
-  --   end,
-  -- },
-  --cmp
   {
     "hrsh7th/cmp-nvim-lsp-signature-help",
     "hrsh7th/cmp-nvim-lsp",
@@ -203,19 +147,6 @@ return {
       },
     },
     opts = {},
-  },
-  {
-    "Bekaboo/dropbar.nvim",
-    dependencies = { "nvim-telescope/telescope-fzf-native.nvim" },
-    opts = {
-      icons = {
-        kinds = {
-          symbols = {
-            Folder = "",
-          },
-        },
-      },
-    },
   },
   {
     "dmmulroy/tsc.nvim", -- Typescript
@@ -308,46 +239,6 @@ return {
     end,
   },
   { "AckslD/messages.nvim", config = true }, -- messages
-  -- tailwind-tools.lua
-  {
-    "luckasRanarison/tailwind-tools.nvim",
-    name = "tailwind-tools",
-    build = ":UpdateRemotePlugins",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-telescope/telescope.nvim", -- optional
-      "neovim/nvim-lspconfig", -- optional
-    },
-    config = function()
-      require("tailwind-tools").setup()
-
-      local function file_exists(name)
-        local f = io.open(name, "r")
-        if f ~= nil then
-          io.close(f)
-          return true
-        else
-          return false
-        end
-      end
-
-      -- Get the current working directory
-      local cwd = vim.loop.cwd()
-
-      -- only add this if we have a tailwind.config.js file in the root of the project
-      if file_exists(cwd .. "/tailwind.config.js") then
-        -- print("yes")
-        vim.api.nvim_create_autocmd("BufWritePre", {
-          pattern = "*.css,*.scss,*.sass,*.less,*.styl,*.html,*.js,*.ts,*.jsx,*.tsx,*.vue",
-          callback = function()
-            vim.cmd("TailwindSortSync")
-          end,
-        })
-      else
-        -- print("no")
-      end
-    end,
-  },
   -- {
   -- 	"numToStr/Comment.nvim",
   -- 	opts = {

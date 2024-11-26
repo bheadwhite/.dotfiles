@@ -1,3 +1,53 @@
+function getCwdDirectory()
+  local cwd = vim.fn.getcwd()
+
+  local dir_parts = vim.fn.split(cwd, "/")
+  return dir_parts[#dir_parts]
+end
+
+function getPPathDir(path)
+  if path:is_file() then
+    return path:parent()
+  else
+    return path
+  end
+end
+
+-- planery relative path
+function relativeDirToCwd(path)
+  local cwd = vim.fn.getcwd()
+  local is_in_cwd = string.sub(path, 1, #cwd) == cwd
+  if not is_in_cwd then
+    return path
+  end
+
+  local pPathDir = getPPathDir(require("plenary.path"):new(path))
+  local cwd_name = getCwdDirectory() or ""
+  local relative = pPathDir:make_relative(cwd)
+
+  if relative == "." then
+    return cwd_name
+  end
+
+  -- if relative starts with a slash, it's an absolute path
+  if string.sub(relative, 1, 1) == "/" then
+    return relative
+  end
+
+  return string.gsub(cwd_name .. "/" .. relative, "/", " → ")
+end
+
+function get_cwd_path_display()
+  bufname = vim.api.nvim_buf_get_name(0)
+  local isOil = string.match(bufname, "oil")
+
+  if isOil then
+    bufname = bufname:gsub("oil://", "")
+  end
+
+  return relativeDirToCwd(bufname)
+end
+
 return {
   "nvim-lualine/lualine.nvim", -- statusline
   dependencies = {
@@ -11,9 +61,9 @@ return {
       return vim.fn.winwidth(0) > 80
     end
 
-    -- local full_path_minus_filename = function()
-    --   return vim.fn.expand("%:.:h") .. "/"
-    -- end
+    local full_path_minus_filename = function()
+      return vim.fn.expand("%:.:h") .. "/"
+    end
 
     local function get_branch()
       require("lualine.components.branch.git_branch").init()
@@ -44,6 +94,19 @@ return {
       end
     end
 
+    local function get_section_widths()
+      local total_width = vim.o.columns
+      local left_width = math.floor(total_width * 0.30)
+      local right_width = math.floor(total_width * 0.30)
+      local center_width = total_width - left_width - right_width -- Remaining width
+
+      return {
+        left = left_width,
+        center = center_width,
+        right = right_width,
+      }
+    end
+
     lualine.setup({
       options = {
         icons_enabled = true,
@@ -63,7 +126,36 @@ return {
 
               return ""
             end,
-            color = { bg = colors.red },
+            color = { bg = colors.bg2 },
+            fmt = function(str, cntx)
+              local widths = get_section_widths()
+
+              return string.rep(" ", widths.left)
+            end,
+          },
+          {
+            get_cwd_path_display,
+            cond = function()
+              return vim.fn.expand("%") ~= ""
+            end,
+            fmt = function(str)
+              local padding = get_section_widths().center - #str
+              return string.rep(" ", math.max(padding / 2, 0)) .. str .. string.rep(" ", math.max(padding / 2, 0))
+            end,
+            color = function()
+              local display = get_cwd_path_display() or ""
+              if string.sub(display, 1, 1) == "/" then
+                return {
+                  bg = colors.bg_visual,
+                  fg = colors.fg,
+                }
+              end
+
+              return {
+                bg = colors.bg_blue,
+                fg = colors.fg,
+              }
+            end,
           },
         },
         lualine_b = {},
@@ -93,18 +185,6 @@ return {
             color = { bg = colors.bg1, fg = "#FFFFFF" },
           },
           {
-            function()
-              local grapple = require("grapple")
-              local app = grapple.app()
-              if app == nil then
-                return ""
-              end
-              local scope = app.scope_manager:get(app.settings.scope)
-              return anchor_icon .. " " .. scope.name
-            end,
-            color = { fg = "#ffffff", bg = colors.bg1 },
-          },
-          {
             "diff",
             colored = true,
             symbols = { added = " ", modified = " ", removed = " " }, -- changes diff symbols
@@ -120,6 +200,17 @@ return {
             update_in_insert = false,
             always_visible = true,
             color = { bg = colors.bg1 },
+          },
+          {
+            function()
+              local grapple = require("grapple")
+              local app = grapple.app()
+              if app == nil then
+                return ""
+              end
+              local scope = app.scope_manager:get(app.settings.scope)
+              return anchor_icon .. " " .. scope.name
+            end,
           },
           {
             dap_status,
@@ -150,7 +241,7 @@ return {
         lualine_z = {},
       },
       inactive_sections = {
-        lualine_a = { { "filename", color = { bg = colors.bg2, fg = colors.fg } } },
+        lualine_a = { { full_path_minus_filename, color = { bg = colors.bg2, fg = colors.fg } } },
         lualine_b = {},
         lualine_c = {},
         lualine_x = {},
@@ -168,7 +259,7 @@ return {
             end,
             color = { bg = colors.red },
           },
-          { "filename", color = { bg = colors.bg2, fg = colors.fg } },
+          { full_path_minus_filename, color = { bg = colors.bg2, fg = colors.fg } },
         },
         lualine_b = {
           -- {

@@ -22,7 +22,6 @@ M.wez_nvim_actions = {
 
 function M.is_nvim_process(window)
 	local current_process = mux.get_window(window:window_id()):active_pane():get_foreground_process_name()
-	print(current_process)
 	return current_process == nvim
 end
 

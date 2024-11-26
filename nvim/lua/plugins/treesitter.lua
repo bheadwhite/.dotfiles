@@ -1,5 +1,11 @@
+local tag = "*"
+if vim.version().minor < 10 then
+  tag = "v0.9.3"
+end
+
 return {
   "nvim-treesitter/nvim-treesitter",
+  tag = tag,
   config = function()
     require("nvim-treesitter.configs").setup({
       textobjects = {
@@ -53,7 +59,7 @@ return {
       },
       indent = {
         enable = true,
-        disable = { "python", "css" },
+        disable = { "python", "css", "go" },
       },
       incremental_selection = {
         enable = true,

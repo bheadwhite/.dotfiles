@@ -1,3 +1,7 @@
+if vim.version().minor < 10 then
+  return {}
+end
+
 local hyper_key = require("bdub.globals").hyper_space_key
 vim.keymap.set({ "i" }, hyper_key, function()
   require("copilot.suggestion").next()

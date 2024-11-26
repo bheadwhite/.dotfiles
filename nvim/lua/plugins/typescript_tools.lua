@@ -9,7 +9,7 @@ local diagnostic_filters = {
 
 return {
   "pmizio/typescript-tools.nvim",
-  branch = "bugfix/202",
+  -- branch = "bugfix/202",
   dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
   config = function()
     local api = require("typescript-tools.api")

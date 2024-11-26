@@ -20,7 +20,7 @@ end
 
 function vSplit()
   -- vertically split the window and jump back to the original window
-  vim.cmd([[vsplit | wincmd p]])
+  vim.cmd([[vsplit]])
 end
 
 local function goToConstructor()
@@ -38,6 +38,15 @@ local function goToConstructor()
   end
   vim.fn.setreg("/", after_search_pattern)
   vim.cmd("nohlsearch")
+end
+
+function get_prev_char()
+  local _, col = unpack(vim.api.nvim_win_get_cursor(0))
+  if col == 0 then
+    return ""
+  end
+  local line = vim.api.nvim_get_current_line()
+  return line:sub(col, col)
 end
 
 -- Function to check if the previous character is a whitespace
@@ -95,8 +104,10 @@ local highlight_under_cursor = function()
     require("hlslens").start()
 
     -- if previous character is alphanumeric, hit the "b" key to go back one word
-    local isPreviousCharWhitespace = is_previous_char_whitespace()
-    if not isPreviousCharWhitespace then
+    local prev_char = get_prev_char()
+    local isPreviousCharAlphanumeric = prev_char:match("%w") ~= nil
+
+    if isPreviousCharAlphanumeric then
       vim.cmd("normal! b")
     end
   end
@@ -120,10 +131,6 @@ vim.api.nvim_create_autocmd("FocusGained", {
   end,
 })
 
-local handleEnterDropBar = function()
-  require("dropbar.api").pick()
-end
-
 local normal_keymaps = {
   { "gj", "mzJ`z", "join" },
   { "<c-d>", "<c-d>zz", "half page down" },
@@ -135,7 +142,6 @@ local normal_keymaps = {
   { "<C-M-g>", ToggleGit, "git" },
   { "<leader>>", "<cmd>lnext<CR>zz", "next location" },
   { "<leader><", "<cmd>lprev<CR>zz", "prev location" },
-  { "<leader>b", handleEnterDropBar, "enter dropbar" },
   {
     "<leader>Ofj",
     function()
@@ -226,10 +232,22 @@ vim.keymap.set("c", "<M-k>", "\\(.*\\)", {
   desc = "one eyed fighting kirby",
 })
 
+vim.keymap.set("n", "<leader><leader>", function()
+  local currentFileType = vim.bo.filetype
+
+  if currentFileType == "norg" then
+    vim.cmd("Neorg return")
+  else
+    vim.cmd("Neorg index")
+  end
+end, add_desc("neorg"))
+
 vim.keymap.set("v", "/", "<Esc>/\\%V", add_desc("search visual selection"))
 vim.keymap.set({ "n", "v" }, "j", "gj", options)
-vim.keymap.set({ "n", "v" }, "k", "gk", options)
-vim.keymap.set({ "n", "v" }, "J", function() end, options)
+vim.keymap.set({ "v", "n" }, "J", "j", options)
+vim.keymap.set({ "v", "n" }, "K", "k", options)
+-- vim.keymap.set({ "n", "v" }, "k", "gk", options)
+-- vim.keymap.set({ "n", "v" }, "J", function() end, options)
 vim.keymap.set({ "n", "v" }, "L", "$", options)
 vim.keymap.set({ "n", "v" }, "H", "_", options)
 vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("move to top window"))
@@ -237,8 +255,8 @@ vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", add_desc("move to right win
 vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", add_desc("move to bottom window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("move to left window"))
 vim.keymap.set({ "n", "v" }, "<C-M-t>", vim.cmd.tabe, add_desc("new tab"))
-vim.keymap.set("n", "<leader>c", ":Bdelete<cr>", { noremap = true, desc = "close buffer" })
-vim.keymap.set("n", "<leader>C", ":Bdelete!<cr>", { noremap = true, desc = "close buffer" })
+-- vim.keymap.set("n", "<leader>c", ":Bdelete<cr>", { noremap = true, desc = "close buffer" })
+-- vim.keymap.set("n", "<leader>C", ":Bdelete!<cr>", { noremap = true, desc = "close buffer" })
 
 vim.keymap.set("n", "<esc>", "<cmd>noh<cr><esc>", add_desc("esc normal"))
 

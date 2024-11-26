@@ -103,10 +103,21 @@ function getRangeFromDefinitionResult(result)
 end
 
 function M.on_attach(client, bufnr)
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities = vim.tbl_deep_extend("force", capabilities, client.capabilities, require("cmp_nvim_lsp").default_capabilities())
+  local cmp_capabilities = {}
+  -- Safely attempt to load cmp_nvim_lsp capabilities
+  local status, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+  if status then
+    cmp_capabilities = cmp_nvim_lsp.default_capabilities()
+  end
 
-  client.capabilities = capabilities
+  -- Ensure client.capabilities exists and safely extend capabilities
+  local base_capabilities = vim.lsp.protocol.make_client_capabilities()
+  client.capabilities = vim.tbl_deep_extend(
+    "force",
+    base_capabilities, -- Base capabilities
+    client.capabilities or {}, -- Existing client capabilities
+    cmp_capabilities -- cmp_nvim_lsp capabilities
+  )
 
   function isDefinitionResultLessThan2WithConstructor(ifYesCb, ifNoCb)
     local params = vim.lsp.util.make_position_params()
@@ -192,6 +203,29 @@ function M.on_attach(client, bufnr)
     isDefinitionResultLessThan2WithConstructor(yesFn, noFn)
   end
 
+  local function goToImplementation()
+    function yesFn(target_uri, target_line, target_character)
+      vim.cmd("e " .. target_uri)
+      vim.api.nvim_win_set_cursor(0, { target_line, target_character })
+    end
+    function noFn()
+      require("telescope.builtin").lsp_implementations({ show_line = false })
+    end
+
+    isDefinitionResultLessThan2WithConstructor(yesFn, noFn)
+  end
+
+  local function goToSplitImplementation()
+    function yesFn(target_uri, target_line, target_character)
+      vim.cmd("vsplit " .. target_uri)
+      vim.api.nvim_win_set_cursor(0, { target_line, target_character })
+    end
+    function noFn()
+      require("telescope.builtin").lsp_implementations({ show_line = false, jump_type = "vsplit" })
+    end
+    isDefinitionResultLessThan2WithConstructor(yesFn, noFn)
+  end
+
   local function goToTabDefinition()
     telescope.lsp_definitions({ show_line = false, jump_type = "tab" })
   end
@@ -265,16 +299,44 @@ function M.on_attach(client, bufnr)
   end
 
   local normal_keymaps = {
-    { "gi", goToDefinition, "go to defintion" },
-    { "gI", goToSplitDefinition, "open definition in split" },
+    { "gd", goToDefinition, "go to defintion" },
+    { "gD", goToSplitDefinition, "open definition in split" },
     { "g<tab>i", goToTabDefinition, "go to definition in new tab" },
+    {
+      "gi",
+      function()
+        local params = vim.lsp.util.make_position_params()
+        vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result, ctx, config)
+          if err or not result or vim.tbl_isempty(result) then
+            goToDefinition()
+          else
+            vim.cmd([[Telescope lsp_implementations]])
+          end
+        end)
+      end,
+      "go to implemenation",
+    },
+    {
+      "gI",
+      function()
+        local params = vim.lsp.util.make_position_params()
+        vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result, ctx, config)
+          if err or not result or vim.tbl_isempty(result) then
+            goToSplitDefinition()
+          else
+            vim.cmd([[Telescope lsp_implementations]])
+          end
+        end)
+      end,
+      "open implemenation in split",
+    },
     { "gr", lspFinder, "lsp finder" },
     { "gR", goToSplitReferences, "go to references v_split" },
     { "gt", goToTypeDefinition, "go to type definition" },
     { "gT", openTypeInSplit, "open type in split" },
     { "g<tab>t", goToTabTypeDefinition, "go to type definition in new tab" },
     {
-      "gd",
+      "g<leader>",
       function()
         vim.diagnostic.open_float(0, { scope = "line" })
       end,
@@ -312,13 +374,6 @@ function M.on_attach(client, bufnr)
         vim.lsp.buf.hover()
       end,
       "hover",
-    },
-    {
-      "K",
-      function()
-        -- vim.cmd([[Lspsaga peek_type_definition]])
-      end,
-      "peek type definition",
     },
     { "gH", vim.lsp.buf.signature_help, "signature help" },
   }
