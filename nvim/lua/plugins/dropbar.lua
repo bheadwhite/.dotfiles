@@ -43,7 +43,7 @@ local handleEnterDropBar = function()
   end, 100)
 end
 
-vim.keymap.set("n", "<leader>b", handleEnterDropBar, { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>db", handleEnterDropBar, { noremap = true, silent = true })
 
 return {
   "Bekaboo/dropbar.nvim",

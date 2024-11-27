@@ -1,11 +1,5 @@
-local tag = "*"
-if vim.version().minor < 10 then
-  tag = "v0.9.3"
-end
-
-return {
+local opts = {
   "nvim-treesitter/nvim-treesitter",
-  tag = tag,
   config = function()
     require("nvim-treesitter.configs").setup({
       textobjects = {
@@ -72,3 +66,9 @@ return {
     })
   end,
 }
+
+if vim.version().minor < 10 then
+  opts.tag = "v0.9.3"
+end
+
+return opts

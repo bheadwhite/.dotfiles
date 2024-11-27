@@ -42,6 +42,17 @@ return {
 		mods = "CMD|SHIFT",
 		action = act.ActivatePaneDirection("Up"),
 	},
+	{
+		key = "UpArrow",
+		mods = "SHIFT",
+		action = act.ScrollByPage(-1),
+	},
+	{
+		key = "DownArrow",
+		mods = "SHIFT",
+		action = act.ScrollByPage(1),
+	},
+
 	{ key = ",", mods = "ALT", action = act.MoveTabRelative(-1) },
 	{ key = ".", mods = "ALT", action = act.MoveTabRelative(1) },
 	{ key = "-", mods = "CMD", action = act.DecreaseFontSize },
