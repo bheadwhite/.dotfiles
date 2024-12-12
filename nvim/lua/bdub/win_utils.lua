@@ -1,7 +1,15 @@
 local lua_utils = require("bdub.lua_utils")
 local WinUtils = {}
 
-local function printWin(win)
+-- local duplicateWindows = {}
+--
+-- vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+--   callback = function()
+--     duplicateWindows = WinUtils.get_duplicate_win_buffers()
+--   end,
+-- })
+
+function WinUtils.printWin(win)
   local buf = vim.api.nvim_win_get_buf(win)
   local buf_name = vim.api.nvim_buf_get_name(buf)
   local cursor = vim.api.nvim_win_get_cursor(win)
@@ -41,6 +49,7 @@ function WinUtils.get_duplicate_win_buffers()
   return buffer_names
 end
 
+-- key = tab_number .. buf_name
 function WinUtils.getDuplicateTableKeyFromWin(win)
   local name = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
   local tab = vim.api.nvim_win_get_tabpage(win)
@@ -48,6 +57,10 @@ function WinUtils.getDuplicateTableKeyFromWin(win)
 
   return tab_number .. name
 end
+
+-- function WinUtils.isWindowDuplicate(winToCheck)
+--   -- return WinUtils.is_duplicate_win(winToCheck, duplicateWindows)
+-- end
 
 function WinUtils.set_window_backgrounds()
   -- Get the current window ID
@@ -58,9 +71,15 @@ function WinUtils.set_window_backgrounds()
 
   -- get duplicate win buffers
   local duplicates = WinUtils.get_duplicate_win_buffers()
-
   -- Iterate through each window
   for _, win in ipairs(windows) do
+    local config = vim.api.nvim_win_get_config(win)
+    local focusable = config.focusable
+
+    if not focusable then
+      goto continue
+    end
+
     if win == current_win then
       -- Set highlight for the focused window
       vim.api.nvim_win_set_option(win, "winhighlight", "Normal:MyNormalColor")
@@ -71,6 +90,8 @@ function WinUtils.set_window_backgrounds()
       -- Set highlight for the unfocused windows
       vim.api.nvim_win_set_option(win, "winhighlight", "Normal:MyInactiveBufferColor")
     end
+
+    ::continue::
   end
 end
 
@@ -84,11 +105,14 @@ function WinUtils.get_win_buffers_with_duplicates()
     local tab = vim.api.nvim_win_get_tabpage(win)
     local winKey = buf_name .. ">" .. tab
 
-    if not duplicates_table[winKey] then
-      duplicates_table[winKey] = { win }
-    end
+    if buf_name == "" then
+    else
+      if not duplicates_table[winKey] then
+        duplicates_table[winKey] = { win }
+      end
 
-    table.insert(duplicates_table[winKey], win)
+      table.insert(duplicates_table[winKey], win)
+    end
   end
 
   for key, win_list in pairs(duplicates_table) do
@@ -102,17 +126,18 @@ end
 function WinUtils.printWindows()
   local windows = vim.api.nvim_list_wins()
   for _, win in ipairs(windows) do
-    printWin(win)
+    WinUtils.printWin(win)
   end
 end
 
 function WinUtils.printCurrentWindow()
   local win = vim.api.nvim_get_current_win()
-  printWin(win)
+  WinUtils.printWin(win)
 end
 
 function WinUtils.close_all_duplicates()
   local duplicates_table = WinUtils.get_win_buffers_with_duplicates()
+  vim.print(duplicates_table)
   local currentTab = vim.api.nvim_get_current_tabpage()
   local didClose = false
   for _, win_list in pairs(duplicates_table) do
@@ -121,6 +146,7 @@ function WinUtils.close_all_duplicates()
         local win = win_list[i]
         local isCurrentTab = vim.api.nvim_win_get_tabpage(win) == currentTab
         if isCurrentTab then
+          vim.print(win)
           didClose = true
           vim.api.nvim_win_close(win, true)
         end

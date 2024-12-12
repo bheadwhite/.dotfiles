@@ -2,6 +2,7 @@ require("bdub.options")
 require("bdub.diagnostics")
 require("bdub.remap")
 require("bdub.inactive_backgrounds")
+require("bdub.color_config")
 require("bdub.autocommands")
 require("bdub.buf-only")
 

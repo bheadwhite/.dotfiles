@@ -23,7 +23,6 @@ return {
               omnichannel = "~/Projects/omnichannel/.norg",
               attachments = "~/Projects/attachments/.norg",
             },
-            default_workspace = "attachments",
           },
         },
       },

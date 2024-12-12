@@ -43,10 +43,6 @@ M.config = function()
     commands.copy_operator_file_path(relative_path)
   end
 
-  local function openAndSwap(selection)
-    actions.file_vsplit(selection)
-  end
-
   local default_opts = {
     initial_mode = "normal",
     path_display = operator_path_display,
@@ -99,7 +95,7 @@ M.config = function()
         i = {
           ["<C-M-r>"] = copy_path_from_selection,
           ["<c-f>"] = actions.to_fuzzy_refine,
-          ["<C-v>"] = openAndSwap,
+          ["<C-v>"] = actions.file_vsplit,
           ["<C-u>"] = false,
           ["<C-M-S-l>"] = function()
             print("target rpc references")
@@ -113,7 +109,7 @@ M.config = function()
         },
         n = {
           ["<C-M-r>"] = copy_path_from_selection,
-          ["<C-v>"] = openAndSwap,
+          ["<C-v>"] = actions.file_vsplit,
           ["<M-S-q>"] = actions.add_to_qflist,
         },
       },

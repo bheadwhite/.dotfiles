@@ -93,13 +93,14 @@ end
 
 local highlight_under_cursor = function()
   local current_word = vim.fn.expand("<cword>")
-  local found = vim.fn.search(current_word, "nw")
+  -- Use \C to enforce case-sensitive search
+  local found = vim.fn.search("\\C" .. current_word, "nw")
 
   if found == 0 then
     error("word not found")
   else
     -- highlight the word and set as search register
-    vim.fn.setreg("/", current_word)
+    vim.fn.setreg("/", "\\C" .. current_word) -- Add \C here for case sensitivity
     vim.cmd("set hlsearch")
     require("hlslens").start()
 
@@ -112,7 +113,6 @@ local highlight_under_cursor = function()
     end
   end
 end
-
 local active_tab = 1
 
 vim.api.nvim_create_autocmd("TabEnter", {

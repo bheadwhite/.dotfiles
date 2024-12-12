@@ -1,6 +1,7 @@
 local wezterm = require("wezterm")
 local keys = require("config.keys")
 local opts = require("config.options")
+local tab_title = require("config.tab_title")
 local events = require("config.events")
 
 local config = {}
@@ -24,7 +25,7 @@ wezterm.on("zoom-toggle", events.zoomToggle)
 wezterm.on("split-down", events.splitDown)
 
 --wezterm events
-wezterm.on("format-tab-title", events.formatTabTitle)
+wezterm.on("format-tab-title", tab_title.formatTabTitle)
 wezterm.on("window-config-reloaded", events.apply_color_scheme)
 wezterm.on("window-focus-changed", events.apply_color_scheme)
 

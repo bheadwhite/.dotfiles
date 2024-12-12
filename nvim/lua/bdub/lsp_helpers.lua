@@ -9,7 +9,27 @@ local function add_desc(description, bufnr)
   return opts
 end
 
-local M = {}
+local M = {
+  glanceState = {
+    findTests = false,
+  },
+}
+
+function M.showFilterNotify()
+  local message = ""
+  if M.glanceState.findTests then
+    message = "Showing ALL ([leader+t] to filter)"
+  else
+    message = "Filtering Tests, Mocks, logs and Stories ([leader+t] to clear)"
+  end
+
+  notify.notify(message, (M.glanceState.findTests and "info" or "warn"), { title = "Filtering results" })
+end
+
+M.changeGlanceState = function()
+  M.glanceState.findTests = not M.glanceState.findTests
+  M.showFilterNotify()
+end
 
 function M.cursorToParent()
   --find constructor if none found then notify such and return
@@ -173,8 +193,10 @@ function M.on_attach(client, bufnr)
         local target_line = range.start.line + 1
         local target_character = range.start.character
 
+        vim.print("yes cb")
         ifYesCb(target_uri, target_line, target_character)
       else
+        vim.print("no cb")
         ifNoCb()
       end
     end)
@@ -200,29 +222,7 @@ function M.on_attach(client, bufnr)
     local noFn = function(isOnlyOne)
       require("telescope.builtin").lsp_definitions({ show_line = false, jump_type = "vsplit" })
     end
-    isDefinitionResultLessThan2WithConstructor(yesFn, noFn)
-  end
-
-  local function goToImplementation()
-    function yesFn(target_uri, target_line, target_character)
-      vim.cmd("e " .. target_uri)
-      vim.api.nvim_win_set_cursor(0, { target_line, target_character })
-    end
-    function noFn()
-      require("telescope.builtin").lsp_implementations({ show_line = false })
-    end
-
-    isDefinitionResultLessThan2WithConstructor(yesFn, noFn)
-  end
-
-  local function goToSplitImplementation()
-    function yesFn(target_uri, target_line, target_character)
-      vim.cmd("vsplit " .. target_uri)
-      vim.api.nvim_win_set_cursor(0, { target_line, target_character })
-    end
-    function noFn()
-      require("telescope.builtin").lsp_implementations({ show_line = false, jump_type = "vsplit" })
-    end
+    vim.print("split")
     isDefinitionResultLessThan2WithConstructor(yesFn, noFn)
   end
 
@@ -307,10 +307,29 @@ function M.on_attach(client, bufnr)
       function()
         local params = vim.lsp.util.make_position_params()
         vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result, ctx, config)
-          if err or not result or vim.tbl_isempty(result) then
+          filtered_result = {}
+
+          if not M.glanceState.findTests and result ~= nil then
+            for _, res in ipairs(result) do
+              local uri = res.uri or res.targetUri
+              if not (string.find(uri, "%.test%.") or string.find(uri, "stories") or string.find(uri, "mock") or string.find(uri, "logging")) then
+                table.insert(filtered_result, res)
+              end
+            end
+          end
+
+          if #filtered_result == 1 then
+            local target_uri = filtered_result[1].uri or filtered_result[1].targetUri
+            local range = filtered_result[1].range or filtered_result[1].targetRange
+            local col = range.start.character
+            --open in split
+            M.showFilterNotify()
+            vim.cmd("e " .. vim.uri_to_fname(target_uri))
+            vim.api.nvim_win_set_cursor(0, { range.start.line + 1, col })
+          elseif err or not result or vim.tbl_isempty(result) then
             goToDefinition()
           else
-            vim.cmd([[Telescope lsp_implementations]])
+            telescope.lsp_implementations({ show_line = false })
           end
         end)
       end,
@@ -321,10 +340,30 @@ function M.on_attach(client, bufnr)
       function()
         local params = vim.lsp.util.make_position_params()
         vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result, ctx, config)
-          if err or not result or vim.tbl_isempty(result) then
+          filtered_result = {}
+
+          if not M.glanceState.findTests and result ~= nil then
+            for _, res in ipairs(result) do
+              local uri = res.uri or res.targetUri
+              if not (string.find(uri, "%.test%.") or string.find(uri, "stories") or string.find(uri, "mock") or string.find(uri, "logging")) then
+                table.insert(filtered_result, res)
+              end
+            end
+          end
+
+          if #filtered_result == 1 then
+            local target_uri = filtered_result[1].uri or filtered_result[1].targetUri
+            vim.print(filtered_result[1])
+            local range = filtered_result[1].range or filtered_result[1].targetRange
+            local col = range.start.character
+            --open in split
+            M.showFilterNotify()
+            vim.cmd("vsplit " .. vim.uri_to_fname(target_uri))
+            vim.api.nvim_win_set_cursor(0, { range.start.line + 1, col })
+          elseif err or not result or vim.tbl_isempty(result) then
             goToSplitDefinition()
           else
-            vim.cmd([[Telescope lsp_implementations]])
+            telescope.lsp_implementations({ show_line = false, jump_type = "vsplit" })
           end
         end)
       end,
@@ -368,6 +407,7 @@ function M.on_attach(client, bufnr)
     { "<leader>vs", vim.lsp.buf.workspace_symbol, "workspace symbols" },
     { "<leader>.", vim.lsp.buf.code_action, "code action" },
     { "<C-A-n>", vim.lsp.buf.rename, "rename symbol" },
+    { "<leader>t", M.changeGlanceState, "toggle glance filter" },
     {
       "gh",
       function()

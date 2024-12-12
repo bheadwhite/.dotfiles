@@ -1,3 +1,4 @@
+local colors = require("bdub.catppuccin_colors")
 return {
   { "mileszs/ack.vim" }, -- Integrates 'ack' search tool
   { "windwp/nvim-ts-autotag" }, -- Auto-closes HTML tags
@@ -19,6 +20,27 @@ return {
   --   end,
   -- },
   {
+    "nvim-zh/colorful-winsep.nvim",
+    config = function()
+      require("colorful-winsep").setup({
+        smooth = false,
+        exponential_smoothing = false,
+        only_line_seq = false,
+      })
+
+      vim.cmd([[highlight NvimSeparator guifg=]] .. colors.mocha.overlay0)
+    end,
+    event = { "WinLeave" },
+  },
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = { "markdown" },
+    build = function()
+      vim.fn["mkdp#util#install"]()
+    end,
+  },
+  {
     "mxsdev/nvim-dap-vscode-js",
     lazy = false,
     dependencies = { "mfussenegger/nvim-dap" },
@@ -37,6 +59,11 @@ return {
     "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
   },
+  { "yochem/jq-playground.nvim", opts = {
+    query_window = {
+      height = 0.2,
+    },
+  } },
   -- {
   --   "rachartier/tiny-inline-diagnostic.nvim",
   --   opts = {
@@ -46,6 +73,13 @@ return {
   --   },
   -- },
   {
+    "max397574/colortils.nvim",
+    cmd = "Colortils",
+    config = function()
+      require("colortils").setup()
+    end,
+  },
+  {
     "troydm/zoomwintab.vim",
     config = function()
       vim.g.zoomwintab = 1
@@ -54,7 +88,8 @@ return {
   { "nanotee/zoxide.vim" },
   {
     "CopilotC-Nvim/CopilotChat.nvim",
-    branch = "canary",
+    branch = "main",
+    build = "make tiktoken", -- Only on MacOS or Linux
     dependencies = { "zbirenbaum/copilot.vim", "nvim-lua/plenary.nvim" },
     config = function()
       require("CopilotChat").setup()
@@ -114,6 +149,9 @@ return {
   {
     "nvim-telescope/telescope-fzf-native.nvim", -- Telescope
     build = "make",
+  },
+  {
+    "nvim-telescope/telescope-dap.nvim",
   },
   { "nvim-telescope/telescope-live-grep-args.nvim" },
   { "nvim-telescope/telescope-ui-select.nvim" },

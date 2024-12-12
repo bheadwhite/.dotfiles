@@ -72,11 +72,12 @@ function! BufOnly(buffer, bang)
 endfunction]])
 
 function CloseAllExceptCurrent()
-	local didCloseDuplicates = win_utils.close_all_duplicates()
+  local didCloseDuplicates = win_utils.close_all_duplicates()
+  vim.print("didCloseDuplicates", didCloseDuplicates)
 
-	if not didCloseDuplicates then
-		vim.cmd([[BufOnly]])
-	end
+  if not didCloseDuplicates then
+    vim.cmd([[BufOnly]])
+  end
 end
 
 vim.keymap.set("n", "<leader>o", CloseAllExceptCurrent, { desc = "Close All Except this one", noremap = true })

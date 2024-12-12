@@ -1,89 +1,70 @@
 return {
-	"dnlhc/glance.nvim",
-	dependencies = {
-		"rcarriga/nvim-notify",
-	},
-	config = function()
-		local glance = require("glance")
-		local notify = require("notify")
+  "dnlhc/glance.nvim",
+  dependencies = {
+    "rcarriga/nvim-notify",
+  },
+  config = function()
+    local glance = require("glance")
 
-		local glanceState = {
-			findTests = false,
-		}
+    local function gatherFilteredResults(results)
+      local filtered_results = {}
+      for _, result in ipairs(results) do
+        local resultUri = result.uri:lower() or result.targetUri:lower()
+        local testFound = resultUri:find(".test") or resultUri:find("mock") or resultUri:find(".stories")
+        vim.print(resultUri)
 
-		local function showFilterNotify(shouldFindTests)
-			local message = ""
-			if shouldFindTests then
-				message = "Showing ALL ([leader+t] to filter)"
-			else
-				message = "Filtering Tests, Mocks and Stories ([leader+t] to clear)"
-			end
+        if not testFound then
+          table.insert(filtered_results, result)
+        end
 
-			notify.notify(message, (shouldFindTests and "info" or "warn"), { title = "Filter References" })
-		end
+        if require("bdub.lsp_helpers").glanceState.findTests and testFound then
+          table.insert(filtered_results, result)
+        end
+      end
 
-		local function gatherFilteredResults(results)
-			local filtered_results = {}
-			for _, result in ipairs(results) do
-				local resultUri = result.uri:lower() or result.targetUri:lower()
-				local testFound = resultUri:find(".test") or resultUri:find("mock") or resultUri:find(".stories")
+      return filtered_results
+    end
 
-				if not testFound then
-					table.insert(filtered_results, result)
-				end
+    glance.setup({
+      height = 50,
+      -- your configuration
+      detached = true,
+      mappings = {
+        list = {
+          ["<c-v>"] = glance.actions.jump_vsplit,
+        },
+      },
+      hooks = {
+        before_open = function(results, open, jump)
+          local bufUri = vim.uri_from_bufnr(0):lower()
+          local ok, filtered_results = pcall(gatherFilteredResults, results)
 
-				if glanceState.findTests and testFound then
-					table.insert(filtered_results, result)
-				end
-			end
+          if not ok then
+            print("Error gathering filtered results")
+            return
+          end
 
-			return filtered_results
-		end
+          -- if there are no results, return early
+          if #filtered_results == 0 then
+            vim.notify("No results found", "info")
+            return
+          end
 
-		local changeGlanceState = function()
-			local shouldFindTests = not glanceState.findTests
-			showFilterNotify(shouldFindTests)
+          require("bdub.lsp_helpers").showFilterNotify()
 
-			glanceState.findTests = shouldFindTests
-		end
+          if #filtered_results == 1 then
+            local target_uri = results[1].uri or results[1].targetUri
 
-		vim.keymap.set("n", "<leader>t", changeGlanceState, { noremap = true, silent = true })
-
-		glance.setup({
-			height = 50,
-			-- your configuration
-			detached = true,
-			hooks = {
-				before_open = function(results, open, jump)
-					local bufUri = vim.uri_from_bufnr(0):lower()
-					local ok, filtered_results = pcall(gatherFilteredResults, results)
-
-					if not ok then
-						print("Error gathering filtered results")
-						return
-					end
-
-					-- if there are no results, return early
-					if #filtered_results == 0 then
-						vim.notify("No results found", "info")
-						return
-					end
-
-					showFilterNotify(glanceState.findTests)
-
-					if #filtered_results == 1 then
-						local target_uri = results[1].uri or results[1].targetUri
-
-						if target_uri == bufUri then
-							jump(filtered_results[1])
-						else
-							open(filtered_results)
-						end
-					else
-						open(filtered_results)
-					end
-				end,
-			},
-		})
-	end,
+            if target_uri == bufUri then
+              jump(filtered_results[1])
+            else
+              open(filtered_results)
+            end
+          else
+            open(filtered_results)
+          end
+        end,
+      },
+    })
+  end,
 }

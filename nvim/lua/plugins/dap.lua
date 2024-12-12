@@ -102,18 +102,34 @@ return {
           "start",
         },
       },
+      {
+        name = "launch omniapi",
+        type = "go",
+        request = "launch",
+        mode = "debug",
+        program = "${workspaceFolder}/omnictl",
+        args = {
+          "api",
+          "start",
+        },
+      },
     }
 
     require("dap-go").setup()
 
-    vim.keymap.set("n", "<leader>dd", "<cmd>lua require('dap').continue()<cr>", { noremap = true, silent = true })
+    vim.keymap.set("n", "<leader>D", "<cmd>lua require('dap').continue()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<leader>b", "<cmd>lua require('dap').toggle_breakpoint()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<leader>dc", "<cmd>lua require('dap').run_to_cursor()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<leader>dr", "<cmd>lua require('dap').repl.toggle()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<C-M-S-.>", "<cmd>lua require('dap').step_over()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<C-M-S-i>", "<cmd>lua require('dap').step_into()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<C-M-S-,>", "<cmd>lua require('dap').step_out()<cr>", { noremap = true, silent = true })
-    vim.keymap.set("n", "<C-M-S-h>", "<cmd>lua require('dap.ui.widgets').hover()<cr>", { noremap = true, silent = true })
+    vim.keymap.set("n", "<leader>du", "<cmd>lua require('dapui').toggle()<cr>", { noremap = true, silent = true })
+    vim.keymap.set("n", "<leader>dv", "<cmd>lua require('nvim-dap-virtual-text').refresh()<cr>", { noremap = true, silent = true })
+    vim.keymap.set("n", "<C-M-S-h>", function()
+      require("dapui").eval(nil, { enter = true })
+    end, { noremap = true, silent = true })
+    vim.keymap.set("n", "<leader>db", "<cmd>Telescope dap list_breakpoints<cr>", { noremap = true, silent = true })
     vim.keymap.set(
       "n",
       "<leader>df",
@@ -126,10 +142,6 @@ return {
       "<cmd>lua require('dap.ui.widgets').centered_float(require('dap.ui.widgets').scopes)<cr>",
       { noremap = true, silent = true }
     )
-
-    vim.keymap.set("n", "<leader>?", function()
-      require("dapui").eval(nil, { enter = true })
-    end)
 
     dap.listeners.before.attach.dapui_config = function()
       ui.open()

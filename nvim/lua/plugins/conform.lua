@@ -1,5 +1,5 @@
 -- local biomefmt = { "biome" }
-local js_formatter = "prettierd" -- "prettierd" or "biome"
+local js_formatter = "biome" -- "prettierd" or "biome"
 
 if vim.version().minor < 10 then
   return {}
@@ -35,6 +35,7 @@ return {
       javascriptreact = { js_formatter },
       typescript = { js_formatter },
       typescriptreact = { js_formatter },
+      html = { "prettierd" },
       json = { js_formatter },
     },
     format_on_save = {
