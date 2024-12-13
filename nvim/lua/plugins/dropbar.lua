@@ -7,10 +7,9 @@ local custom_path = {
     local symbols = require("dropbar.sources").path.get_symbols(buff, win, cursor)
 
     symbols[#symbols].name_hl = "DropBarFileName"
-    -- if vim.bo[buff].modified then
-    --   symbols[#symbols].name = symbols[#symbols].name .. " [+]"
-    --   symbols[#symbols].name_hl = "DiffAdded"
-    -- end
+    if vim.bo[buff].modified then
+      symbols[#symbols].name_hl = "DiffAdded"
+    end
 
     -- if show_directories then
     -- return vim.list_slice(symbols, 1, #symbols - 1)
@@ -33,7 +32,7 @@ function activate_top_level_components()
   end
 
   for _, component in ipairs(current_bar.components) do
-    if component.name_hl == "DropBarKindDir" then
+    if component.name_hl == "DropBarFileName" then
       if current_bar.components[component.bar_idx + 1] ~= nil then
         current_idx = component.bar_idx + 1
       else

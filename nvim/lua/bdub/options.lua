@@ -47,6 +47,11 @@ for k, v in pairs(options) do
   vim.opt[k] = v
 end
 
+vim.cmd([[set guicursor=n-v-c:block-blinkon500-blinkoff300-blinkwait700]])
+vim.cmd([[set guicursor+=i:ver25-blinkon500-blinkoff300-blinkwait700]])
+vim.cmd([[set guicursor+=r:hor20-blinkon500-blinkoff300-blinkwait700]])
+vim.cmd([[highlight Cursor guibg=#FFFFFF guifg=#f38ba8 ]])
+
 -- disable netrw at the very start of your init.lua (strongly advised) per :h nvim-tree-quickstart
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1

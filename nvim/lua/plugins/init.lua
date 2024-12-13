@@ -22,12 +22,7 @@ return {
   {
     "nvim-zh/colorful-winsep.nvim",
     config = function()
-      require("colorful-winsep").setup({
-        smooth = false,
-        exponential_smoothing = false,
-        only_line_seq = false,
-      })
-
+      require("colorful-winsep").setup()
       vim.cmd([[highlight NvimSeparator guifg=]] .. colors.mocha.overlay0)
     end,
     event = { "WinLeave" },

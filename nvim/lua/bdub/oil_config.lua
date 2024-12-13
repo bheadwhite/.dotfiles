@@ -68,9 +68,9 @@ end
 -- 	desc = "toggle oil",
 -- })
 
-vim.keymap.set("n", "-", open_oil, {
-  noremap = true,
-  desc = "open oil",
-})
+-- vim.keymap.set("n", "-", open_oil, {
+--   noremap = true,
+--   desc = "open oil",
+-- })
 
 return M

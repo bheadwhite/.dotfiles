@@ -27,28 +27,6 @@ function WinUtils.printWin(win)
   print("----------------------")
 end
 
-function WinUtils.get_duplicate_win_buffers()
-  -- Get a list of all window IDs
-  local windows = vim.api.nvim_list_wins()
-
-  -- Create a table to keep track of buffer names
-  local buffer_names = {}
-
-  -- Iterate through each buffer
-  for _, win in ipairs(windows) do
-    local key = WinUtils.getDuplicateTableKeyFromWin(win)
-    -- local buf_name = vim.api.nvim_buf_get_name(win)
-    -- If the buffer name is already in the table, mark it as a duplicate
-    if buffer_names[key] then
-      buffer_names[key] = "duplicate"
-    else
-      buffer_names[key] = "unique"
-    end
-  end
-
-  return buffer_names
-end
-
 -- key = tab_number .. buf_name
 function WinUtils.getDuplicateTableKeyFromWin(win)
   local name = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
@@ -58,10 +36,6 @@ function WinUtils.getDuplicateTableKeyFromWin(win)
   return tab_number .. name
 end
 
--- function WinUtils.isWindowDuplicate(winToCheck)
---   -- return WinUtils.is_duplicate_win(winToCheck, duplicateWindows)
--- end
-
 function WinUtils.set_window_backgrounds()
   -- Get the current window ID
   local current_win = vim.api.nvim_get_current_win()
@@ -69,8 +43,34 @@ function WinUtils.set_window_backgrounds()
   -- Get a list of all window IDs
   local windows = vim.api.nvim_list_wins()
 
+  -- if any window is part of a tab with a bufname that start with the word "diffview", lets filter that out
+  local diffview_windows = {}
+  for _, win in ipairs(windows) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local buf_name = vim.api.nvim_buf_get_name(buf)
+    if string.find(buf_name, "diffview") then
+      -- iterate over all the windows in this tab and add them to the diffview_windows table
+      local tab = vim.api.nvim_win_get_tabpage(win)
+      local tab_windows = vim.api.nvim_tabpage_list_wins(tab)
+      for _, tab_win in ipairs(tab_windows) do
+        table.insert(diffview_windows, tab_win)
+      end
+      break
+    end
+  end
+
+  -- remove the diffview windows from the windows table
+  for _, win in ipairs(diffview_windows) do
+    for i, w in ipairs(windows) do
+      if w == win then
+        table.remove(windows, i)
+        break
+      end
+    end
+  end
+
   -- get duplicate win buffers
-  local duplicates = WinUtils.get_duplicate_win_buffers()
+  -- local duplicateStore = WinUtils.get_buffer_duplicate_store()
   -- Iterate through each window
   for _, win in ipairs(windows) do
     local config = vim.api.nvim_win_get_config(win)
@@ -83,9 +83,9 @@ function WinUtils.set_window_backgrounds()
     if win == current_win then
       -- Set highlight for the focused window
       vim.api.nvim_win_set_option(win, "winhighlight", "Normal:MyNormalColor")
-    elseif WinUtils.is_duplicate_win(win, duplicates) then
-      -- Set highlight for windows displaying duplicate buffers
-      vim.api.nvim_win_set_option(win, "winhighlight", "Normal:DuplicateBuffer")
+    -- elseif WinUtils.is_win_duplicate_from_store(win, duplicateStore) then
+    --   -- Set highlight for windows displaying duplicate buffers
+    --   vim.api.nvim_win_set_option(win, "winhighlight", "Normal:DuplicateBuffer")
     else
       -- Set highlight for the unfocused windows
       vim.api.nvim_win_set_option(win, "winhighlight", "Normal:MyInactiveBufferColor")
@@ -95,32 +95,89 @@ function WinUtils.set_window_backgrounds()
   end
 end
 
+function WinUtils.is_win_duplicate_from_store(win, duplicateStore)
+  local key = WinUtils.getDuplicateTableKeyFromWin(win)
+
+  return duplicateStore[key] == "duplicate"
+end
+
+function WinUtils.is_win_duplicate(win)
+  return WinUtils.is_win_duplicate_from_store(win, WinUtils.get_buffer_duplicate_store())
+end
+
+-- used in set_window_backgrounds
+-- @return table of buffer names with tab number appended as key
+-- the value is either "duplicate" or "unique"
+-- this is a quick lookup of duplicate buffers
+function WinUtils.get_buffer_duplicate_store()
+  -- Get a list of all window IDs
+  local windows = vim.api.nvim_list_wins()
+
+  -- Create a table to keep track of buffer names
+  local duplicateStore = {}
+
+  -- Iterate through each buffer
+  for _, win in ipairs(windows) do
+    local config = vim.api.nvim_win_get_config(win)
+    if not config.focusable then
+      goto continue
+    end
+
+    local key = WinUtils.getDuplicateTableKeyFromWin(win)
+    -- local buf_name = vim.api.nvim_buf_get_name(win)
+    -- If the buffer name is already in the table, mark it as a duplicate
+    if duplicateStore[key] then
+      duplicateStore[key] = "duplicate"
+    else
+      duplicateStore[key] = "unique"
+    end
+
+    ::continue::
+  end
+
+  return duplicateStore
+end
+
+-- used in close_all_duplicates method
+--@return table of lists of window ids
+-- key = <BUF_NAME> > <TAB_NUMBER>
+-- value = list of window ids {win1, win2, ...}
+-- if length of lists > 1, then it has duplicates
+-- this is used to keep track of winids that are duplicates
 function WinUtils.get_win_buffers_with_duplicates()
-  local duplicates_table = {}
+  local duplicateWindows = {}
   local windows = vim.api.nvim_list_wins()
 
   for _, win in ipairs(windows) do
     local buf = vim.api.nvim_win_get_buf(win)
     local buf_name = vim.api.nvim_buf_get_name(buf)
     local tab = vim.api.nvim_win_get_tabpage(win)
+    local config = vim.api.nvim_win_get_config(win)
+
+    if not config.focusable then
+      goto continue
+    end
+
     local winKey = buf_name .. ">" .. tab
 
     if buf_name == "" then
     else
-      if not duplicates_table[winKey] then
-        duplicates_table[winKey] = { win }
+      if not duplicateWindows[winKey] then
+        duplicateWindows[winKey] = { win }
       end
 
-      table.insert(duplicates_table[winKey], win)
+      table.insert(duplicateWindows[winKey], win)
     end
+
+    ::continue::
   end
 
-  for key, win_list in pairs(duplicates_table) do
+  for key, win_list in pairs(duplicateWindows) do
     local deduped = lua_utils.deduplicate_list(win_list)
-    duplicates_table[key] = deduped
+    duplicateWindows[key] = deduped
   end
 
-  return duplicates_table
+  return duplicateWindows
 end
 
 function WinUtils.printWindows()
@@ -135,9 +192,8 @@ function WinUtils.printCurrentWindow()
   WinUtils.printWin(win)
 end
 
-function WinUtils.close_all_duplicates()
+function WinUtils.close_current_tab_duplicate_windows()
   local duplicates_table = WinUtils.get_win_buffers_with_duplicates()
-  vim.print(duplicates_table)
   local currentTab = vim.api.nvim_get_current_tabpage()
   local didClose = false
   for _, win_list in pairs(duplicates_table) do
@@ -146,7 +202,6 @@ function WinUtils.close_all_duplicates()
         local win = win_list[i]
         local isCurrentTab = vim.api.nvim_win_get_tabpage(win) == currentTab
         if isCurrentTab then
-          vim.print(win)
           didClose = true
           vim.api.nvim_win_close(win, true)
         end
@@ -159,12 +214,6 @@ function WinUtils.close_all_duplicates()
   end
 
   return didClose
-end
-
-function WinUtils.is_duplicate_win(win, duplicateTable)
-  local key = WinUtils.getDuplicateTableKeyFromWin(win)
-
-  return duplicateTable[key] == "duplicate"
 end
 
 return WinUtils

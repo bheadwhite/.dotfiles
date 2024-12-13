@@ -72,8 +72,7 @@ function! BufOnly(buffer, bang)
 endfunction]])
 
 function CloseAllExceptCurrent()
-  local didCloseDuplicates = win_utils.close_all_duplicates()
-  vim.print("didCloseDuplicates", didCloseDuplicates)
+  local didCloseDuplicates = win_utils.close_current_tab_duplicate_windows()
 
   if not didCloseDuplicates then
     vim.cmd([[BufOnly]])

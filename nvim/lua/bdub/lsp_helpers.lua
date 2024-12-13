@@ -181,7 +181,6 @@ function M.on_attach(client, bufnr)
 
       if jump_to_config then
         -- jump to the constructor in a new vsplit window
-        vim.print(jump_to_config)
         local uri = getUriFromDefinitionResult(jump_to_config)
 
         local target_uri = vim.uri_to_fname(uri)
@@ -193,10 +192,8 @@ function M.on_attach(client, bufnr)
         local target_line = range.start.line + 1
         local target_character = range.start.character
 
-        vim.print("yes cb")
         ifYesCb(target_uri, target_line, target_character)
       else
-        vim.print("no cb")
         ifNoCb()
       end
     end)
@@ -222,7 +219,6 @@ function M.on_attach(client, bufnr)
     local noFn = function(isOnlyOne)
       require("telescope.builtin").lsp_definitions({ show_line = false, jump_type = "vsplit" })
     end
-    vim.print("split")
     isDefinitionResultLessThan2WithConstructor(yesFn, noFn)
   end
 
@@ -353,7 +349,6 @@ function M.on_attach(client, bufnr)
 
           if #filtered_result == 1 then
             local target_uri = filtered_result[1].uri or filtered_result[1].targetUri
-            vim.print(filtered_result[1])
             local range = filtered_result[1].range or filtered_result[1].targetRange
             local col = range.start.character
             --open in split

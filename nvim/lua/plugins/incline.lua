@@ -1,4 +1,3 @@
-local colors = require("bdub.color_config")
 local catp_colors = require("bdub.catppuccin_colors")
 return {
   "b0o/incline.nvim",
@@ -74,12 +73,27 @@ return {
           return label
         end
 
+        local isModified = vim.bo[props.buf].modified
+        local filenameDisp = filename
+        if isModified then
+          filenameDisp = filename .. " [+]"
+        end
+
+        local isDuplicate = require("bdub.win_utils").is_win_duplicate(props.win)
+
+        if isDuplicate then
+          filenameDisp = "[] " .. filenameDisp
+        end
+
         return {
           {
-            "  " .. filename .. "  ",
-            gui = vim.bo[props.buf].modified and "bold,italic" or "bold",
+            "  " .. filenameDisp .. "  ",
+            gui = isModified and "bold,italic" or "bold",
             guifg = "#000000",
-            guibg = props.focused and catp_colors.mocha.peach or "#ffffff",
+            guibg = isModified and catp_colors.mocha.green
+              or props.focused and catp_colors.mocha.peach
+              or isDuplicate and catp_colors.mocha.blue
+              or "#ffffff",
           },
           { get_git_diff() },
           { get_diagnostic_label() },

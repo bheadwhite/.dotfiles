@@ -11,7 +11,6 @@ return {
       for _, result in ipairs(results) do
         local resultUri = result.uri:lower() or result.targetUri:lower()
         local testFound = resultUri:find(".test") or resultUri:find("mock") or resultUri:find(".stories")
-        vim.print(resultUri)
 
         if not testFound then
           table.insert(filtered_results, result)

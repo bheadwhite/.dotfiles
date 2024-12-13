@@ -16,11 +16,6 @@ function R(name)
   require("plenary.reload").reload_module(name)
 end
 
-vim.cmd([[
-highlight NormalSB guibg=#272e33
-]])
-
---
 autocmd("TextYankPost", {
   group = yank_group,
   pattern = "*",
