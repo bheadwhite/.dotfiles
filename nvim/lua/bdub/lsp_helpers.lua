@@ -413,7 +413,7 @@ function M.on_attach(client, bufnr)
     { "gH", vim.lsp.buf.signature_help, "signature help" },
   }
 
-  diagnostics.setDiagnosticColorOverrides()
+  -- diagnostics.setDiagnosticColorOverrides()
 
   for _, value in ipairs(normal_keymaps) do
     vim.keymap.set("n", value[1], value[2], add_desc(value[3], bufnr))

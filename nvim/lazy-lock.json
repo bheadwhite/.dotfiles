@@ -27,6 +27,7 @@
   "jq-playground.nvim": { "branch": "main", "commit": "d2efe430a9226f9dc8f63e5715cc3207d35210bc" },
   "lazy.nvim": { "branch": "main", "commit": "7c493713bc2cb392706866eeba53aaef6c8e9fc6" },
   "lsp-status.nvim": { "branch": "master", "commit": "54f48eb5017632d81d0fd40112065f1d062d0629" },
+  "lsp_lines.nvim": { "branch": "main", "commit": "f7f18b85360b8e85cd6a5418c9fbccb6a2ff4b1b" },
   "lspkind-nvim": { "branch": "master", "commit": "d79a1c3299ad0ef94e255d045bed9fa26025dab6" },
   "lua-utils.nvim": { "branch": "main", "commit": "e565749421f4bbb5d2e85e37c3cef9d56553d8bd" },
   "lualine.nvim": { "branch": "master", "commit": "2a5bae925481f999263d6f5ed8361baef8df4f83" },

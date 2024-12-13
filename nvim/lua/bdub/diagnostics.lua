@@ -5,6 +5,10 @@ local default_diagnostic_config = {
   signs = true,
   update_in_insert = false,
   virtual_text = false,
+  virtual_lines = {
+    only_current_line = true,
+    highlight_whole_line = false,
+  },
   severity_sort = true,
 }
 
@@ -43,6 +47,7 @@ local M = {}
 -- 	end
 -- end
 
+-- not sure why i need this yet... had something to do with the python workflow...
 function M.setDiagnosticColorOverrides()
   vim.cmd([[
     highlight DiagnosticHint guifg=#a9a1e1 gui=underline
