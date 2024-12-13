@@ -44,23 +44,31 @@ function WinUtils.set_window_backgrounds()
   local windows = vim.api.nvim_list_wins()
 
   -- if any window is part of a tab with a bufname that start with the word "diffview", lets filter that out
-  local diffview_windows = {}
+  local execption_windows = {}
   for _, win in ipairs(windows) do
     local buf = vim.api.nvim_win_get_buf(win)
     local buf_name = vim.api.nvim_buf_get_name(buf)
+
+    if buf_name == "" then
+      table.insert(execption_windows, win)
+      goto continue
+    end
+
     if string.find(buf_name, "diffview") then
       -- iterate over all the windows in this tab and add them to the diffview_windows table
       local tab = vim.api.nvim_win_get_tabpage(win)
       local tab_windows = vim.api.nvim_tabpage_list_wins(tab)
       for _, tab_win in ipairs(tab_windows) do
-        table.insert(diffview_windows, tab_win)
+        table.insert(execption_windows, tab_win)
       end
       break
     end
+
+    ::continue::
   end
 
   -- remove the diffview windows from the windows table
-  for _, win in ipairs(diffview_windows) do
+  for _, win in ipairs(execption_windows) do
     for i, w in ipairs(windows) do
       if w == win then
         table.remove(windows, i)
