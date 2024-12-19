@@ -75,17 +75,17 @@ return {
 
         local isModified = vim.bo[props.buf].modified
         local filenameDisp = filename
-        if isModified then
-          filenameDisp = filename .. " [+]"
-        end
 
         local isDuplicate = require("bdub.win_utils").is_win_duplicate(props.win)
 
         if isDuplicate then
-          filenameDisp = "[] " .. filenameDisp
+          filenameDisp = "  " .. filenameDisp
         end
 
         return {
+          {
+            isModified and " 🌱 " or "",
+          },
           {
             "  " .. filenameDisp .. "  ",
             gui = isModified and "bold,italic" or "bold",

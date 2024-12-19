@@ -12,7 +12,7 @@ return {
 		mods = "CMD",
 		action = wezterm.action({ EmitEvent = "zoom-toggle" }),
 	},
-	{ key = "c", mods = "CMD", action = act.CopyTo("Clipboard") },
+	{ key = "c", mods = "CMD|SHIFT", action = act.ActivateCopyMode },
 	{ key = "v", mods = "CMD", action = act.PasteFrom("Clipboard") },
 	{ key = "n", mods = "CMD", action = act.SpawnWindow },
 	{

@@ -294,6 +294,37 @@ function M.on_attach(client, bufnr)
     })
   end
 
+  function unpackResultUri(result)
+    local uri = result.uri or result.targetUri
+    return vim.uri_to_fname(uri)
+  end
+
+  function unpackResultRange(result)
+    return result.range or result.targetRange
+  end
+
+  function getSingleResult(result)
+    filtered_result = {}
+
+    if not M.glanceState.findTests and result ~= nil then
+      for _, res in ipairs(result) do
+        local uri = unpackResultUri(res)
+        if not (string.find(uri, "%.test%.") or string.find(uri, "stories") or string.find(uri, "mock") or string.find(uri, "logging")) then
+          table.insert(filtered_result, res)
+        end
+      end
+    end
+
+    if #filtered_result == 1 then
+      local target_uri = unpackResultUri(filtered_result[1])
+      local range = unpackResultRange(filtered_result[1])
+
+      return filtered_result, target_uri, range
+    end
+
+    return filtered_result, nil, nil
+  end
+
   local normal_keymaps = {
     { "gd", goToDefinition, "go to defintion" },
     { "gD", goToSplitDefinition, "open definition in split" },
@@ -302,25 +333,14 @@ function M.on_attach(client, bufnr)
       "gi",
       function()
         local params = vim.lsp.util.make_position_params()
-        vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result, ctx, config)
-          filtered_result = {}
+        vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result) -- err, result, ctx, config)
+          local filtered, target_uri, range = getSingleResult(result)
 
-          if not M.glanceState.findTests and result ~= nil then
-            for _, res in ipairs(result) do
-              local uri = res.uri or res.targetUri
-              if not (string.find(uri, "%.test%.") or string.find(uri, "stories") or string.find(uri, "mock") or string.find(uri, "logging")) then
-                table.insert(filtered_result, res)
-              end
-            end
-          end
-
-          if #filtered_result == 1 then
-            local target_uri = filtered_result[1].uri or filtered_result[1].targetUri
-            local range = filtered_result[1].range or filtered_result[1].targetRange
+          if target_uri and range then
             local col = range.start.character
             --open in split
             M.showFilterNotify()
-            vim.cmd("e " .. vim.uri_to_fname(target_uri))
+            vim.cmd("e " .. target_uri)
             vim.api.nvim_win_set_cursor(0, { range.start.line + 1, col })
           elseif err or not result or vim.tbl_isempty(result) then
             goToDefinition()
@@ -336,24 +356,13 @@ function M.on_attach(client, bufnr)
       function()
         local params = vim.lsp.util.make_position_params()
         vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result, ctx, config)
-          filtered_result = {}
+          local filtered, target_uri, range = getSingleResult(result)
 
-          if not M.glanceState.findTests and result ~= nil then
-            for _, res in ipairs(result) do
-              local uri = res.uri or res.targetUri
-              if not (string.find(uri, "%.test%.") or string.find(uri, "stories") or string.find(uri, "mock") or string.find(uri, "logging")) then
-                table.insert(filtered_result, res)
-              end
-            end
-          end
-
-          if #filtered_result == 1 then
-            local target_uri = filtered_result[1].uri or filtered_result[1].targetUri
-            local range = filtered_result[1].range or filtered_result[1].targetRange
+          if target_uri and range then
             local col = range.start.character
             --open in split
             M.showFilterNotify()
-            vim.cmd("vsplit " .. vim.uri_to_fname(target_uri))
+            vim.cmd("vsplit " .. target_uri)
             vim.api.nvim_win_set_cursor(0, { range.start.line + 1, col })
           elseif err or not result or vim.tbl_isempty(result) then
             goToSplitDefinition()
@@ -365,7 +374,63 @@ function M.on_attach(client, bufnr)
       "open implemenation in split",
     },
     { "gr", lspFinder, "lsp finder" },
-    { "gR", goToSplitReferences, "go to references v_split" },
+    {
+      "gR",
+      function()
+        local params = vim.lsp.util.make_position_params()
+        vim.lsp.buf_request(0, "textDocument/references", params, function(err, result, ctx, config)
+          local filtered = getSingleResult(result)
+
+          local pickers = require("telescope.pickers")
+          local finders = require("telescope.finders")
+          local previewers = require("telescope.previewers")
+          local actions = require("telescope.actions")
+          local action_state = require("telescope.actions.state")
+          local conf = require("telescope.config").values
+
+          pickers
+            .new({}, {
+              prompt_title = "References",
+              finder = finders.new_table({
+                results = filtered,
+                entry_maker = function(entry)
+                  return {
+                    value = entry,
+                    display = unpackResultUri(entry),
+                    ordinal = unpackResultUri(entry),
+                  }
+                end,
+              }),
+              previewer = previewers.new_buffer_previewer({
+                define_preview = function(self, entry)
+                  local uri = unpackResultUri(entry)
+                  local range = unpackResultRange(entry)
+                  local bufnr = vim.uri_to_bufnr(unpackResultUri(uri))
+                  local lines = vim.api.nvim_buf_get_lines(bufnr, entry.range.start.line, entry.range["end"].line + 1, false)
+                  vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
+                end,
+              }),
+              sorter = conf.generic_sorter({}),
+              attach_mappings = function(prompt_bufnr)
+                actions.select_default:replace(function()
+                  local selection = action_state.get_selected_entry()
+                  local uri = selection.value.uri
+                  local bufnr = vim.uri_to_bufnr(uri)
+                  local range = selection.value.range
+
+                  vim.api.nvim_set_current_buf(bufnr)
+                  vim.api.nvim_win_set_cursor(0, { range.start.line + 1, range.start.character })
+                  actions.close(prompt_bufnr)
+                end)
+
+                return true
+              end,
+            })
+            :find()
+        end)
+      end,
+      "go to references v_split",
+    },
     { "gt", goToTypeDefinition, "go to type definition" },
     { "gT", openTypeInSplit, "open type in split" },
     { "g<tab>t", goToTabTypeDefinition, "go to type definition in new tab" },

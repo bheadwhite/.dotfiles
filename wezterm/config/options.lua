@@ -7,8 +7,8 @@ local window_frame = {
 	border_top_color = colors.bg1,
 }
 
--- debug_key_events = true,
 return {
+	debug_key_events = true,
 	font_size = 15,
 	command_palette_font_size = 19,
 	native_macos_fullscreen_mode = false,

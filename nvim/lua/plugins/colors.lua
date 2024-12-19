@@ -1,4 +1,5 @@
 -- vim.g.everforest_transparent_background = 1
+local colors = require("bdub.color_config")
 
 return {
   -- {
@@ -13,10 +14,10 @@ return {
     priority = 1000,
     config = function()
       vim.cmd("colorscheme catppuccin-macchiato")
-      vim.cmd([[highlight WinSeparator guifg=]] .. "#000000")
-      vim.cmd([[highlight CursorLine guibg=#653A45]])
-      vim.cmd([[highlight Cursor guibg=#FFFFFF]])
-      vim.cmd([[highlight GitSignsCurrentLineBlame guifg=#FFFFFF]])
+      vim.cmd([[highlight WinSeparator guifg=]] .. colors.winseperator)
+      vim.cmd([[highlight CursorLine guibg=]] .. colors.cursorLine)
+      vim.cmd([[highlight Cursor guibg=]] .. colors.cursor)
+      vim.cmd([[highlight GitSignsCurrentLineBlame guifg=]] .. colors.lineBlame)
     end,
   },
   -- {

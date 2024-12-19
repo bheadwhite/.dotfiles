@@ -26,5 +26,8 @@ return {
   sectionFilePathBg = colors.mocha.overlay0,
   sectionFilePathFg = colors.mocha.crust,
   zoomBg = colors.mocha.red,
-  winseperator = colors.mocha.surface0,
+  winseperator = "#000000",
+  cursorLine = "#653A45",
+  cursor = "#FFFFFF",
+  lineBlame = "#FFFFFF",
 }
