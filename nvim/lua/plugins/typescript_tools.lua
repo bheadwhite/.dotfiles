@@ -54,7 +54,7 @@ return {
       desc = "TS add missing imports",
       pattern = { "*.ts", "*.tsx" },
       callback = function()
-        --only call add missing imports if diagnostics are present and contain missing import code
+        -- only call add missing imports if diagnostics are present and contain missing import code
         -- Check for diagnostics related to missing imports
         local diagnostics = vim.diagnostic.get(0) -- 0 means current buffer
         local has_missing_imports = false

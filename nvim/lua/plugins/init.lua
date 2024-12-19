@@ -28,15 +28,6 @@ return {
     event = { "WinLeave" },
   },
   {
-    "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
-    config = function()
-      require("lsp_lines").setup()
-      vim.keymap.set("", "<leader>l", function()
-        require("lsp_lines").toggle()
-      end, { noremap = true })
-    end,
-  },
-  {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
     ft = { "markdown" },
@@ -68,14 +59,6 @@ return {
       height = 0.2,
     },
   } },
-  -- {
-  --   "rachartier/tiny-inline-diagnostic.nvim",
-  --   opts = {
-  --     options = {
-  --       show_source = true,
-  --     },
-  --   },
-  -- },
   {
     "max397574/colortils.nvim",
     cmd = "Colortils",
@@ -143,7 +126,7 @@ return {
 
       -- if TSC runs and your expecting results but there arent any..
       -- it could be that your getting the "this is not the TSC your looking for" error when running TSC
-      -- find the path to the tsc bin by running require("tsc.utils").get_tsc_bin()
+      -- find the path to the tsc bin by running require("tsc.utils").find_tsc_bin()
       -- troubleshoot why thats not running as a standalone
       -- references:
       -- https://stackoverflow.com/questions/69080861/error-running-a-npx-tsc-command-regarding-typescript-this-is-not-the-tsc-comm
