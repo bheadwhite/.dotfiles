@@ -122,7 +122,7 @@ function getRangeFromDefinitionResult(result)
   return result.range ~= nil and result.range or nil
 end
 
-function M.on_attach(client, bufnr)
+function M.on_attach(client, attached_bufnr)
   local cmp_capabilities = {}
   -- Safely attempt to load cmp_nvim_lsp capabilities
   local status, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
@@ -481,10 +481,10 @@ function M.on_attach(client, bufnr)
   -- diagnostics.setDiagnosticColorOverrides()
 
   for _, value in ipairs(normal_keymaps) do
-    vim.keymap.set("n", value[1], value[2], add_desc(value[3], bufnr))
+    vim.keymap.set("n", value[1], value[2], add_desc(value[3], attached_bufnr))
   end
 
-  vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, add_desc("signature help", bufnr))
+  vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, add_desc("signature help", attached_bufnr))
 end
 
 return M
