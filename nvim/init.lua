@@ -14,6 +14,8 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.localleader = ","
 
+package.path = package.path .. ";/Users/bdub/.luarocks/share/lua/5.1/?.lua"
+
 require("bdub.options")
 require("bdub.remap")
 require("bdub.autocommands")

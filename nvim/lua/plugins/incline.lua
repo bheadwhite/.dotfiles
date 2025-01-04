@@ -14,6 +14,7 @@ return {
         },
         placement = {
           horizontal = "right",
+          vertical = "bottom",
         },
         margin = {
           vertical = 1,

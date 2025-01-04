@@ -7,6 +7,11 @@ local diagnostic_filters = {
 }
 -- filter codes list - https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
 
+local autoImportFileExcludePatterns = {
+  "*mantine*",
+  "*react-big-calendar*",
+}
+
 return {
   "pmizio/typescript-tools.nvim",
   -- branch = "bugfix/202",
@@ -35,6 +40,7 @@ return {
       settings = {
         tsserver_file_preferences = {
           importModuleSpecifierPreference = "non-relative",
+          autoImportFileExcludePatterns = autoImportFileExcludePatterns,
         },
         jsx_close_tag = {
           enabled = true,

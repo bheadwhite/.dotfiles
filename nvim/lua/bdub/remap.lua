@@ -244,7 +244,7 @@ vim.keymap.set("n", "<leader><leader>", function()
 end, add_desc("neorg"))
 
 vim.keymap.set("v", "/", "<Esc>/\\%V", add_desc("search visual selection"))
-vim.keymap.set({ "n", "v" }, "j", "gj", options)
+-- vim.keymap.set({ "n", "v" }, "j", "gj", options)
 vim.keymap.set({ "v", "n" }, "J", "j", options)
 vim.keymap.set({ "v", "n" }, "K", "k", options)
 -- vim.keymap.set({ "n", "v" }, "k", "gk", options)

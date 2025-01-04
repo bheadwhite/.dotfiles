@@ -11,6 +11,7 @@ return {
   config = function()
     local dap = require("dap")
     local ui = require("dapui")
+    local json = require("dkjson")
 
     require("dapui").setup()
     require("nvim-dap-virtual-text").setup({
@@ -46,6 +47,43 @@ return {
     end
 
     --- go
+    local function load_vscode_go_configs()
+      local cwd = vim.fn.getcwd()
+      local vscode_dir = cwd .. "/.vscode"
+      local launch_file = vscode_dir .. "/launch.json"
+      local uv = vim.loop
+
+      if uv.fs_stat(vscode_dir) and uv.fs_stat(launch_file) then
+        local file = io.open(launch_file, "r")
+        if file then
+          local content = file:read("*a")
+          file:close()
+          local success, parsed = pcall(json.decode, content)
+          if success and parsed.configurations then
+            for _, config in ipairs(parsed.configurations) do
+              if config.type == "go" then
+                local configuration = {
+                  name = config.name or "VSCode Config",
+                  type = config.type,
+                  request = config.request,
+                  mode = config.mode or "debug",
+                  program = config.program or "${workspaceFolder}",
+                  args = config.args or {},
+                }
+
+                if config.cwd then
+                  configuration.cwd = config.cwd
+                end
+
+                table.insert(dap.configurations.go, configuration)
+              end
+            end
+          else
+            vim.notify("Failed to parse launch.json", vim.log.levels.ERROR)
+          end
+        end
+      end
+    end
 
     dap.configurations.go = {
       {
@@ -115,6 +153,8 @@ return {
       },
     }
 
+    load_vscode_go_configs()
+
     require("dap-go").setup()
 
     vim.keymap.set("n", "<leader>D", "<cmd>lua require('dap').continue()<cr>", { noremap = true, silent = true })
@@ -142,18 +182,5 @@ return {
       "<cmd>lua require('dap.ui.widgets').centered_float(require('dap.ui.widgets').scopes)<cr>",
       { noremap = true, silent = true }
     )
-
-    dap.listeners.before.attach.dapui_config = function()
-      ui.open()
-    end
-    dap.listeners.before.launch.dapui_config = function()
-      ui.open()
-    end
-    dap.listeners.before.event_terminated.dapui_config = function()
-      ui.close()
-    end
-    dap.listeners.before.event_exited.dapui_config = function()
-      ui.close()
-    end
   end,
 }
