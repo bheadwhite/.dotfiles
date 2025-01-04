@@ -2,12 +2,12 @@
 local colors = require("bdub.color_config")
 
 return {
-  -- {
-  --   "norcalli/nvim-colorizer.lua",
-  --   config = function()
-  --     require("colorizer").setup()
-  --   end,
-  -- },
+  {
+    "norcalli/nvim-colorizer.lua",
+    config = function()
+      require("colorizer").setup()
+    end,
+  },
   {
     "catppuccin/nvim",
     name = "catppuccin",
@@ -17,7 +17,11 @@ return {
       vim.cmd([[highlight WinSeparator guifg=]] .. colors.winseperator)
       vim.cmd([[highlight CursorLine guibg=]] .. colors.cursorLine)
       vim.cmd([[highlight Cursor guibg=]] .. colors.cursor)
+      vim.cmd([[highlight Search guibg=]] .. colors.search .. [[ guifg=#000000]])
+      vim.cmd([[highlight IncSearch guibg=]] .. colors.headerBg .. [[ guifg=#ffffff]])
+      vim.cmd([[highlight CurSearch guibg=]] .. colors.search .. [[ guifg=#ffffff]])
       vim.cmd([[highlight GitSignsCurrentLineBlame guifg=]] .. colors.lineBlame)
+      vim.cmd([[hi HlSearchLensNear guibg=#bac2de]] .. [[ guifg=]] .. colors.diffBg)
     end,
   },
   -- {

@@ -174,6 +174,7 @@ local normal_keymaps = {
   { "<C-,>", vim.cmd.tabp, "prev tab" },
   { "<C-.>", vim.cmd.tabn, "next tab" },
   { "*", highlight_under_cursor, "for jumps" },
+  { ",", highlight_under_cursor, "for jumps" },
   { "gn", goToConstructor, "go to constructor" },
 }
 

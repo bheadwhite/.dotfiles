@@ -1,4 +1,3 @@
-local cwd = require("bdub.cwd")
 local color_config = require("bdub.color_config")
 
 return {

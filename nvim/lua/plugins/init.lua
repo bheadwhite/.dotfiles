@@ -1,7 +1,10 @@
-local colors = require("bdub.catppuccin_colors")
+local function getColors()
+  return require("bdub.catppuccin_colors")
+end
+
 return {
   { "mileszs/ack.vim" }, -- Integrates 'ack' search tool
-  { "windwp/nvim-ts-autotag" }, -- Auto-closes HTML tags
+  { "windwp/nvim-ts-autotag", opts = true }, -- Auto-closes HTML tags
   { "stevearc/dressing.nvim" }, -- Improved UI components
   { "sbulav/nredir.nvim" }, -- Redirects command output
   { "dstein64/vim-startuptime" }, -- startup time
@@ -23,9 +26,21 @@ return {
     "nvim-zh/colorful-winsep.nvim",
     config = function()
       require("colorful-winsep").setup()
-      vim.cmd([[highlight NvimSeparator guifg=]] .. colors.mocha.overlay0)
+      vim.cmd([[highlight NvimSeparator guifg=]] .. getColors().mocha.overlay0)
     end,
     event = { "WinLeave" },
+  },
+  {
+    "RRethy/vim-illuminate",
+    config = function()
+      require("illuminate").configure({
+        providers = {
+          "lsp",
+        },
+      })
+      vim.cmd([[hi IlluminatedWordText guifg=NONE guibg=NONE gui=underline guisp=#6DABD3]])
+      vim.cmd([[hi IlluminatedWordRead guifg=NONE guibg=NONE gui=underline guisp=#6DABD3]])
+    end,
   },
   {
     "iamcco/markdown-preview.nvim",
@@ -72,6 +87,18 @@ return {
       vim.g.zoomwintab = 1
     end,
   },
+
+  -- {
+  --   "anuvyklack/windows.nvim",
+  --   dependencies = { "anuvyklack/middleclass" },
+  --   config = function()
+  --     require("windows").setup()
+  --   end,
+  -- },
+  -- {
+  --   "fasterius/simple-zoom.nvim",
+  --   config = true,
+  -- },
   { "nanotee/zoxide.vim" },
   {
     "CopilotC-Nvim/CopilotChat.nvim",
@@ -174,6 +201,7 @@ return {
           go_out = "",
         },
         windows = {
+          width_focus = 150,
           preview = false,
         },
       })

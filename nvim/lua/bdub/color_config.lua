@@ -6,12 +6,12 @@ vim.cmd([[highlight MyZoomedBufferColor guibg=]] .. colors.macchiato.mantle)
 vim.cmd([[highlight DuplicateBuffer guibg=]] .. colors.macchiato.base)
 vim.cmd([[highlight DropBarFileName guifg=]] .. colors.mocha.sky)
 vim.cmd([[highlight DropBarKindDir gui=bold,italic guifg=]] .. colors.mocha.peach)
-vim.cmd([[hi link CurSearch IncSearch]])
 vim.cmd([[hi InclineActive guibg=]] .. colors.mocha.base)
 vim.cmd([[hi InclineInactive guibg=]] .. colors.mocha.base)
 vim.cmd([[highlight NormalSB guibg=#272e33 ]])
 
 return {
+  search = colors.mocha.red,
   inclineFileName = colors.mocha.peach,
   tabBar = colors.macchiato.crust,
   outOfBoundsBg = colors.mocha.red,

@@ -12,7 +12,10 @@ utils.set_window_backgrounds()
 local zoomed = false
 vim.keymap.set("n", "<leader>z", function()
   vim.cmd("ZoomWinTabToggle")
-end, { noremap = true, silent = true, desc = "zoom" })
+end, { noremap = true, silent = true, desc = "zoom in" })
+-- vim.keymap.set("n", "<leader>z", function()
+--   vim.cmd("WindowsMaximize")
+-- end, { noremap = true, silent = true, desc = "zoom in" })
 
 return {
   get_zoom = function()
