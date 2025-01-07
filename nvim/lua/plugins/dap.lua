@@ -10,8 +10,6 @@ return {
   lazy = false,
   config = function()
     local dap = require("dap")
-    local ui = require("dapui")
-    local json = require("dkjson")
 
     require("dapui").setup()
     require("nvim-dap-virtual-text").setup({
@@ -48,6 +46,11 @@ return {
 
     --- go
     local function load_vscode_go_configs()
+      local ok, json = pcall(require, "dkjson")
+      if not ok then
+        vim.notify("Failed to load dkjson, unable to load vscode go configurations", vim.log.levels.ERROR)
+        return
+      end
       local cwd = vim.fn.getcwd()
       local vscode_dir = cwd .. "/.vscode"
       local launch_file = vscode_dir .. "/launch.json"

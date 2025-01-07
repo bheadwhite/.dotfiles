@@ -14,7 +14,11 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.localleader = ","
 
-package.path = package.path .. ";/Users/bdub/.luarocks/share/lua/5.1/?.lua"
+local luarocksPath = os.getenv("LUAROCKS_PATH") or ""
+
+if luarocksPath ~= "" then
+  package.path = package.path .. ";" .. luarocksPath .. "/share/lua/5.1/?.lua"
+end
 
 require("bdub.options")
 require("bdub.remap")
