@@ -155,6 +155,13 @@ local normal_keymaps = {
   { "<leader>X", "<cmd>!chmod +x %<CR>", "make file executable" },
   { "<leader>w", ":w<CR>", "write" },
   { "<C-\\>", vSplit, "vertical split" },
+  {
+    "<C-backspace>",
+    function()
+      vim.cmd("sp")
+    end,
+    "vertical split",
+  },
   { "<C-M-S-j>", "<cmd>cnext<CR>zz", "next quickfix" },
   { "<C-M-S-k>", "<cmd>cprev<CR>zz", "prev quickfix" },
   { "<C-M-S-q>", "<cmd>cclose<CR>", "close quickfix" },

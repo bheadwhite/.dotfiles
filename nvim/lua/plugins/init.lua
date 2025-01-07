@@ -4,7 +4,12 @@ end
 
 return {
   { "mileszs/ack.vim" }, -- Integrates 'ack' search tool
-  { "windwp/nvim-ts-autotag", opts = true }, -- Auto-closes HTML tags
+  {
+    "windwp/nvim-ts-autotag",
+    config = function()
+      require("nvim-ts-autotag").setup()
+    end,
+  }, -- Auto-closes HTML tags
   { "stevearc/dressing.nvim" }, -- Improved UI components
   { "sbulav/nredir.nvim" }, -- Redirects command output
   { "dstein64/vim-startuptime" }, -- startup time
