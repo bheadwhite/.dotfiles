@@ -48,7 +48,7 @@ return {
     local function load_vscode_go_configs()
       local ok, json = pcall(require, "dkjson")
       if not ok then
-        vim.notify("Failed to load dkjson, unable to load vscode go configurations", vim.log.levels.ERROR)
+        -- vim.notify("Failed to load dkjson, unable to load vscode go configurations")
         return
       end
       local cwd = vim.fn.getcwd()
