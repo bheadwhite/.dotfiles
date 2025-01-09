@@ -1,5 +1,5 @@
 -- local biomefmt = { "biome" }
-local js_formatter = "biome" -- "prettierd" or "biome"
+local js_formatter = "prettierd" -- "prettierd" or "biome"
 
 if vim.version().minor < 10 then
   return {}
@@ -28,6 +28,7 @@ return {
       },
     },
     formatters_by_ft = {
+      css = { js_formatter },
       python = { "blackd" },
       go = { "gofmt" },
       lua = { "stylua" },

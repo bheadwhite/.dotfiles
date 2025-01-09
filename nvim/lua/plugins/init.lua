@@ -6,9 +6,7 @@ return {
   { "mileszs/ack.vim" }, -- Integrates 'ack' search tool
   {
     "windwp/nvim-ts-autotag",
-    config = function()
-      require("nvim-ts-autotag").setup()
-    end,
+    config = true,
   }, -- Auto-closes HTML tags
   { "stevearc/dressing.nvim" }, -- Improved UI components
   { "sbulav/nredir.nvim" }, -- Redirects command output
