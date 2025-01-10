@@ -45,7 +45,7 @@ return {
 
           -- if there are no results, return early
           if #filtered_results == 0 then
-            vim.notify("No results found", "info")
+            vim.notify("No results found", vim.log.levels.INFO)
             return
           end
 

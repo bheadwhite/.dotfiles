@@ -16,13 +16,12 @@ return {
       commented = true,
     })
 
-    ---------- end -----------
-
     dap.adapters.chrome = {
       type = "executable",
       command = "node",
     }
 
+    -- typescript
     for _, language in ipairs({ "typescript", "javascript", "typescriptreact", "javascriptreact" }) do
       require("dap").configurations[language] = {
         -- launch
@@ -45,118 +44,55 @@ return {
     end
 
     --- go
-    local function load_vscode_go_configs()
-      local ok, json = pcall(require, "dkjson")
-      if not ok then
-        -- vim.notify("Failed to load dkjson, unable to load vscode go configurations")
-        return
-      end
-      local cwd = vim.fn.getcwd()
-      local vscode_dir = cwd .. "/.vscode"
-      local launch_file = vscode_dir .. "/launch.json"
-      local uv = vim.loop
-
-      if uv.fs_stat(vscode_dir) and uv.fs_stat(launch_file) then
-        local file = io.open(launch_file, "r")
-        if file then
-          local content = file:read("*a")
-          file:close()
-          local success, parsed = pcall(json.decode, content)
-          if success and parsed.configurations then
-            for _, config in ipairs(parsed.configurations) do
-              if config.type == "go" then
-                local configuration = {
-                  name = config.name or "VSCode Config",
-                  type = config.type,
-                  request = config.request,
-                  mode = config.mode or "debug",
-                  program = config.program or "${workspaceFolder}",
-                  args = config.args or {},
-                }
-
-                if config.cwd then
-                  configuration.cwd = config.cwd
-                end
-
-                table.insert(dap.configurations.go, configuration)
-              end
-            end
-          else
-            vim.notify("Failed to parse launch.json", vim.log.levels.ERROR)
-          end
-        end
-      end
-    end
-
-    dap.configurations.go = {
-      {
-        name = "launch attachments",
-        type = "go",
-        request = "launch",
-        mode = "debug",
-        program = "${workspaceFolder}/attachmentsctl",
-        args = {
-          "start",
-        },
-      },
-      {
-        name = "launch campaigns",
-        type = "go",
-        request = "launch",
-        mode = "debug",
-        program = "${workspaceFolder}/processorsctl",
-        args = {
-          "campaigns",
-          "start",
-        },
-      },
-      {
-        name = "launch messages",
-        type = "go",
-        request = "launch",
-        mode = "debug",
-        program = "${workspaceFolder}/processorsctl",
-        args = {
-          "messages",
-          "start",
-        },
-      },
-      {
-        name = "launch conversations",
-        type = "go",
-        request = "launch",
-        mode = "debug",
-        program = "${workspaceFolder}/processorsctl",
-        args = {
-          "conversations",
-          "start",
-        },
-      },
-      {
-        name = "launch tasks",
-        type = "go",
-        request = "launch",
-        mode = "debug",
-        program = "${workspaceFolder}/processorsctl",
-        args = {
-          "tasks",
-          "start",
-        },
-      },
-      {
-        name = "launch omniapi",
-        type = "go",
-        request = "launch",
-        mode = "debug",
-        program = "${workspaceFolder}/omnictl",
-        args = {
-          "api",
-          "start",
-        },
-      },
-    }
-
-    load_vscode_go_configs()
+    -- dap.configurations.go = {}
+    -- local known_configs = require("bdub.dap_known_configurations")
+    -- for _, config in ipairs(known_configs) do
+    --   table.insert(dap.configurations.go, config)
+    -- end
+    --
+    -- local function load_vscode_go_configs()
+    --   local ok, json = pcall(require, "dkjson")
+    --   if not ok then
+    --     -- vim.notify("Failed to load dkjson, unable to load vscode go configurations")
+    --     return
+    --   end
+    --   local cwd = vim.fn.getcwd()
+    --   local vscode_dir = cwd .. "/.vscode"
+    --   local launch_file = vscode_dir .. "/launch.json"
+    --   local uv = vim.loop
+    --
+    --   if uv.fs_stat(vscode_dir) and uv.fs_stat(launch_file) then
+    --     local file = io.open(launch_file, "r")
+    --     if file then
+    --       local content = file:read("*a")
+    --       file:close()
+    --       local success, parsed = pcall(json.decode, content)
+    --       if success and parsed.configurations then
+    --         for _, config in ipairs(parsed.configurations) do
+    --           if config.type == "go" then
+    --             local configuration = {
+    --               name = config.name or "VSCode Config",
+    --               type = config.type,
+    --               request = config.request,
+    --               mode = config.mode or "debug",
+    --               program = config.program or "${workspaceFolder}",
+    --               args = config.args or {},
+    --             }
+    --
+    --             if config.cwd then
+    --               configuration.cwd = config.cwd
+    --             end
+    --
+    --             table.insert(dap.configurations.go, configuration)
+    --           end
+    --         end
+    --       else
+    --         vim.notify("Failed to parse launch.json", vim.log.levels.ERROR)
+    --       end
+    --     end
+    --   end
+    -- end
+    -- load_vscode_go_configs()
 
     require("dap-go").setup()
 

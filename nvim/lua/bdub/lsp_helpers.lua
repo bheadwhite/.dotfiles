@@ -1,6 +1,5 @@
 local notify = require("notify")
 local telescope = require("telescope.builtin")
-local diagnostics = require("bdub.diagnostics")
 
 local function add_desc(description, bufnr)
   local opts = { buffer = bufnr, remap = false }
@@ -296,6 +295,11 @@ function M.on_attach(client, attached_bufnr)
 
   function unpackResultUri(result)
     local uri = result.uri or result.targetUri
+    if uri == nil then
+      vim.print("No uri found in result")
+      vim.print(result)
+      return ""
+    end
     return vim.uri_to_fname(uri)
   end
 
@@ -379,50 +383,105 @@ function M.on_attach(client, attached_bufnr)
       function()
         local params = vim.lsp.util.make_position_params()
         vim.lsp.buf_request(0, "textDocument/references", params, function(err, result, ctx, config)
-          local filtered = getSingleResult(result)
+          local results = getSingleResult(result)
 
           local pickers = require("telescope.pickers")
           local finders = require("telescope.finders")
           local previewers = require("telescope.previewers")
+          local conf = require("telescope.config").values
           local actions = require("telescope.actions")
           local action_state = require("telescope.actions.state")
-          local conf = require("telescope.config").values
 
           pickers
             .new({}, {
               prompt_title = "References",
               finder = finders.new_table({
-                results = filtered,
+                results = results,
                 entry_maker = function(entry)
                   return {
                     value = entry,
-                    display = unpackResultUri(entry),
-                    ordinal = unpackResultUri(entry),
+                    display = entry.uri:gsub("file://", ""), -- Clean up the display path
+                    ordinal = entry.uri,
+                    path = vim.uri_to_fname(entry.uri), -- Convert URI to file path
+                    range = entry.range, -- Pass range data for future use
                   }
                 end,
               }),
+
               previewer = previewers.new_buffer_previewer({
                 define_preview = function(self, entry)
-                  local uri = unpackResultUri(entry)
-                  local range = unpackResultRange(entry)
-                  local bufnr = vim.uri_to_bufnr(unpackResultUri(uri))
-                  local lines = vim.api.nvim_buf_get_lines(bufnr, entry.range.start.line, entry.range["end"].line + 1, false)
+                  local path = entry.path
+                  local range = entry.range
+
+                  -- Load the file into the preview buffer
+                  if not vim.loop.fs_stat(path) then
+                    vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, { "File not found: " .. path })
+                    return
+                  end
+
+                  -- Read the file content into the buffer
+                  local lines = vim.fn.readfile(path)
                   vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
+
+                  -- Set filetype for syntax highlighting
+                  local filetype = vim.filetype.match({ filename = path }) or "text"
+                  vim.api.nvim_buf_set_option(self.state.bufnr, "filetype", filetype)
+
+                  -- Highlight the specific line
+                  local line_to_highlight = range.start.line
+                  local total_lines = vim.api.nvim_buf_line_count(self.state.bufnr)
+
+                  if line_to_highlight < total_lines then
+                    vim.api.nvim_buf_add_highlight(self.state.bufnr, -1, "TelescopePreviewLine", line_to_highlight, 0, -1)
+
+                    -- Use a single defer to set the cursor and center the window
+                    vim.defer_fn(function()
+                      vim.api.nvim_win_set_cursor(self.state.winid, { line_to_highlight + 1, 0 })
+
+                      -- Center the preview window based on its height
+                      local win_height = vim.api.nvim_win_get_height(self.state.winid)
+                      local top_line = math.max(0, line_to_highlight - math.floor(win_height / 2))
+                      vim.api.nvim_win_call(self.state.winid, function()
+                        vim.fn.winrestview({ topline = top_line + 1 })
+                      end)
+                    end, 10) -- Small delay to ensure the buffer is ready
+                  else
+                    vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, { "Error: Line out of range" })
+                  end
                 end,
               }),
               sorter = conf.generic_sorter({}),
               attach_mappings = function(prompt_bufnr)
                 actions.select_default:replace(function()
                   local selection = action_state.get_selected_entry()
-                  local uri = selection.value.uri
-                  local bufnr = vim.uri_to_bufnr(uri)
-                  local range = selection.value.range
-
-                  vim.api.nvim_set_current_buf(bufnr)
-                  vim.api.nvim_win_set_cursor(0, { range.start.line + 1, range.start.character })
                   actions.close(prompt_bufnr)
-                end)
 
+                  -- Open the file and jump to the related position
+                  local path = selection.path
+                  local range = selection.range
+
+                  -- Open the file
+                  vim.cmd("vsp " .. vim.fn.fnameescape(path))
+
+                  -- Move cursor to the specified position
+                  vim.api.nvim_win_set_cursor(0, { range.start.line + 1, range.start.character })
+
+                  -- Center the cursor on the screen
+                  vim.defer_fn(function()
+                    local win_height = vim.api.nvim_win_get_height(0)
+                    local total_lines = vim.api.nvim_buf_line_count(0)
+
+                    -- Calculate top line to center the cursor
+                    local line_to_highlight = range.start.line
+                    local top_line = math.max(0, line_to_highlight - math.floor(win_height / 2))
+                    vim.fn.winrestview({ topline = top_line + 1 })
+
+                    -- Additional safety check to ensure proper cursor centering
+                    if line_to_highlight < total_lines then
+                      vim.api.nvim_win_set_cursor(0, { line_to_highlight + 1, range.start.character })
+                    end
+                  end, 10) -- Short delay to ensure window dimensions are finalized
+                end)
                 return true
               end,
             })
