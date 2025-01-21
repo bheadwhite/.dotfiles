@@ -151,7 +151,7 @@ return {
   {
     "dmmulroy/tsc.nvim", -- Typescript
     opts = {
-      use_diagnostics = true,
+      -- use_diagnostics = true,
       -- run_as_monorepo = true,
 
       -- if TSC runs and your expecting results but there arent any..

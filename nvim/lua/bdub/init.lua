@@ -6,11 +6,11 @@ require("bdub.color_config")
 require("bdub.autocommands")
 require("bdub.buf-only")
 
-local augroup = vim.api.nvim_create_augroup
-local bdubsGroup = augroup("bdub", {})
+-- local augroup = vim.api.nvim_create_augroup
+-- local bdubsGroup = augroup("bdub", {})
 
-local autocmd = vim.api.nvim_create_autocmd
-local yank_group = augroup("HighlightYank", {})
+-- local autocmd = vim.api.nvim_create_autocmd
+-- local yank_group = augroup("HighlightYank", {})
 
 function R(name)
   require("plenary.reload").reload_module(name)
