@@ -121,13 +121,18 @@ vim.api.nvim_create_autocmd("TabEnter", {
     active_tab = vim.api.nvim_get_current_tabpage()
   end,
 })
+
+function tryNavToActive()
+  local current = vim.api.nvim_get_current_tabpage()
+  if current ~= active_tab then
+    vim.cmd("tabnext " .. active_tab)
+  end
+end
+
 vim.api.nvim_create_autocmd("FocusGained", {
   pattern = "*",
   callback = function()
-    local current = vim.api.nvim_get_current_tabpage()
-    if current ~= active_tab then
-      vim.cmd("tabnext " .. active_tab)
-    end
+    pcall(tryNavToActive)
   end,
 })
 

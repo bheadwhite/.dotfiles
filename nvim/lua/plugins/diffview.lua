@@ -91,7 +91,7 @@ return {
     vim.keymap.set("n", "<leader>gg", ":DiffviewClose<CR>", { desc = "close diffview", noremap = true, silent = true })
 
     require("diffview").setup({
-      enhanced_diff_hl = true,
+      -- enhanced_diff_hl = true,
       keymaps = {
         view = {
           {
