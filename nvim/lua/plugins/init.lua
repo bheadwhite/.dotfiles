@@ -33,6 +33,7 @@ return {
     end,
     event = { "WinLeave" },
   },
+
   {
     "RRethy/vim-illuminate",
     config = function()
@@ -84,13 +85,6 @@ return {
       require("colortils").setup()
     end,
   },
-  {
-    "troydm/zoomwintab.vim",
-    config = function()
-      vim.g.zoomwintab = 1
-    end,
-  },
-
   -- {
   --   "anuvyklack/windows.nvim",
   --   dependencies = { "anuvyklack/middleclass" },
@@ -148,6 +142,34 @@ return {
     },
     opts = {},
   },
+  -- {
+  --   "tanvirtin/vgit.nvim",
+  --   branch = "v1.0.x",
+  --   -- or               , tag = 'v1.0.2',
+  --   dependencies = { "nvim-lua/plenary.nvim", "nvim-tree/nvim-web-devicons" },
+  --   -- Lazy loading on 'VimEnter' event is necessary.
+  --   event = "VimEnter",
+  --   config = function()
+  --     require("vgit").setup({
+  --       settings = {
+  --         live_gutter = {
+  --           enabled = false,
+  --         },
+  --         live_blame = {
+  --           enabled = false,
+  --         },
+  --         signs = {
+  --           enabled = false,
+  --         },
+  --       },
+  --     })
+  --   end,
+  --
+  --   vim.keymap.set("n", "<esc>", function()
+  --     print("hello world")
+  --     -- <cmd>noh<cr><esc>
+  --   end),
+  -- },
   {
     "dmmulroy/tsc.nvim", -- Typescript
     opts = {

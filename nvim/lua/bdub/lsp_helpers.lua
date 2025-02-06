@@ -522,7 +522,7 @@ function M.on_attach(client, attached_bufnr)
       end,
       "prev diagnostic",
     },
-    { "<leader>vd", vim.diagnostic.open_float, "view diagnostic" },
+    { "<A-h>", vim.diagnostic.open_float, "view diagnostic" },
     { "<leader>vs", vim.lsp.buf.workspace_symbol, "workspace symbols" },
     { "<leader>.", vim.lsp.buf.code_action, "code action" },
     { "<C-A-n>", vim.lsp.buf.rename, "rename symbol" },
@@ -537,13 +537,14 @@ function M.on_attach(client, attached_bufnr)
     { "gH", vim.lsp.buf.signature_help, "signature help" },
   }
 
-  -- diagnostics.setDiagnosticColorOverrides()
-
   for _, value in ipairs(normal_keymaps) do
     vim.keymap.set("n", value[1], value[2], add_desc(value[3], attached_bufnr))
   end
 
   vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, add_desc("signature help", attached_bufnr))
+
+  local config = require("bdub.diagnostics").GetDiagnosticConfig("on")
+  vim.diagnostic.config(config)
 end
 
 return M

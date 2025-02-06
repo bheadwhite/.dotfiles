@@ -5,10 +5,6 @@ local default_diagnostic_config = {
   signs = true,
   update_in_insert = false,
   virtual_text = false,
-  virtual_lines = {
-    only_current_line = true,
-    highlight_whole_line = false,
-  },
   severity_sort = true,
 }
 
@@ -65,7 +61,8 @@ function M.GetDiagnosticConfig(on_or_off)
   end
 end
 
-vim.diagnostic.config(M.GetDiagnosticConfig("on"))
+-- vim.diagnostic.config(M.GetDiagnosticConfig("on"))
+vim.diagnostic.config(default_diagnostic_config)
 
 vim.fn.sign_define("DiagnosticSignError", { text = "💀", texthl = "DiagnosticSignError" })
 vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })

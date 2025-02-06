@@ -1,4 +1,6 @@
-if vim.version().minor < 10 then
+local os_name = vim.loop.os_uname().sysname
+
+if vim.version().minor < 10 or os_name == "Linux" then
   return {}
 end
 

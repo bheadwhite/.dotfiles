@@ -88,7 +88,6 @@ M.config = function()
       file_ignore_patterns = {
         ".*/webphone/",
         ".*/pb_description/",
-        "genproto",
       },
       dynamic_preview_title = true,
       mappings = {

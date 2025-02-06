@@ -66,7 +66,7 @@ return {
         component_separators = { left = "", right = "" },
         section_separators = "",
         disabled_filetypes = { "alpha", "dashboard", "NvimTree", "Outline" },
-        -- globalstatus = true,
+        globalstatus = true,
       },
       tabline = {
         lualine_a = {
@@ -225,6 +225,12 @@ return {
               return ""
             end,
             color = { bg = colors.mocha.red },
+          },
+          {
+            "aerial",
+            depth = 3,
+            colored = true,
+            color = { bg = colors.mocha.crust, fg = colors.mocha.rosewater },
           },
           {
             -- full_path_minus_filename,
