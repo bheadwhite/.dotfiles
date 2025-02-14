@@ -1,6 +1,64 @@
 -- local biomefmt = { "biome" }
--- local js_formatter = "prettierd" -- "prettierd" or "biome"
-local js_formatter = "biome" -- "prettierd" or "biome"
+local function detect_formatter()
+  local biome_files = { "biome.json", ".biome.json" }
+  local prettier_files = {
+    ".prettierrc",
+    ".prettierrc.json",
+    ".prettierrc.js",
+    "prettier.config.js",
+    "prettier.config.cjs",
+    "prettier.config.mjs",
+  }
+
+  local cwd = vim.fn.getcwd()
+  local found_biome, found_prettier = false, false
+
+  -- Check for Biome config files
+  for _, file in ipairs(biome_files) do
+    if vim.fn.filereadable(cwd .. "/" .. file) == 1 then
+      found_biome = true
+      break
+    end
+  end
+
+  -- Check for Prettier config files
+  for _, file in ipairs(prettier_files) do
+    if vim.fn.filereadable(cwd .. "/" .. file) == 1 then
+      found_prettier = true
+      break
+    end
+  end
+
+  -- Return detected formatter
+  if found_biome and found_prettier then
+    return "both"
+  elseif found_biome then
+    return "biome"
+  elseif found_prettier then
+    return "prettier"
+  else
+    return nil
+  end
+end
+
+-- Example usage:
+local formatter = detect_formatter()
+local js_formatter = "prettierd" -- "prettierd" or "biome"
+
+if formatter then
+  if formatter == "both" then
+    print("Detected both Biome and Prettier config files")
+  end
+
+  if formatter == "biome" then
+    js_formatter = "biome"
+  elseif formatter == "prettier" then
+    js_formatter = "prettierd"
+  end
+else
+end
+
+-- local js_formatter = "biome" -- "prettierd" or "biome"
 
 if vim.version().minor < 10 then
   return {}

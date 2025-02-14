@@ -45,10 +45,6 @@ return {
 
     --- go
     -- dap.configurations.go = {}
-    -- local known_configs = require("bdub.dap_known_configurations")
-    -- for _, config in ipairs(known_configs) do
-    --   table.insert(dap.configurations.go, config)
-    -- end
     --
     -- local function load_vscode_go_configs()
     --   local ok, json = pcall(require, "dkjson")
@@ -96,7 +92,12 @@ return {
 
     require("dap-go").setup()
 
-    vim.keymap.set("n", "<leader>D", "<cmd>lua require('dap').continue()<cr>", { noremap = true, silent = true })
+    local known_configs = require("bdub.dap_known_configurations")
+    for _, config in ipairs(known_configs) do
+      table.insert(dap.configurations.go, config)
+    end
+
+    vim.keymap.set("n", "<C-M-S-return>", "<cmd>lua require('dap').continue()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<leader>b", "<cmd>lua require('dap').toggle_breakpoint()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<leader>dc", "<cmd>lua require('dap').run_to_cursor()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<leader>dr", "<cmd>lua require('dap').repl.toggle()<cr>", { noremap = true, silent = true })
@@ -104,7 +105,7 @@ return {
     vim.keymap.set("n", "<C-M-S-i>", "<cmd>lua require('dap').step_into()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<C-M-S-,>", "<cmd>lua require('dap').step_out()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<leader>du", "<cmd>lua require('dapui').toggle()<cr>", { noremap = true, silent = true })
-    vim.keymap.set("n", "<leader>dv", "<cmd>lua require('nvim-dap-virtual-text').refresh()<cr>", { noremap = true, silent = true })
+    vim.keymap.set("n", "<C-M-S-m>", "<cmd>lua require('nvim-dap-virtual-text').toggle()<cr>", { noremap = true, silent = true })
     vim.keymap.set("n", "<C-M-S-h>", function()
       require("dapui").eval(nil, { enter = true })
     end, { noremap = true, silent = true })

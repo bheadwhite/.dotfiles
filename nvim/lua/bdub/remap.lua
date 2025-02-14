@@ -93,24 +93,33 @@ end
 
 local highlight_under_cursor = function()
   local current_word = vim.fn.expand("<cword>")
+  local mc = require("multicursor-nvim")
   -- Use \C to enforce case-sensitive search
   local found = vim.fn.search("\\C" .. current_word, "nw")
+  local hlslens = require("hlslens")
 
   if found == 0 then
     error("word not found")
   else
     -- highlight the word and set as search register
     vim.fn.setreg("/", "\\C" .. current_word) -- Add \C here for case sensitivity
-    vim.cmd("set hlsearch")
-    require("hlslens").start()
+
+    if not hlslens.isEnabled() then
+      vim.cmd("set hlsearch")
+      hlslens.enable()
+      hlslens.start()
+    else
+      require("notify").notify("adding a cursor", "info", { title = "Lens" })
+      mc.matchAddCursor(1)
+    end
 
     -- if previous character is alphanumeric, hit the "b" key to go back one word
-    local prev_char = get_prev_char()
-    local isPreviousCharAlphanumeric = prev_char:match("%w") ~= nil
-
-    if isPreviousCharAlphanumeric then
-      vim.cmd("normal! b")
-    end
+    -- local prev_char = get_prev_char()
+    -- local isPreviousCharAlphanumeric = prev_char:match("%w") ~= nil
+    --
+    -- if isPreviousCharAlphanumeric then
+    --   vim.cmd("normal! b")
+    -- end
   end
 end
 local active_tab = 1
@@ -255,6 +264,14 @@ vim.keymap.set("n", "<leader><leader>", function()
   end
 end, add_desc("neorg"))
 
+function handleEscape()
+  vim.cmd("noh")
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+  local mc = require("multicursor-nvim")
+  require("hlslens").disable()
+  mc.clearCursors()
+end
+
 vim.keymap.set("v", "/", "<Esc>/\\%V", add_desc("search visual selection"))
 -- vim.keymap.set({ "n", "v" }, "j", "gj", options)
 vim.keymap.set({ "v", "n" }, "J", "j", options)
@@ -271,6 +288,6 @@ vim.keymap.set({ "n", "v" }, "<C-M-t>", vim.cmd.tabe, add_desc("new tab"))
 -- vim.keymap.set("n", "<leader>c", ":Bdelete<cr>", { noremap = true, desc = "close buffer" })
 -- vim.keymap.set("n", "<leader>C", ":Bdelete!<cr>", { noremap = true, desc = "close buffer" })
 
-vim.keymap.set("n", "<esc>", "<cmd>noh<cr><esc>", add_desc("esc normal"))
+vim.keymap.set("n", "<esc>", handleEscape, add_desc("esc normal"))
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", options)

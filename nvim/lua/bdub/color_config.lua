@@ -1,15 +1,5 @@
 local colors = require("bdub.catppuccin_colors")
 
-vim.cmd([[highlight MyNormalColor guibg=]] .. colors.macchiato.mantle)
-vim.cmd([[highlight MyInactiveBufferColor guibg=]] .. colors.mocha.mantle)
-vim.cmd([[highlight MyZoomedBufferColor guibg=]] .. colors.macchiato.mantle)
-vim.cmd([[highlight DuplicateBuffer guibg=]] .. colors.macchiato.base)
-vim.cmd([[highlight DropBarFileName guifg=]] .. colors.mocha.sky)
-vim.cmd([[highlight DropBarKindDir gui=bold,italic guifg=]] .. colors.mocha.peach)
-vim.cmd([[hi InclineActive guibg=]] .. colors.mocha.base)
-vim.cmd([[hi InclineInactive guibg=]] .. colors.mocha.base)
-vim.cmd([[highlight NormalSB guibg=#272e33 ]])
-
 return {
   search = colors.mocha.red,
   inclineFileName = colors.mocha.peach,

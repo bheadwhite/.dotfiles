@@ -73,6 +73,14 @@ return {
     "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
   },
+  {
+    "jake-stewart/multicursor.nvim",
+    branch = "1.0",
+    config = function()
+      local mc = require("multicursor-nvim")
+      mc.setup()
+    end,
+  },
   { "yochem/jq-playground.nvim", opts = {
     query_window = {
       height = 0.2,

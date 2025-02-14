@@ -20,6 +20,18 @@ return {
             },
           })
         end,
+        ["biome"] = function()
+          require("lspconfig").biome.setup({
+            on_attach = helpers.on_attach,
+            settings = {
+              biome = {
+                organizeImports = {
+                  enabled = false,
+                },
+              },
+            },
+          })
+        end,
         ["pbls"] = function()
           require("lspconfig").pbls.setup({
             on_attach = helpers.on_attach,
