@@ -91,37 +91,91 @@ local function handleClose()
   end
 end
 
+-- local highlight_under_cursor = function()
+--   --get current word under cursor
+--   local current_word = vim.fn.expand("<cword>")
+--   if current_word == "" then
+--     require("notify").notify("No valid word under cursor")
+--     return
+--   end
+--
+--   --start hlsearch if not already started
+--   local hlslens = require("hlslens")
+--   if not hlslens.isEnabled() then
+--     vim.fn.setreg("/", "\\C" .. current_word) -- Add \C here for case sensitivity
+--     vim.cmd("set hlsearch")
+--     hlslens.enable()
+--     hlslens.start()
+--   end
+--
+--   -- if the current word matches the last search, we need to add a cursor
+--   local current_search = vim.fn.getreg("/")
+--   local foundNext = vim.fn.search("\\C" .. current_word, "nw")
+--   if current_search == "\\C" .. current_word and foundNext ~= 0 then
+--     --look for the next occurrence.. if it has another one, lets start multi-cursor
+--     local mc = require("multicursor-nvim")
+--     require("notify").notify("adding a cursor", "info", { title = "Lens" })
+--     mc.matchAddCursor(1)
+--   end
+-- end
+--
+-- -- Store the last searched word in a global variable
+_G.last_searched_word = nil
+
 local highlight_under_cursor = function()
+  -- Get current word under cursor
   local current_word = vim.fn.expand("<cword>")
-  local mc = require("multicursor-nvim")
-  -- Use \C to enforce case-sensitive search
-  local found = vim.fn.search("\\C" .. current_word, "nw")
-  local hlslens = require("hlslens")
+  if current_word == "" then
+    require("notify").notify("No valid word under cursor", vim.log.levels.WARN, { title = "Highlight" })
+    return
+  end
 
-  if found == 0 then
-    error("word not found")
-  else
-    -- highlight the word and set as search register
-    vim.fn.setreg("/", "\\C" .. current_word) -- Add \C here for case sensitivity
+  -- Ensure hlslens is available
+  local hlslens_ok, hlslens = pcall(require, "hlslens")
+  if not hlslens_ok then
+    require("notify").notify("hlslens not found", vim.log.levels.ERROR, { title = "Highlight" })
+    return
+  end
 
+  -- Construct case-sensitive search pattern
+  local search_pattern = "\\C" .. current_word
+  local current_search = vim.fn.getreg("/")
+
+  -- If the current search term is different from the last searched word, just set it
+  if _G.last_searched_word ~= search_pattern then
+    _G.last_searched_word = search_pattern -- Update last searched word
+    vim.fn.setreg("/", search_pattern) -- Set search register
+    vim.cmd("set hlsearch") -- Ensure hlsearch is enabled
+
+    -- Enable hlslens if it's not already active
     if not hlslens.isEnabled() then
-      vim.cmd("set hlsearch")
       hlslens.enable()
       hlslens.start()
-    else
-      require("notify").notify("adding a cursor", "info", { title = "Lens" })
-      mc.matchAddCursor(1)
     end
 
-    -- if previous character is alphanumeric, hit the "b" key to go back one word
-    -- local prev_char = get_prev_char()
-    -- local isPreviousCharAlphanumeric = prev_char:match("%w") ~= nil
-    --
-    -- if isPreviousCharAlphanumeric then
-    --   vim.cmd("normal! b")
-    -- end
+    -- require("notify").notify("Search set: " .. current_word, "info", { title = "Highlight" })
+    return -- Exit early, requiring a second tap to proceed
   end
+
+  -- If it's the same word as before, proceed to add a cursor
+  local foundNext = vim.fn.search(search_pattern, "nw")
+  if foundNext == 0 then
+    require("notify").notify("No other matches found", vim.log.levels.INFO, { title = "Highlight" })
+    return
+  end
+
+  -- Try to load multicursor-nvim safely
+  local mc_ok, mc = pcall(require, "multicursor-nvim")
+  if not mc_ok then
+    require("notify").notify("multicursor-nvim not found", vim.log.levels.ERROR, { title = "Highlight" })
+    return
+  end
+
+  -- Add cursor for the next match
+  require("notify").notify("Adding a cursor", "info", { title = "Lens" })
+  mc.matchAddCursor(1)
 end
+
 local active_tab = 1
 
 vim.api.nvim_create_autocmd("TabEnter", {
@@ -269,6 +323,7 @@ function handleEscape()
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
   local mc = require("multicursor-nvim")
   require("hlslens").disable()
+  _G.last_searched_word = nil
   mc.clearCursors()
 end
 

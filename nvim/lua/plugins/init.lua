@@ -234,7 +234,7 @@ return {
           go_out = "",
         },
         windows = {
-          width_focus = 150,
+          -- width_focus = 150,
           preview = false,
         },
       })

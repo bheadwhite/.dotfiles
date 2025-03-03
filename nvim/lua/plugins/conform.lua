@@ -31,7 +31,7 @@ local function detect_formatter()
 
   -- Return detected formatter
   if found_biome and found_prettier then
-    return "both"
+    return "biome"
   elseif found_biome then
     return "biome"
   elseif found_prettier then
@@ -46,10 +46,6 @@ local formatter = detect_formatter()
 local js_formatter = "prettierd" -- "prettierd" or "biome"
 
 if formatter then
-  if formatter == "both" then
-    print("Detected both Biome and Prettier config files")
-  end
-
   if formatter == "biome" then
     js_formatter = "biome"
   elseif formatter == "prettier" then

@@ -1,5 +1,10 @@
 local colors = {
-  darkest_black = "#0D1215",
+  muted_teal = "#2A3D40",
+  dark_olive = "#2C322E",
+  deep_blue = "#28343D",
+  soft_purple = "#322E40",
+  subtle_gray = "#252A2E",
+  darkest_black = "#000000",
   darker_black = "#161D21",
   bg = "#1D2326",
   fg = "#E6E7E6",
@@ -24,7 +29,8 @@ local colors = {
 
 function colorMyPencils()
   vim.cmd([[highlight WinSeparator guifg=]] .. colors.white_bright)
-  vim.cmd([[highlight CursorLine guibg=]] .. colors.darker_black)
+  vim.cmd([[highlight CursorLine guibg=]] .. colors.deep_blue)
+  vim.cmd([[highlight QuickFixLine guibg=]] .. colors.dark)
   vim.cmd([[highlight Visual guibg=]] .. colors.white .. [[ guifg=]] .. colors.black)
   vim.cmd([[highlight MyInactiveBufferColor guibg=]] .. colors.black)
 

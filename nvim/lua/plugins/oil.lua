@@ -55,5 +55,7 @@ return {
         end,
       },
     })
+
+    vim.keymap.set("n", "_", oil.open, { desc = "Open parent directory" })
   end,
 }
