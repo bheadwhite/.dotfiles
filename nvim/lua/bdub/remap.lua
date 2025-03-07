@@ -298,11 +298,12 @@ end, add_desc("new split"))
 -- You can then call this function with `:lua open_buffer_in_floating_window()`
 
 -- vim.keymap.set("n", "<leader>os", split_line_by, add_desc("split line by"))
-
 -- system clipboard
+vim.opt.clipboard:append("unnamedplus")
 vim.keymap.set("x", "<leader>P", [["_dP]], add_desc("Paste over selection"))
 vim.keymap.set("x", "c", '"_c', options)
 vim.keymap.set({ "n", "v" }, "<C-M-c>", [["+y]], add_desc("Copy to system clipboard"))
+vim.keymap.set({ "n", "v" }, "<D-c>", '"+y')
 
 vim.keymap.set("c", "<M-k>", "\\(.*\\)", {
   desc = "one eyed fighting kirby",
@@ -312,9 +313,10 @@ vim.keymap.set("n", "<leader><leader>", function()
   local currentFileType = vim.bo.filetype
 
   if currentFileType == "norg" then
-    vim.cmd("Neorg return")
+    -- return to the last opened buffer
+    vim.cmd("b#")
   else
-    vim.cmd("Neorg index")
+    vim.cmd("e index.norg")
   end
 end, add_desc("neorg"))
 
