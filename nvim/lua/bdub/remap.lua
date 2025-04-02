@@ -297,7 +297,6 @@ end, add_desc("new split"))
 
 -- You can then call this function with `:lua open_buffer_in_floating_window()`
 
--- vim.keymap.set("n", "<leader>os", split_line_by, add_desc("split line by"))
 -- system clipboard
 vim.opt.clipboard:append("unnamedplus")
 vim.keymap.set("x", "<leader>P", [["_dP]], add_desc("Paste over selection"))

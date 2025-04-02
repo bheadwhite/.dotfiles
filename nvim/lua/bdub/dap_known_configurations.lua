@@ -1,14 +1,23 @@
 return {
-  -- {
-  --   name = "launch attachments",
-  --   type = "go",
-  --   request = "launch",
-  --   mode = "debug",
-  --   program = "${workspaceFolder}/attachmentsctl",
-  --   args = {
-  --     "start",
-  --   },
-  -- },
+  {
+    type = "delve",
+    name = "file",
+    request = "launch",
+    program = "${file}",
+    outputMode = "remote",
+  },
+  {
+    name = "launch attachments",
+    type = "go",
+    request = "launch",
+    mode = "debug",
+    program = "${workspaceFolder}/attachmentsctl",
+    console = "integratedTerminal",
+    outputMode = "remote",
+    args = {
+      "start",
+    },
+  },
   -- {
   --   name = "launch campaigns",
   --   type = "go",

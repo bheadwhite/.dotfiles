@@ -21,7 +21,7 @@ return {
         },
       },
       hide = {
-        -- cursorline = true,
+        cursorline = true,
       },
       render = function(props)
         local buf_name = vim.api.nvim_buf_get_name(props.buf)

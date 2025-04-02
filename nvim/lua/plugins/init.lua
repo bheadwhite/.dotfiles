@@ -33,7 +33,6 @@ return {
     end,
     event = { "WinLeave" },
   },
-
   {
     "RRethy/vim-illuminate",
     config = function()
@@ -42,8 +41,9 @@ return {
           "lsp",
         },
       })
-      vim.cmd([[hi IlluminatedWordText guifg=NONE guibg=NONE gui=underline guisp=#6DABD3]])
-      vim.cmd([[hi IlluminatedWordRead guifg=NONE guibg=NONE gui=underline guisp=#6DABD3]])
+      vim.cmd([[hi IlluminatedWordText guifg=#FFC83D guibg=#2A2F33 gui=bold,underline guisp=#FFB000]])
+      vim.cmd([[hi IlluminatedWordRead guifg=#FFC83D guibg=#2A2F33 gui=bold,underline guisp=#FFB000]])
+      vim.cmd([[hi IlluminatedWordWrite guifg=#FFC83D guibg=#2A2F33 gui=bold,underline guisp=#FFB000]])
     end,
   },
   {
@@ -223,25 +223,6 @@ return {
       end)
     end,
   },
-  {
-    "echasnovski/mini.files",
-    version = false,
-    config = function()
-      local mini_files = require("mini.files")
-      mini_files.setup({
-        mappings = {
-          go_in = "",
-          go_out = "",
-        },
-        windows = {
-          -- width_focus = 150,
-          preview = false,
-        },
-      })
-
-      require("bdub.mini_files").setup()
-    end,
-  },
   { "tpope/vim-abolish", "tpope/vim-surround" },
   { "tpope/vim-dispatch", event = "VeryLazy" },
   { "nvim-zh/better-escape.vim", event = "InsertEnter" }, -- better escape from insert mode
@@ -258,12 +239,6 @@ return {
 
       -- Jump to next entry in the edit history
       vim.keymap.set("n", "<c-s-l>", before.jump_to_next_edit, {})
-
-      -- -- Look for previous edits in quickfix list
-      -- vim.keymap.set("n", "<leader>oq", before.show_edits_in_quickfix, {})
-      --
-      -- -- Look for previous edits in telescope (needs telescope, obviously)
-      -- vim.keymap.set("n", "<leader>oe", before.show_edits_in_telescope, {})
     end,
   },
   {

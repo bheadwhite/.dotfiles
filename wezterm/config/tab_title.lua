@@ -36,10 +36,9 @@ function M.formatTabTitle(tab, tabs, panes, config, hover, max_width)
 	end
 
 	local title = tab_title(tab)
-	local is_nvim = contains(title, "NVIM")
+	local is_nvim = contains(title, "Nvim")
 
 	-----------------
-
 	if is_nvim then
 		-- (oil:///Users/brent.whitehead/Projects/tcn) - NVIM
 		local vimDisplay = title or ""

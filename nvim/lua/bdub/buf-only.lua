@@ -72,10 +72,19 @@ function! BufOnly(buffer, bang)
 endfunction]])
 
 function CloseAllExceptCurrent()
-  local didCloseDuplicates = win_utils.close_current_tab_duplicate_windows()
+  local ok, err = pcall(function()
+    local didCloseDuplicates = win_utils.close_current_tab_duplicate_windows()
 
-  if not didCloseDuplicates then
-    vim.cmd([[BufOnly]])
+    if not didCloseDuplicates then
+      -- Use BufOnly only if the plugin/command is available
+      if vim.fn.exists(":BufOnly") == 2 then
+        vim.cmd("BufOnly")
+      end
+    end
+  end)
+
+  if not ok then
+    vim.notify("Error in CloseAllExceptCurrent: " .. tostring(err), vim.log.levels.ERROR)
   end
 end
 

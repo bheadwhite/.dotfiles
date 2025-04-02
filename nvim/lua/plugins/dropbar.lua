@@ -85,46 +85,56 @@ end
 vim.keymap.set("n", "K", handleEnterDropBarUp, { noremap = true, silent = true })
 vim.keymap.set("n", "J", handleEnterDropBarDown, { noremap = true, silent = true })
 vim.keymap.set("n", "H", function()
-  local dropbar = require("dropbar.api").get_current_dropbar()
+  local success, err = pcall(function()
+    local dropbar = require("dropbar.api").get_current_dropbar()
 
-  if dropbar == nil then
-    local menu = require("dropbar.utils").menu.get_current()
-    if menu == nil or current_bar == nil or current_idx == 1 then
+    if dropbar == nil then
+      local menu = require("dropbar.utils").menu.get_current()
+      if menu == nil or current_bar == nil or current_idx == 1 then
+        error("Fallback") -- Trigger fallback action
+      end
+
+      current_idx = current_idx - 1
+      menu:close()
+      current_bar:pick(current_idx)
       return
     end
 
-    current_idx = current_idx - 1
+    if not dropbar.in_pick_mode then
+      error("Fallback") -- Trigger fallback action
+    end
+  end)
 
-    menu:close()
-    current_bar:pick(current_idx)
-    return
-  end
-
-  if not dropbar.in_pick_mode then
+  -- If `pcall` catches an error, press "_"
+  if not success then
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("_", true, true, true), "n", true)
-    return
   end
 end, { noremap = true, silent = true })
 
 vim.keymap.set("n", "L", function()
-  local dropbar = require("dropbar.api").get_current_dropbar()
+  local success, err = pcall(function()
+    local dropbar = require("dropbar.api").get_current_dropbar()
 
-  if dropbar == nil then
-    local menu = require("dropbar.utils").menu.get_current()
-    if menu == nil or current_idx + 1 > initial_idx or current_bar == nil then
+    if dropbar == nil then
+      local menu = require("dropbar.utils").menu.get_current()
+      if menu == nil or current_idx + 1 > initial_idx or current_bar == nil then
+        error("Fallback") -- Trigger fallback action
+      end
+
+      current_idx = current_idx + 1
+      menu:close()
+      current_bar:pick(current_idx)
       return
     end
 
-    current_idx = current_idx + 1
-    menu:close()
+    if not dropbar.in_pick_mode then
+      error("Fallback") -- Trigger fallback action
+    end
+  end)
 
-    current_bar:pick(current_idx)
-    return
-  end
-
-  if not dropbar.in_pick_mode then
+  -- If `pcall` catches an error, press "$"
+  if not success then
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("$", true, true, true), "n", true)
-    return
   end
 end, { noremap = true, silent = true })
 

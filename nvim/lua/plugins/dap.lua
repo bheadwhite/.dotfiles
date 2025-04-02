@@ -39,14 +39,98 @@ return {
     config = function()
       local dap = require("dap")
 
-      require("dapui").setup()
+      require("dapui").setup({
+        controls = {
+          element = "repl",
+          enabled = true,
+          icons = {
+            disconnect = "",
+            pause = "",
+            play = "",
+            run_last = "",
+            step_back = "",
+            step_into = "",
+            step_out = "",
+            step_over = "",
+          },
+        },
+        element_mappings = {},
+        expand_lines = true,
+        floating = {
+          border = "rounded",
+          mappings = {
+            close = { "q", "<Esc>" },
+          },
+        },
+        force_buffers = true,
+        icons = {
+          collapsed = "",
+          current_frame = "",
+          expanded = "",
+        },
+        layouts = {
+          {
+            elements = {
+              {
+                id = "scopes",
+                size = 0.25,
+              },
+              {
+                id = "breakpoints",
+                size = 0.25,
+              },
+              {
+                id = "stacks",
+                size = 0.25,
+              },
+              {
+                id = "watches",
+                size = 0.25,
+              },
+            },
+            position = "right",
+            size = 50,
+          },
+          {
+            elements = {
+              {
+                id = "repl",
+                size = 1,
+              },
+            },
+            position = "bottom",
+            size = 10,
+          },
+        },
+        mappings = {
+          edit = "e",
+          expand = { "<CR>", "<2-LeftMouse>" },
+          open = "o",
+          remove = "d",
+          repl = "r",
+          toggle = "t",
+        },
+        render = {
+          indent = 1,
+          max_value_lines = 100,
+        },
+      })
       require("nvim-dap-virtual-text").setup({
         commented = true,
+        enabled = false,
       })
 
-      dap.adapters.chrome = {
-        type = "executable",
-        command = "node",
+      dap.adapters["pwa-chrome"] = {
+        type = "server",
+        host = "localhost",
+        port = "${port}",
+        executable = {
+          command = "node",
+          args = {
+            get_pkg_path("js-debug-adapter", "/js-debug/src/dapDebugServer.js"),
+            "${port}",
+          },
+        },
       }
 
       dap.adapters["pwa-node"] = {
@@ -65,15 +149,7 @@ return {
       -- typescript
       for _, language in ipairs({ "typescriptreact", "javascriptreact", "typescript", "javascript" }) do
         require("dap").configurations[language] = {
-
           -- launch
-          -- {
-          --   type = "pwa-chrome",
-          --   request = "launch",
-          --   name = "Launch Chrome",
-          --   url = "http://localhost:3000",
-          --   webRoot = "${workspaceFolder}",
-          -- },
           --
           {
             type = "pwa-node",
@@ -104,14 +180,17 @@ return {
             name = "attach",
             processId = require("dap.utils").pick_process,
             cwd = "${workspaceFolder}",
+            sourceMaps = true,
           },
           {
-            type = "pwa-chrome",
+            type = "pwa-node",
             request = "attach",
             name = "Attach Chrome",
+            sourceMaps = true,
+            protocol = "inspector",
             port = 9222,
             webRoot = "${workspaceFolder}",
-            runtimeExecutable = "canary",
+            -- runtimeExecutable = "canary",
           },
         }
       end
@@ -162,21 +241,55 @@ return {
       --   end
       -- end
       -- load_vscode_go_configs()
-      require("dap-go").setup()
+      -- debugger        Log debugger commands
+      -- gdbwire         Log connection to gdbserial backend
+      -- lldbout         Copy output from debugserver/lldb to standard output
+      -- debuglineerr    Log recoverable errors reading .debug_line
+      -- rpc             Log all RPC messages
+      -- dap             Log all DAP messages
+      -- fncall          Log function call protocol
+      -- minidump        Log minidump loading
+      -- stack           Log stacktracer
+      require("dap-go").setup({
+        delve = {
+          initialize_timeout_sec = 60,
+          args = {
+            "--log",
+          },
+        },
+      })
 
       local known_configs = require("bdub.dap_known_configurations")
       for _, config in ipairs(known_configs) do
         table.insert(dap.configurations.go, config)
       end
 
+      function openREPL()
+        local width = vim.api.nvim_get_option("columns")
+        local height = vim.api.nvim_get_option("lines")
+
+        local win_width = math.floor(width * 0.95)
+        local win_height = math.floor(height * 0.95)
+
+        require("dapui").float_element("repl", {
+          width = win_width,
+          height = win_height,
+          border = "rounded",
+        })
+      end
+
+      local function toggle_ui()
+        require("dapui").toggle()
+      end
+
       vim.keymap.set("n", "<C-M-S-return>", "<cmd>lua require('dap').continue()<cr>", { noremap = true, silent = true })
       vim.keymap.set("n", "<leader>b", "<cmd>lua require('dap').toggle_breakpoint()<cr>", { noremap = true, silent = true })
       vim.keymap.set("n", "<leader>dc", "<cmd>lua require('dap').run_to_cursor()<cr>", { noremap = true, silent = true })
-      vim.keymap.set("n", "<leader>dr", "<cmd>lua require('dap').repl.toggle()<cr>", { noremap = true, silent = true })
+      vim.keymap.set("n", "<leader>dr", openREPL, { noremap = true, silent = true })
       vim.keymap.set("n", "<C-M-S-.>", "<cmd>lua require('dap').step_over()<cr>", { noremap = true, silent = true })
       vim.keymap.set("n", "<C-M-S-i>", "<cmd>lua require('dap').step_into()<cr>", { noremap = true, silent = true })
       vim.keymap.set("n", "<C-M-S-,>", "<cmd>lua require('dap').step_out()<cr>", { noremap = true, silent = true })
-      vim.keymap.set("n", "<leader>du", "<cmd>lua require('dapui').toggle()<cr>", { noremap = true, silent = true })
+      vim.keymap.set("n", "<leader>du", toggle_ui, { noremap = true, silent = true })
       vim.keymap.set("n", "<C-M-S-m>", "<cmd>lua require('nvim-dap-virtual-text').toggle()<cr>", { noremap = true, silent = true })
       vim.keymap.set("n", "<C-M-S-h>", function()
         require("dapui").eval(nil, { enter = true })

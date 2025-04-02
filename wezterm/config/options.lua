@@ -8,7 +8,7 @@ local window_frame = {
 }
 
 return {
-	debug_key_events = true,
+	-- debug_key_events = true,
 	font_size = 15,
 	command_palette_font_size = 19,
 	native_macos_fullscreen_mode = false,
@@ -27,9 +27,9 @@ return {
 		background = wezterm.color.parse(colors.bg0):lighten(0),
 	},
 	inactive_pane_hsb = {
-		hue = 2.3,
-		saturation = 1,
-		brightness = 1,
+		hue = 10,
+		saturation = 4,
+		brightness = 0.4,
 	},
 	color_schemes = {
 		["dark"] = colors.dark,
