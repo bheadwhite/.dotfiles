@@ -144,6 +144,9 @@ return {
   dependencies = { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   opts = {
     menu = {
+      win_configs = {
+        border = "rounded",
+      },
       keymaps = {
         ["l"] = function()
           local utils = require("dropbar.utils")

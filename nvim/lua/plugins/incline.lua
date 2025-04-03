@@ -96,8 +96,8 @@ return {
               or isDuplicate and catp_colors.mocha.blue
               or "#ffffff",
           },
-          { get_git_diff() },
-          { get_diagnostic_label() },
+          -- { get_git_diff() },
+          -- { get_diagnostic_label() },
         }
       end,
     })
