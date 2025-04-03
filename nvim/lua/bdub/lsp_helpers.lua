@@ -49,7 +49,7 @@ function M.jump_to_parent_class()
   M.cursorToParent()
 
   local current_buf = vim.api.nvim_get_current_buf()
-  local params = vim.lsp.util.make_position_params()
+  local params = vim.lsp.util.make_position_params(0, "utf-8")
   local current_uri = vim.uri_from_bufnr(current_buf)
 
   -- Ensure the context is set correctly for the references request
@@ -84,10 +84,9 @@ function M.jump_to_parent_class()
     if filtered_result and #filtered_result == 1 then
       local uri = filtered_result[1].uri
       local bufnr = vim.uri_to_bufnr(uri)
-      local range = filtered_result[1].range
 
       -- Jump to the location of the single reference
-      vim.lsp.util.jump_to_location({ uri = uri, range = range })
+      vim.lsp.util.show_document(filtered_result[1], "utf-8", { focus = true })
       vim.api.nvim_set_current_buf(bufnr)
     elseif result then
       vim.cmd("Glance references")
@@ -139,7 +138,7 @@ function M.on_attach(client, attached_bufnr)
   )
 
   function isDefinitionResultLessThan2WithConstructor(ifYesCb, ifNoCb)
-    local params = vim.lsp.util.make_position_params()
+    local params = vim.lsp.util.make_position_params(0, "utf-8")
     vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result, _ctx, _config)
       if err or not result or vim.tbl_isempty(result) then
         print("No definitions found")
@@ -336,7 +335,7 @@ function M.on_attach(client, attached_bufnr)
     {
       "gi",
       function()
-        local params = vim.lsp.util.make_position_params()
+        local params = vim.lsp.util.make_position_params(0, "utf-8")
         vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result) -- err, result, ctx, config)
           local filtered, target_uri, range = getSingleResult(result)
 
@@ -358,7 +357,7 @@ function M.on_attach(client, attached_bufnr)
     {
       "gI",
       function()
-        local params = vim.lsp.util.make_position_params()
+        local params = vim.lsp.util.make_position_params(0, "utf-8")
         vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result, ctx, config)
           local filtered, target_uri, range = getSingleResult(result)
 
@@ -381,7 +380,7 @@ function M.on_attach(client, attached_bufnr)
     {
       "gR",
       function()
-        local params = vim.lsp.util.make_position_params()
+        local params = vim.lsp.util.make_position_params(0, "utf-8")
         vim.lsp.buf_request(0, "textDocument/references", params, function(err, result, ctx, config)
           local results = getSingleResult(result)
 
@@ -496,7 +495,7 @@ function M.on_attach(client, attached_bufnr)
     {
       "g<leader>",
       function()
-        vim.diagnostic.open_float(0, { scope = "line" })
+        vim.diagnostic.open_float({ scope = "line", bufnr = 0 })
       end,
       "open diagnostic float",
     },
