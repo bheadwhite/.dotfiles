@@ -32,6 +32,55 @@ function M.zoomToggle(window, pane)
 	window:perform_action(action, pane)
 end
 
+local themes = {
+	default = options.color_scheme,
+	aqua = "aqua",
+	purple = "purple",
+	blue = "blue",
+	orange = "orange",
+}
+
+function M.setRightStatus(window, pane)
+	-- "Wed Mar 3 08:14"
+	local date = wezterm.strftime("%a %b %-d %H:%M ")
+
+	local bat = ""
+	for _, b in ipairs(wezterm.battery_info()) do
+		bat = "🔋 " .. string.format("%.0f%%", b.state_of_charge * 100)
+	end
+
+	window:set_right_status(wezterm.format({
+		{ Text = bat .. "   " .. date },
+	}))
+end
+
+function M.toggle_background(window, pane)
+	local focused = window:is_focused()
+	if not focused then
+		return
+	end
+	local overrides = window:get_config_overrides() or {}
+
+	if not overrides.window_frame then
+		overrides.window_frame = {}
+	end
+
+	if overrides.color_scheme == themes.default then
+		overrides.color_scheme = themes.aqua
+	elseif overrides.color_scheme == themes.aqua then
+		overrides.color_scheme = themes.purple
+	elseif overrides.color_scheme == themes.purple then
+		overrides.color_scheme = themes.blue
+	elseif overrides.color_scheme == themes.blue then
+		overrides.color_scheme = themes.orange
+	else
+		overrides.color_scheme = themes.default
+	end
+
+	options.window_frame.border_left_color = getWindowColor(overrides.color_scheme)
+	window:set_config_overrides(overrides)
+end
+
 function M.splitDown(window, pane)
 	local action = nvim.wez_nvim_actions.split_down.wez
 	if nvim.is_nvim_process(window) then
@@ -41,15 +90,39 @@ function M.splitDown(window, pane)
 	window:perform_action(action, pane)
 end
 
+function getWindowColor(color_theme)
+	if not color_theme then
+		return "#ffffff"
+	end
+
+	if color_theme == themes.default then
+		return "#ffffff"
+	elseif color_theme == themes.aqua then
+		return colors.aqua
+	elseif color_theme == themes.purple then
+		return colors.purple
+	elseif color_theme == themes.blue then
+		return colors.blue
+	elseif color_theme == themes.orange then
+		return colors.orange
+	end
+end
+
 function M.apply_color_scheme(window)
 	local focused = window:is_focused()
 	local overrides = window:get_config_overrides() or {}
 	overrides.window_frame = options.window_frame
 
 	if focused then
-		options.window_frame.border_left_color = options.everforestGreen
+		options.window_frame.border_top_color = getWindowColor(overrides.color_scheme)
+		options.window_frame.border_left_color = getWindowColor(overrides.color_scheme)
+		options.window_frame.border_bottom_color = getWindowColor(overrides.color_scheme)
+		options.window_frame.border_right_color = getWindowColor(overrides.color_scheme)
 	else
-		options.window_frame.border_left_color = colors.red
+		options.window_frame.border_top_color = options.everforestGreen
+		options.window_frame.border_left_color = options.everforestGreen
+		options.window_frame.border_bottom_color = options.everforestGreen
+		options.window_frame.border_right_color = options.everforestGreen
 	end
 
 	window:set_config_overrides(overrides)

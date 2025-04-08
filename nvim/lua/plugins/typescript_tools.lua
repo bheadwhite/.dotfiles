@@ -32,8 +32,16 @@ return {
           documentFormattingProvider = false,
           documentRangeFormattingProvider = false,
         })
-        vim.keymap.set("n", "gp", helpers.jump_to_parent_class, { noremap = true, silent = true })
-        vim.keymap.set("n", "<leader>r", "<cmd>TSToolsRenameFile<CR>", { noremap = true, silent = true })
+        -- vim.keymap.set("n", "gp", helpers.jumpToTypescriptReference, { noremap = true, silent = true })
+        -- <cmd>lua require('helpers').jumpToTypescriptReference()<CR>"
+        --
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "gp", "<cmd>lua require('bdub.lsp_helpers').jumpToTypescriptReference()<CR>", {
+          noremap = true,
+          silent = true,
+          desc = "Jump to TypeScript reference",
+        })
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>r", "<cmd>TSToolsRenameFile<CR>", { noremap = true, silent = true, desc = "Rename file" })
+        vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>W", [[<cmd>TSToolsOrganizeImports<CR>]], { noremap = true, silent = true })
 
         helpers.on_attach(client, bufnr)
       end,
@@ -50,10 +58,6 @@ return {
         ["textDocument/publishDiagnostics"] = api.filter_diagnostics(diagnostic_filters),
       },
     })
-
-    vim.keymap.set("n", "<leader>W", function()
-      vim.cmd([[TSToolsOrganizeImports]])
-    end, { noremap = true, silent = true })
 
     vim.api.nvim_create_autocmd("BufWritePre", {
       group = vim.api.nvim_create_augroup("TS", { clear = true }),

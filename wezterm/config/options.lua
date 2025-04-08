@@ -1,10 +1,14 @@
 local colors = require("config.colors")
-local wezterm = require("wezterm")
+local color_pointer = require("config.color_pointer")
 
 local window_frame = {
-	border_left_width = "1cell",
+	border_top_height = ".1cell",
+	border_bottom_height = ".1cell",
 	border_left_color = colors.everforestGreen,
 	border_top_color = colors.bg1,
+	border_bottom_color = colors.bg1,
+	border_left_width = ".3cell",
+	border_right_width = ".3cell",
 }
 
 return {
@@ -22,18 +26,19 @@ return {
 	foreground_text_hsb = {
 		brightness = 1.8,
 	},
-	colors = {
-		split = colors.purple,
-		background = wezterm.color.parse(colors.bg0):lighten(0),
-	},
+	colors = color_pointer,
 	inactive_pane_hsb = {
 		hue = 10,
 		saturation = 4,
 		brightness = 0.4,
 	},
 	color_schemes = {
-		["dark"] = colors.dark,
-		["dark_focus"] = colors.dark_focus,
+		["dark"] = {},
+		["aqua"] = {},
+		["orange"] = {},
+		["purple"] = {},
+		["blue"] = {},
+		["dark_focus"] = {},
 	},
 	window_frame = window_frame,
 }

@@ -40,14 +40,43 @@ function M.cursorToParent()
 
     if exportFound == 0 then
       notify.notify("No constructor, or export found", "error", { title = "Jump to Parent", timeout = 200 })
-      return
+      return false
     end
+  end
+
+  return true
+end
+
+function M.jumpToGolangReference()
+  local found = cursorToGolangExport()
+  if found then
+    glanceOrJumpToFirstReference()
   end
 end
 
-function M.jump_to_parent_class()
-  M.cursorToParent()
+function cursorToGolangExport()
+  -- First, find the line starting with "func"
+  local found = vim.fn.search("\\v^func", "bW")
+  if found == 0 then
+    notify.notify("No function found", "error", { title = "Jump to Export", timeout = 200 })
+    return false
+  end
 
+  -- Get the current line text.
+  local line = vim.api.nvim_get_current_line()
+
+  -- If there's a receiver (line starts with "func ("), jump to the closing parenthesis then one word forward.
+  if line:match("^func%s*%(") then
+    vim.cmd("normal! f)w")
+  else
+    -- Otherwise, simply jump one word forward from the "func" keyword.
+    vim.cmd("normal! w")
+  end
+
+  return true
+end
+
+function glanceOrJumpToFirstReference()
   local current_buf = vim.api.nvim_get_current_buf()
   local params = vim.lsp.util.make_position_params(0, "utf-8")
   local current_uri = vim.uri_from_bufnr(current_buf)
@@ -56,25 +85,25 @@ function M.jump_to_parent_class()
   params.context = { includeDeclaration = true }
 
   vim.lsp.buf_request(0, "textDocument/references", params, function(err, result)
-    --sort results by line number
-    table.sort(result, function(a, b)
-      return a.range.start.line > b.range.start.line
-    end)
-
     if err ~= nil then
       print("Error during references request: " .. err.message)
       return
     end
+    --sort results by line number
+    table.sort(result, function(a, b)
+      return a.range.start.line > b.range.start.line
+    end)
 
     -- Filter out unwanted references and the current file's URI
     local filtered_result = {}
     local added_uris = {}
     for _, ref in ipairs(result or {}) do
       local uri = ref.uri or ""
+      vim.print("Checking URI: " .. uri)
       if
         not added_uris[uri]
         and uri ~= current_uri
-        and not (string.find(uri, "%.test%.") or string.find(uri, "stories") or string.find(uri, "mock"))
+        and not (string.find(uri, "%.test%.") or string.find(uri, "stories") or string.find(uri, "mock") or string.find(uri, "test.go"))
       then
         table.insert(filtered_result, ref)
         added_uris[uri] = true
@@ -94,6 +123,15 @@ function M.jump_to_parent_class()
       print("No references found.")
     end
   end)
+end
+
+function M.jumpToTypescriptReference()
+  local found = M.cursorToParent()
+  if not found then
+    return
+  end
+
+  glanceOrJumpToFirstReference()
 end
 
 function getUriFromDefinitionResult(result)
@@ -337,7 +375,22 @@ function M.on_attach(client, attached_bufnr)
       function()
         local params = vim.lsp.util.make_position_params(0, "utf-8")
         vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result) -- err, result, ctx, config)
-          local filtered, target_uri, range = getSingleResult(result)
+          if err then
+            vim.print("Error during implementation request: " .. err.message)
+            return
+          end
+          if not result or vim.tbl_isempty(result) then
+            print("No implementations found")
+            return
+          end
+
+          local current_uri = vim.uri_from_bufnr(0)
+
+          local without_current = vim.tbl_filter(function(item)
+            return item.uri ~= current_uri
+          end, result)
+
+          local _filtered, target_uri, range = getSingleResult(without_current)
 
           if target_uri and range then
             local col = range.start.character
@@ -359,7 +412,22 @@ function M.on_attach(client, attached_bufnr)
       function()
         local params = vim.lsp.util.make_position_params(0, "utf-8")
         vim.lsp.buf_request(0, "textDocument/implementation", params, function(err, result, ctx, config)
-          local filtered, target_uri, range = getSingleResult(result)
+          if err then
+            vim.print("Error during implementation request: " .. err.message)
+            return
+          end
+          if not result or vim.tbl_isempty(result) then
+            print("No implementations found")
+            return
+          end
+
+          local current_uri = vim.uri_from_bufnr(0)
+
+          local without_current = vim.tbl_filter(function(item)
+            return item.uri ~= current_uri
+          end, result)
+
+          local filtered, target_uri, range = getSingleResult(without_current)
 
           if target_uri and range then
             local col = range.start.character

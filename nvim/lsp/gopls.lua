@@ -14,5 +14,13 @@ return {
       },
     },
   },
-  on_attach = require("bdub.lsp_helpers").on_attach,
+  on_attach = function(client, bufnr)
+    vim.api.nvim_buf_set_keymap(bufnr, "n", "gp", "<cmd>lua require('bdub.lsp_helpers').jumpToGolangReference()<CR>", {
+      noremap = true,
+      silent = true,
+      desc = "Jump to golang reference",
+    })
+
+    require("bdub.lsp_helpers").on_attach(client, bufnr)
+  end,
 }

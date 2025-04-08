@@ -87,6 +87,7 @@ return {
           if action.type == "delete" and action.entry_type == "file" then
             local path = parse_url(action.url)
             local bufnr = vim.fn.bufnr(path)
+            delete_any_deleted_buffers()
             if bufnr == -1 then
               return
             end
@@ -111,20 +112,34 @@ return {
       return buf_name:find("^oil://") ~= nil
     end
 
+    function delete_any_deleted_buffers()
+      -- This function will delete any buffers that have been deleted from disk
+      local bufnrs = vim.api.nvim_list_bufs()
+      for _, bufnr in ipairs(bufnrs) do
+        --is buf valid
+        local bufName = vim.api.nvim_buf_get_name(bufnr)
+        local isOil = is_oil_buffer()
+        if isOil then
+          goto continue -- skip if the buffer is not loaded or is an oil buffer
+        end
+
+        local existsOnDisk = vim.loop.fs_stat(bufName) ~= nil
+        local isLoaded = vim.api.nvim_buf_is_loaded(bufnr)
+
+        if not existsOnDisk and isLoaded then
+          -- If the buffer doesn't exist on disk and is loaded, close it
+          vim.api.nvim_buf_delete(bufnr, { force = true })
+        end
+
+        ::continue:: -- label to skip to the next iteration
+      end
+    end
+
     vim.keymap.set("n", "<leader>e", function()
       if is_oil_buffer() then
         -- If we're in an oil buffer, close it
         require("oil").close()
-        --clear any deleted buffers in buf list
-        local bufnrs = vim.api.nvim_list_bufs()
-        for _, bufnr in ipairs(bufnrs) do
-          --does buf exist on disk?
-          local exists = vim.loop.fs_stat(vim.api.nvim_buf_get_name(bufnr))
-          if not exists and vim.api.nvim_buf_is_loaded(bufnr) then
-            -- If the buffer doesn't exist on disk and is loaded, close it
-            vim.api.nvim_buf_delete(bufnr, { force = true })
-          end
-        end
+        delete_any_deleted_buffers()
       else
         -- Otherwise, open oil
         vim.cmd("Oil")

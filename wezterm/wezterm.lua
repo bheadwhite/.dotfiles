@@ -23,6 +23,9 @@ wezterm.on("move-prev", events.movePrevPane)
 wezterm.on("split-right", events.splitRight)
 wezterm.on("zoom-toggle", events.zoomToggle)
 wezterm.on("split-down", events.splitDown)
+wezterm.on("toggle_background", events.toggle_background)
+
+wezterm.on("update-right-status", events.setRightStatus)
 
 --wezterm events
 wezterm.on("format-tab-title", tab_title.formatTabTitle)

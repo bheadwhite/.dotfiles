@@ -52,7 +52,6 @@ return {
 		mods = "SHIFT",
 		action = act.ScrollByPage(1),
 	},
-
 	{ key = ",", mods = "ALT", action = act.MoveTabRelative(-1) },
 	{ key = ".", mods = "ALT", action = act.MoveTabRelative(1) },
 	{ key = "-", mods = "CMD", action = act.DecreaseFontSize },
@@ -114,5 +113,10 @@ return {
 		key = "l",
 		mods = "CMD",
 		action = { SendKey = { key = "End" } },
+	},
+
+	{
+		key = "F12",
+		action = wezterm.action.EmitEvent("toggle_background"),
 	},
 }
