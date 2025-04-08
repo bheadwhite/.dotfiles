@@ -36,12 +36,17 @@ function M.cursorToParent()
 
   if found == 0 then
     local exportFound = vim.fn.search("export", "bW")
-    vim.cmd("normal! ww")
 
     if exportFound == 0 then
-      notify.notify("No constructor, or export found", "error", { title = "Jump to Parent", timeout = 200 })
-      return false
+      local defaultFound = vim.fn.search("export default")
+
+      if defaultFound == 0 then
+        notify.notify("No constructor, or export found", "error", { title = "Jump to Parent", timeout = 200 })
+        return false
+      end
     end
+
+    vim.cmd("normal! ww")
   end
 
   return true
