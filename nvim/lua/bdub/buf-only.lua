@@ -76,8 +76,15 @@ function CloseAllExceptCurrent()
     local didCloseDuplicates = win_utils.close_current_tab_duplicate_windows()
 
     if not didCloseDuplicates then
-      -- Use BufOnly only if the plugin/command is available
-      if vim.fn.exists(":BufOnly") == 2 then
+      for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+        local current_tab = vim.api.nvim_get_current_tabpage()
+        if tab ~= current_tab then
+          pcall(vim.cmd, "tabclose " .. tab)
+        end
+      end
+
+      local current_wins = vim.api.nvim_list_wins()
+      if #current_wins > 1 then
         vim.cmd("BufOnly")
       end
     end

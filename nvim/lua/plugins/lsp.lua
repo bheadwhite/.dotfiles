@@ -3,7 +3,7 @@ return {
   dependencies = { "rcarriga/nvim-notify" },
   config = function()
     require("mason").setup()
-    vim.lsp.enable({ "lua-language-server", "gopls", "pbls", "biome", "pyright" })
+    vim.lsp.enable({ "lua-language-server", "gopls", "pbls", "biome", "pyright", "typescript-language-server" })
 
     vim.api.nvim_create_autocmd("LspAttach", {
       callback = function(ev)
