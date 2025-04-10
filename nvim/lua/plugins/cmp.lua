@@ -8,8 +8,15 @@ return {
     local cmp = require("cmp")
     local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
+    local function fast_cmp_visible()
+      if not (cmp.core.view and cmp.core.view.custom_entries_view) then
+        return false
+      end
+      return cmp.core.view.custom_entries_view:visible()
+    end
+
     local handleDown = function(fallback)
-      if cmp.visible() then
+      if fast_cmp_visible() then
         cmp.select_next_item()
       else
         fallback()
@@ -17,7 +24,7 @@ return {
     end
 
     local handleUp = function(fallback)
-      if cmp.visible() then
+      if fast_cmp_visible() then
         cmp.select_prev_item()
       else
         fallback()
@@ -26,15 +33,40 @@ return {
 
     local cmp_mappings = {
       ["<CR>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
+        if fast_cmp_visible() then
+          local entry = cmp.get_selected_entry()
+          if not entry then
+            -- If nothing is selected, select the first item
+            cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+          end
           cmp.confirm({
+            behavior = cmp.ConfirmBehavior.Replace,
             select = true,
           })
         else
           fallback()
         end
-        fallback()
-      end),
+      end, { "i", "s" }),
+      ["<C-v>"] = cmp.mapping(function(fallback)
+        if require("copilot.suggestion").is_visible() then
+          require("copilot.suggestion").accept()
+          return
+        end
+
+        if fast_cmp_visible() then
+          local entry = cmp.get_selected_entry()
+          if not entry then
+            -- If nothing is selected, select the first item
+            cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+          end
+          cmp.confirm({
+            behavior = cmp.ConfirmBehavior.Replace,
+            select = true,
+          })
+        else
+          fallback()
+        end
+      end, { "i", "s" }),
       ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "s" }),
       ["<C-e>"] = cmp.mapping.close(),
       ["<C-f>"] = cmp.mapping.scroll_docs(4),

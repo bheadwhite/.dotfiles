@@ -134,7 +134,3 @@ return {
     require("bdub.lsp_helpers").on_attach(client, bufnr)
   end,
 }
-
--- jsx_close_tag = {
---   enabled = true,
--- },

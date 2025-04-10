@@ -51,7 +51,6 @@ if formatter then
   elseif formatter == "prettier" then
     js_formatter = "prettierd"
   end
-else
 end
 
 -- local js_formatter = "biome" -- "prettierd" or "biome"

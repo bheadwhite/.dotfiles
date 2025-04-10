@@ -21,6 +21,7 @@ end, { noremap = true, silent = true })
 
 return {
   "zbirenbaum/copilot.lua",
+  commit = "1ff8ab7baae8dab4a9e078350624374cff0d5e71",
   init = function()
     vim.g.copilot_no_tab_map = true
   end,

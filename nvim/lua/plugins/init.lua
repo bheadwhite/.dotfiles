@@ -109,7 +109,7 @@ return {
     "CopilotC-Nvim/CopilotChat.nvim",
     branch = "main",
     build = "make tiktoken", -- Only on MacOS or Linux
-    dependencies = { "zbirenbaum/copilot.vim", "nvim-lua/plenary.nvim" },
+    dependencies = { "zbirenbaum/copilot.lua", "nvim-lua/plenary.nvim" },
     config = function()
       require("CopilotChat").setup()
     end,
