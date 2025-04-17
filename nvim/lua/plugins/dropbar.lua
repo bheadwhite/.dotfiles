@@ -143,6 +143,14 @@ return {
   commit = "d0c78c570db0f5941f85ba54522c0f01427cdf67", --10.0
   dependencies = { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   opts = {
+    sources = {
+      treesitter = {
+        max_depth = 0
+      },
+      lsp = {
+        max_depth = 0
+      }
+    },
     menu = {
       win_configs = {
         border = "rounded",

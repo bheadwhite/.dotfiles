@@ -13,7 +13,7 @@ return {
   { "dstein64/vim-startuptime" }, -- startup time
   -- treesitter
   {
-    -- "nvim-treesitter/nvim-treesitter-context",
+    "nvim-treesitter/nvim-treesitter-context",
     "RRethy/nvim-treesitter-textsubjects",
     "nvim-treesitter/nvim-treesitter-textobjects",
     "nvim-treesitter/playground",

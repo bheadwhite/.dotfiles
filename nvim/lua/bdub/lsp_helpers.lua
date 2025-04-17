@@ -35,12 +35,12 @@ function M.cursorToParent()
   local found = vim.fn.search("constructor(")
 
   if found == 0 then
-    local exportFound = vim.fn.search("export", "bW")
+    local defaultFound = vim.fn.search("export default")
 
-    if exportFound == 0 then
-      local defaultFound = vim.fn.search("export default")
+    if defaultFound == 0 then
+      local exportFound = vim.fn.search("export", "bW")
 
-      if defaultFound == 0 then
+      if exportFound == 0 then
         notify.notify("No constructor, or export found", "error", { title = "Jump to Parent", timeout = 200 })
         return false
       end
@@ -104,7 +104,6 @@ function glanceOrJumpToFirstReference()
     local added_uris = {}
     for _, ref in ipairs(result or {}) do
       local uri = ref.uri or ""
-      vim.print("Checking URI: " .. uri)
       if
         not added_uris[uri]
         and uri ~= current_uri

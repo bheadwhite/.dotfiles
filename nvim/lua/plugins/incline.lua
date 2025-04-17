@@ -31,10 +31,6 @@ return {
           return { require("bdub.cwd").get_cwd_path_display(props.buf) }
         end
 
-        local filename = vim.fn.fnamemodify(buf_name, ":t")
-        if filename == "" then
-          filename = "[No Name]"
-        end
 
         local function get_git_diff()
           local icons = { removed = "", changed = "", added = "" }
@@ -74,13 +70,18 @@ return {
           return label
         end
 
+        -- local filename = vim.fn.fnamemodify(buf_name, ":t")
+        -- if filename == "" then
+        --   filename = "[No Name]"
+        -- end
+        --
         local isModified = vim.bo[props.buf].modified
-        local filenameDisp = filename
+        local filenameDisp = ""
 
         local isDuplicate = require("bdub.win_utils").is_win_duplicate(props.win)
 
         if isDuplicate then
-          filenameDisp = "  " .. filenameDisp
+          filenameDisp = "   "
         end
 
         return {
@@ -88,7 +89,7 @@ return {
             isModified and " 🌱 " or "",
           },
           {
-            "  " .. filenameDisp .. "  ",
+            filenameDisp,
             gui = isModified and "bold,italic" or "bold",
             guifg = "#000000",
             guibg = isModified and catp_colors.mocha.green
