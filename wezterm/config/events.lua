@@ -2,7 +2,7 @@ local wezterm = require("wezterm")
 local act = wezterm.action
 local nvim = require("config.nvim")
 local colors = require("config.colors")
-local options = require("config.options")
+local options = require("config.init")
 
 local M = {}
 

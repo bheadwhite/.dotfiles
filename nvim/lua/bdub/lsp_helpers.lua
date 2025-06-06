@@ -103,11 +103,18 @@ function glanceOrJumpToFirstReference()
     local filtered_result = {}
     local added_uris = {}
     for _, ref in ipairs(result or {}) do
+      -- vim.print(ref)
       local uri = ref.uri or ""
       if
         not added_uris[uri]
         and uri ~= current_uri
-        and not (string.find(uri, "%.test%.") or string.find(uri, "stories") or string.find(uri, "mock") or string.find(uri, "test.go"))
+        and not (
+          string.find(uri, "%.test%.")
+          or string.find(uri, "stories")
+          or string.find(uri, "mock")
+          or string.find(uri, "test.go")
+          or string.find(uri, "logging")
+        )
       then
         table.insert(filtered_result, ref)
         added_uris[uri] = true

@@ -9,12 +9,12 @@ return {
           inactive = { Normal = "InclineInactive" },
         },
         padding = {
-          left = 2,
-          right = 2,
+          left = 0,
+          right = 0,
         },
         placement = {
-          horizontal = "right",
-          vertical = "bottom",
+          horizontal = "left",
+          vertical = "top",
         },
         margin = {
           vertical = 1,
@@ -28,7 +28,7 @@ return {
         local isOil = string.match(buf_name, "oil")
 
         if isOil then
-          return { require("bdub.cwd").get_cwd_path_display(props.buf) }
+          return ""
         end
 
 

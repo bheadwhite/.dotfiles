@@ -1,59 +1,22 @@
--- local biomefmt = { "biome" }
-local function detect_formatter()
-  local biome_files = { "biome.json", ".biome.json" }
-  local prettier_files = {
+local function biome_lsp_or_prettier(bufnr)
+  local has_prettier = vim.fs.find({
     ".prettierrc",
     ".prettierrc.json",
+    ".prettierrc.yml",
+    ".prettierrc.yaml",
+    ".prettierrc.json5",
     ".prettierrc.js",
+    ".prettierrc.cjs",
+    ".prettierrc.toml",
     "prettier.config.js",
     "prettier.config.cjs",
-    "prettier.config.mjs",
-  }
+  }, { upward = true })[1]
 
-  local cwd = vim.fn.getcwd()
-  local found_biome, found_prettier = false, false
-
-  -- Check for Biome config files
-  for _, file in ipairs(biome_files) do
-    if vim.fn.filereadable(cwd .. "/" .. file) == 1 then
-      found_biome = true
-      break
-    end
+  if has_prettier then
+    return { "prettier", "prettierd" }
   end
-
-  -- Check for Prettier config files
-  for _, file in ipairs(prettier_files) do
-    if vim.fn.filereadable(cwd .. "/" .. file) == 1 then
-      found_prettier = true
-      break
-    end
-  end
-
-  -- Return detected formatter
-  if found_biome and found_prettier then
-    return "biome"
-  elseif found_biome then
-    return "biome"
-  elseif found_prettier then
-    return "prettier"
-  else
-    return nil
-  end
+  return { "biome" }
 end
-
--- Example usage:
-local formatter = detect_formatter()
-local js_formatter = "prettierd" -- "prettierd" or "biome"
-
-if formatter then
-  if formatter == "biome" then
-    js_formatter = "biome"
-  elseif formatter == "prettier" then
-    js_formatter = "prettierd"
-  end
-end
-
--- local js_formatter = "biome" -- "prettierd" or "biome"
 
 if vim.version().minor < 10 then
   return {}
@@ -62,7 +25,7 @@ end
 return {
   "stevearc/conform.nvim",
   opts = {
-    -- log_level = vim.log.levels.DEBUG,
+    log_level = vim.log.levels.TRACE,
     formatters = {
       blackd = {
         command = "blackd-client",
@@ -82,16 +45,17 @@ return {
       },
     },
     formatters_by_ft = {
-      css = { js_formatter },
+      css = biome_lsp_or_prettier,
       python = { "blackd" },
       go = { "gofmt" },
       lua = { "stylua" },
-      javascript = { js_formatter },
-      javascriptreact = { js_formatter },
-      typescript = { js_formatter },
-      typescriptreact = { js_formatter },
-      html = { "prettierd" },
-      json = { js_formatter },
+      javascript = biome_lsp_or_prettier,
+      javascriptreact = biome_lsp_or_prettier,
+      typescript = biome_lsp_or_prettier,
+      typescriptreact = biome_lsp_or_prettier,
+      html = biome_lsp_or_prettier,
+      json = biome_lsp_or_prettier,
+      jsonc = biome_lsp_or_prettier,
     },
     format_on_save = {
       timeout_ms = 3000,

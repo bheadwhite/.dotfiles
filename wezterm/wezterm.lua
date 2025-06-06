@@ -1,6 +1,6 @@
 local wezterm = require("wezterm")
 local keys = require("config.keys")
-local opts = require("config.options")
+local cfg = require("config.init")
 local tab_title = require("config.tab_title")
 local events = require("config.events")
 
@@ -11,7 +11,7 @@ if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
 
-for k, v in pairs(opts) do
+for k, v in pairs(cfg) do
 	config[k] = v
 end
 

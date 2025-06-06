@@ -86,8 +86,8 @@ M.config = function()
       prompt_prefix = " ",
       selection_caret = " ",
       file_ignore_patterns = {
-        ".*/webphone/",
-        ".*/pb_description/",
+        -- ".*/webphone/",
+        -- ".*/pb_description/",
       },
       dynamic_preview_title = true,
       mappings = {
@@ -97,7 +97,7 @@ M.config = function()
           ["<C-v>"] = actions.file_vsplit,
           ["<C-u>"] = false,
           ["<C-M-S-l>"] = function()
-            print("target rpc references")
+            -- print("target rpc references")
             local val = vim.api.nvim_win_get_cursor(0)
             local string = "!mock !fixture !test"
             local startRow = val[1] - 1

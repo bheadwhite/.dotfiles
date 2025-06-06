@@ -68,131 +68,28 @@ return {
         disabled_filetypes = { "alpha", "dashboard", "NvimTree", "Outline" },
         globalstatus = true,
       },
-      -- tabline = {
-      --   lualine_a = {},
-      --   lualine_b = {},
-      --   lualine_c = {},
-      --   lualine_x = {},
-      --   lualine_y = {},
-      --   lualine_z = {},
-      -- },
-      -- {
-      --   function()
-      --     if is_zoomed() then
-      --       return "ZOOOM"
-      --     end
-      --
-      --     return ""
-      --   end,
-      --   fmt = function(str, cntx)
-      --     local widths = get_tabbar_widths()
-      --
-      --     return string.rep(" ", widths.left)
-      --   end,
-      -- },
-      -- {
-      --   function()
-      --     return cwd.get_cwd_path_display()
-      --   end,
-      --   cond = function()
-      --     return vim.fn.expand("%") ~= ""
-      --   end,
-      --   fmt = function(str)
-      --     local padding = get_tabbar_widths().center - #str
-      --     return string.rep(" ", math.max(padding / 2, 0)) .. str .. string.rep(" ", math.max(padding / 2, 0))
-      --   end,
-      --   color = function()
-      --     local display = cwd.get_cwd_path_display() or ""
-      --     if string.sub(display, 1, 1) == "/" then
-      --       return {
-      --         bg = color_config.outOfBoundsBg,
-      --         fg = color_config.outOfBoundsFg,
-      --       }
-      --     end
-      --
-      --     return {
-      --       bg = color_config.headerBg,
-      --       fg = color_config.headerFg,
-      --     }
-      --   end,
-      -- },
-      -- {
-      --   function()
-      --     local sesh = " "
-      --     sesh = sesh .. require("auto-session.lib").current_session_name(true)
-      --     return sesh
-      --   end,
-      --   -- color = { bg = colors.mocha.rosewater, fg = "#FFFFFF" },
-      -- },
-      -- {
-      --   "diff",
-      --   colored = true,
-      --   symbols = { added = " ", modified = " ", removed = " " }, -- changes diff symbols
-      --   cond = hide_in_width,
-      --   color = { bg = color_config.diffBg },
-      -- },
-      -- {
-      --   "diagnostics",
-      --   sources = { "nvim_diagnostic" },
-      --   sections = { "error", "warn" },
-      --   symbols = { error = " ", warn = " " },
-      --   colored = false,
-      --   update_in_insert = false,
-      --   always_visible = true,
-      --   color = { bg = color_config.diagnosticsBg },
-      -- },
-      -- {
-      --   function()
-      --     local grapple = require("grapple")
-      --     local app = grapple.app()
-      --     if app == nil then
-      --       return ""
-      --     end
-      --     local scope = app.scope_manager:get(app.settings.scope)
-      --     return anchor_icon .. " " .. scope.name
-      --   end,
-      -- },
-      -- {
-      --   dap_status,
-      -- },
-      -- {
-      --   function()
-      --     local files = vim.fn.sort(vim.fn["bm#all_files"]())
-      --     local matching_files = {}
-      --     local current_file = vim.fn.expand("%:p")
-      --     for _, file in ipairs(files) do
-      --       if file == current_file then
-      --         local line_nrs = vim.fn.sort(vim.fn["bm#all_lines"](file), "bm#compare_lines")
-      --         for _, line_nr in ipairs(line_nrs) do
-      --           table.insert(matching_files, file)
-      --         end
-      --       end
-      --     end
-      --
-      --     if #matching_files == 0 then
-      --       return ""
-      --     end
-      --
-      --     return "🔖 " .. #matching_files
-      --   end,
-      --   color = { bg = colors.mocha.peach },
-      -- },
-      inactive_sections = {
+      tabline = {
         lualine_a = {
-          -- {
-          --   full_path_minus_filename,
-          --   color = function()
-          --     -- local winid = vim.fn.win_getid()
-          --     -- local isDup = win_utils.isWindowDuplicate(winid)
-          --     --
-          --     -- if isDup then
-          --     --   return { bg = colors.orange, fg = colors.fg }
-          --     -- end
-          --
-          --     return { bg = color_config.sectionFilePathBg, fg = color_config.sectionFilePathFg }
-          --   end,
-          -- },
+          function()
+            --display the current working directory
+            --from the home directory
+            --ie ~/Projects/tcn
+            local cwd = vim.fn.getcwd()
+            local home = os.getenv("HOME")
+            if cwd:sub(1, #home) == home then
+              cwd = "~" .. cwd:sub(#home + 1)
+            end
+            return cwd
+          end,
         },
+        lualine_b = {},
+        lualine_c = {},
+        lualine_x = {},
+        lualine_y = {},
+        lualine_z = {},
+      },
+      inactive_sections = {
+        lualine_a = {},
         lualine_b = {},
         lualine_c = {},
         lualine_x = {},
@@ -201,15 +98,7 @@ return {
       },
       sections = {
         lualine_a = {
-          {
-            function()
-              if is_zoomed() then
-                return "ZOOOM"
-              end
-              return ""
-            end,
-            color = { bg = colors.mocha.red },
-          },
+          {},
           -- {
           --   "aerial",
           --   depth = 3,
