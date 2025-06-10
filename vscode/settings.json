@@ -1,0 +1,112 @@
+{
+  "window.commandCenter": true,
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "editor.formatOnSave": true,
+  "typescript.preferences.quoteStyle": "single",
+  "editor.fontSize": 13,
+  "editor.fontFamily": "Fira Code",
+  "editor.cursorSmoothCaretAnimation": "off",
+  "editor.glyphMargin": false,
+  "editor.lineDecorationsWidth": 0,
+  "editor.lineNumbersMinChars": 0,
+  "editor.linkedEditing": true,
+  "editor.minimap.enabled": false,
+  "editor.parameterHints.enabled": false,
+  "explorer.openEditors.visible": 1,
+  // "editor.guides.bracketPairs": "active",
+  "typescript.referencesCodeLens.showOnAllFunctions": true,
+  "typescript.tsserver.log": "off",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "editor.defaultFormatter": "biomejs.biome",
+  "accessibility.signals.lineHasError": {
+    "sound": "off",
+    "announcement": "off"
+  },
+  "accessibility.signals.lineHasWarning": {
+    "sound": "off",
+    "announcement": "off"
+  },
+  "accessibility.signals.positionHasError": {
+    "sound": "off",
+    "announcement": "off"
+  },
+  "accessibility.signals.positionHasWarning": {
+    "sound": "off",
+    "announcement": "off"
+  },
+  "workbench.colorTheme": "Cursor Dark Midnight",
+  "[jsonc]": {
+    "editor.formatOnSave": false,
+  },
+  "lsio-projects.paths": [],
+  "editor.accessibilitySupport": "off",
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "biome.suggestInstallingGlobally": false,
+  "breadcrumbs.filePath": "on",
+
+  // *** VIM SETTINGS
+  "vim.enableNeovim": true,
+  "vim.leader": "<space>",
+  "vim.easymotion": false,
+  "vim.neovimUseConfigFile": true,
+  "vim.searchHighlightColor": "#555599",
+  "references.preferredLocation": "view",
+  "vim.incsearch": true,
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.hlsearch": true,
+  "vim.shell": "/bin/zsh",
+  "extensions.experimental.affinity": {
+  // To improve performance
+    "vscodevim.vim": 1
+  },
+  "vim.handleKeys": {
+    "<C-a>": false,
+    "<C-f>": false
+  }, 
+  "vim.normalModeKeyBindings": [
+    { "before": [ "L" ], "after": [ "$" ], "recursive": true },
+    { "before": [ "H" ], "after": [ "^" ], "recursive": true },
+    { "before": [ "leader", "w" ], "commands": [ "workbench.action.files.save" ], "recursive": true },
+    { "before": [ "leader", "q" ], "commands": [ "workbench.action.closeActiveEditor" ], "recursive": true },
+    { "before": [ "leader", "z" ], "commands": [ "workbench.action.toggleMaximizeEditorGroup" ], "recursive": true },
+    { "before": [ "leader", "g", "p" ], "commands": [ "editor.action.dirtydiff.previous" ], "recursive": true },
+    { "before": [ "g", "r" ], "commands": [ "editor.action.goToReferences" ], "recursive": true },
+    { "before": [ "g", "R" ], "commands": [ "openReferenceToSide" ], "recursive": true },
+    { "before": [ "g", "i" ], "commands": [ "editor.action.goToImplementation" ], "recursive": true },
+    { "before": [ "g", "I" ], "commands": [ "openImplementationToSide" ], "recursive": true },
+    { "before": [ "g", "D" ], "commands": [ "editor.action.openDeclarationToTheSide" ], "recursive": true },
+    { "before": [ "-" ], "commands": [ { "command": "oil-code.open" } ] },
+    { "before": [ "<cr>" ], "commands": [ { "command": "oil-code.select" } ] },
+    { "before": [ "<c-l>" ], "commands": [ { "command": "oil-code.refresh" } ] },
+    { "before": [ "leader", "e" ], "commands": [ { "command": "oil-code.close" } ] } 
+  ],
+  "vim.normalModeKeyBindingsNonRecursive": [
+    { "before": [ "<leader>", "d" ], "after": [ "d", "d" ] },
+    { "before": [ "S" ], "after": [ "v", "g", "_" ] },
+    { "before": [ "<C-n>" ], "commands": [ ":nohl" ] },
+    { "before": [ "J" ], "commands": [] },
+    { "before": [ "g", "j", ], "after": [ "J" ] },
+  ],
+  "vim.insertModeKeyBindings": [
+    { "before": [ "j", "j" ], "after": [ "<Esc>" ] }
+  ],
+  "vim.visualModeKeyBindings": [
+    { "before": [ ">" ], "commands": [ "editor.action.indentLines" ] },
+    { "before": [ "<" ], "commands": [ "editor.action.outdentLines" ] },
+    { "before": [ "J" ], "commands": [] },
+  ],
+  "vim.visualModeKeyBindingsNonRecursive": [
+    { "before": [ "p" ], "after": [ "p", "g", "v", "y" ] }
+  ],
+  "vim.operatorPendingModeKeyBindingsNonRecursive": [
+    { "before": [ "(" ], "after": [ "i(" ] },
+  ],
+  "vim.operatorPendingModeKeyBindings": [
+    { "before": [ "L" ], "after": [ "$" ] },
+    { "before": [ "w" ], "after": [ "i", "w" ] },
+    { "before": [ "H" ], "after": [ "^" ] }
+  ],
+}
