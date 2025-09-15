@@ -2,6 +2,11 @@ local catp_colors = require("bdub.catppuccin_colors")
 return {
   "b0o/incline.nvim",
   config = function()
+
+    if vim.g.vscode then
+      return
+    end
+
     require("incline").setup({
       window = {
         winhighlight = {

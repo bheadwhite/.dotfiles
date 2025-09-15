@@ -77,6 +77,8 @@ local function handleClose()
     end
   end
 
+  vim.print(listed_buffers .. " listed buffers found")
+
   -- If only one buffer is listed and loaded, use :bd, else use :q
   if listed_buffers == 1 then
     local success, err = pcall(vim.cmd, "bd")
@@ -90,6 +92,12 @@ local function handleClose()
     end
   end
 end
+
+-- Copy to system clipboard in visual mode
+vim.keymap.set({ "v", "x" }, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
+
+-- Open current file in Cursor
+vim.keymap.set("n", "<leader>j", ":silent !cursor %<CR>", { desc = "Open in Cursor" })
 
 -- local highlight_under_cursor = function()
 --   --get current word under cursor
@@ -132,10 +140,6 @@ local highlight_under_cursor = function()
 
   -- Ensure hlslens is available
   local hlslens_ok, hlslens = pcall(require, "hlslens")
-  if not hlslens_ok then
-    require("notify").notify("hlslens not found", vim.log.levels.ERROR, { title = "Highlight" })
-    return
-  end
 
   -- Construct case-sensitive search pattern
   local search_pattern = "\\C" .. current_word
@@ -148,6 +152,11 @@ local highlight_under_cursor = function()
     vim.cmd("set hlsearch") -- Ensure hlsearch is enabled
 
     -- Enable hlslens if it's not already active
+    if not hlslens_ok then
+      require("notify").notify("hlslens not found", vim.log.levels.ERROR, { title = "Highlight" })
+      return
+    end
+
     if not hlslens.isEnabled() then
       hlslens.enable()
       hlslens.start()
@@ -203,8 +212,8 @@ local normal_keymaps = {
   { "gj", "mzJ`z", "join" },
   { "<c-d>", "<c-d>zz", "half page down" },
   { "<C-u>", "<C-u>zz", "half page up" },
-  { "n", "nzzzv", "next with cursor centered" },
-  { "N", "Nzzzv", "prev with cursor centered" },
+  -- { "n", "nzzzv", "next with cursor centered" },
+  -- { "N", "Nzzzv", "prev with cursor centered" },
   { "S", "vg_", "select until EOL" },
   { "Q", "<nop>", "disable ex mode" },
   { "<C-M-g>", ToggleGit, "git" },
@@ -309,15 +318,8 @@ vim.keymap.set("c", "<M-k>", "\\(.*\\)", {
 })
 
 vim.keymap.set("n", "<leader><leader>", function()
-  local currentFileType = vim.bo.filetype
-
-  if currentFileType == "norg" then
-    -- return to the last opened buffer
-    vim.cmd("b#")
-  else
-    vim.cmd("e index.norg")
-  end
-end, add_desc("neorg"))
+  vim.cmd("!cursor %")
+end, add_desc("open in cursor"))
 
 function handleEscape()
   vim.cmd("noh")
@@ -337,13 +339,21 @@ vim.keymap.set({ "v", "n" }, "K", "k", options)
 vim.keymap.set({ "n", "v" }, "L", "$", options)
 vim.keymap.set({ "n", "v" }, "H", "_", options)
 vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", add_desc("move to top window"))
-vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", add_desc("move to right window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", add_desc("move to bottom window"))
-vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("move to left window"))
 vim.keymap.set({ "n", "v" }, "<C-M-t>", vim.cmd.tabe, add_desc("new tab"))
+
+vim.keymap.set({ "n", "v", "x" }, "<C-.>", "<C-w>l", add_desc("move to right window"))
+vim.keymap.set({ "n", "v", "x" }, "<C-,>", "<C-w>h", add_desc("move to left window"))
 -- vim.keymap.set("n", "<leader>c", ":Bdelete<cr>", { noremap = true, desc = "close buffer" })
 -- vim.keymap.set("n", "<leader>C", ":Bdelete!<cr>", { noremap = true, desc = "close buffer" })
 
 vim.keymap.set("n", "<esc>", handleEscape, add_desc("esc normal"))
+
+vim.keymap.set('n', '<leader>c', function()
+  local file = vim.api.nvim_buf_get_name(0)
+  if file ~= "" then
+    vim.fn.jobstart({ "open", "-a", "Cursor", file }, { detach = true })
+  end
+end, { desc = 'Open current buffer in Cursor app' })
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", options)

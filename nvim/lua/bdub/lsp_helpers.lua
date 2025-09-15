@@ -604,7 +604,7 @@ function M.on_attach(client, attached_bufnr)
     { "<leader>vs", vim.lsp.buf.workspace_symbol, "workspace symbols" },
     { "<leader>.", vim.lsp.buf.code_action, "code action" },
     { "<C-A-n>", vim.lsp.buf.rename, "rename symbol" },
-    { "<leader>t", M.changeGlanceState, "toggle glance filter" },
+    -- { "<leader>t", M.changeGlanceState, "toggle glance filter" },
     {
       "gh",
       function()

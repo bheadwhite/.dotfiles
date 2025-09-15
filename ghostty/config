@@ -1,0 +1,107 @@
+# Ghostty Configuration
+# Converted from WezTerm configuration
+
+# Font Settings
+font-family = "JetBrains Mono"
+font-size = 16
+
+# Window Settings
+window-padding-x = 0
+window-padding-y = 0
+
+# Color Scheme - DjangoSmooth equivalent (brightened)
+# Uncomment the line below to try a brighter built-in theme instead:
+# theme = "Solarized Light"
+background = #2a2a2a
+foreground = #ffffff
+
+# Color palette based on your everforest color scheme (brightened)
+# black (brightened)
+palette = 0=#8a9488
+palette = 8=#95a299
+# red
+palette = 1=#e67e80
+palette = 9=#e67e80
+# green
+palette = 2=#a7c080
+palette = 10=#a7c080
+# yellow
+palette = 3=#dbbc7f
+palette = 11=#dbbc7f
+# blue
+palette = 4=#7fbbb3
+palette = 12=#7fbbb3
+# purple
+palette = 5=#d699b6
+palette = 13=#d699b6
+# aqua
+palette = 6=#83c092
+palette = 14=#83c092
+# white
+palette = 7=#9da9a0
+palette = 15=#d3c6aa
+
+# Brightness adjustments - using color modifications instead
+
+# Cursor Settings
+cursor-style = block
+cursor-style-blink = false
+
+# Shell Integration
+shell-integration = zsh
+
+# Misc Settings
+confirm-close-surface = true
+quit-after-last-window-closed = false
+
+# Key Bindings - Converted from WezTerm
+# Basic window/surface management
+keybind = cmd+w=close_surface
+keybind = cmd+shift+c=copy_to_clipboard
+keybind = cmd+v=paste_from_clipboard
+keybind = cmd+n=new_window
+keybind = cmd+t=new_tab
+
+# Splitting
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+
+# Split navigation (equivalent to your pane navigation)
+keybind = cmd+comma=goto_split:previous
+keybind = cmd+period=goto_split:next
+keybind = cmd+shift+j=goto_split:down
+keybind = cmd+shift+k=goto_split:up
+
+# Tab navigation
+keybind = alt+comma=previous_tab
+keybind = alt+period=next_tab
+keybind = cmd+shift+comma=previous_tab
+keybind = cmd+shift+period=next_tab
+
+# Font size adjustment (removed due to key format issues)
+# Use the default Ghostty font size keybindings instead
+
+# Scrolling
+keybind = shift+up=scroll_page_up
+keybind = shift+down=scroll_page_down
+
+# Split resizing (equivalent to your pane resizing)
+keybind = cmd+left=resize_split:left,5
+keybind = cmd+right=resize_split:right,5
+keybind = cmd+down=resize_split:down,5
+keybind = cmd+up=resize_split:up,5
+
+# Zoom toggle (equivalent to your zoom-toggle)
+keybind = cmd+z=toggle_split_zoom
+keybind = cmd+h=toggle_split_zoom
+
+# Fullscreen
+keybind = cmd+m=toggle_fullscreen
+
+# Text operations
+keybind = alt+backspace=text:\x17
+keybind = cmd+backspace=text:\x15
+keybind = cmd+l=text:\x05
+
+# macOS specific settings
+macos-option-as-alt = true

@@ -1,3 +1,7 @@
+if vim.g.vscode then
+  return {}
+end
+
 local colors = require("bdub.everforest_colors")
 
 vim.cmd([[highlight HlSearchLens guibg=]] .. colors.bg4)

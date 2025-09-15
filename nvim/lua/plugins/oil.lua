@@ -1,3 +1,7 @@
+if vim.g.vscode then
+  return {}
+end
+
 -- Declare a global function to retrieve the current directory
 function _G.get_oil_winbar()
   local bufnr = vim.api.nvim_win_get_buf(vim.g.statusline_winid)

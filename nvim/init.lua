@@ -38,3 +38,32 @@ require("lazy").setup({
     enabled = true,
   },
 })
+
+if vim.g.vscode then
+  require("bdub.vscode_keymaps")
+  vim.opt.cmdheight = 1
+else
+
+vim.keymap.set("n", "<leader>t", function()
+  local tsc = require("tsc")
+  tsc.run()
+end, {
+  desc = "Run TypeScript compiler",
+})
+
+vim.api.nvim_create_user_command("CursorQF", function()
+  require("bdub.commands").open_qf_in_cursor()
+end, {
+  desc = "Run TypeScript compiler and open errors in Cursor",
+})
+
+vim.keymap.set("n", "<leader>-", "<cmd>CursorQF<CR>", {
+  noremap = true,
+  silent = true,
+  desc = "Run TypeScript compiler and open errors in Cursor",
+})
+end
+
+
+
+

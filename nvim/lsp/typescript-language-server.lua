@@ -40,6 +40,7 @@ local function apply_code_actions(result, client)
   end
 end
 
+
 local function codeAction(action, bufnr)
   if not action then
     return

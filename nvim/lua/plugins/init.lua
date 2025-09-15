@@ -28,6 +28,9 @@ return {
   {
     "nvim-zh/colorful-winsep.nvim",
     config = function()
+      if vim.g.vscode then
+        return
+      end
       require("colorful-winsep").setup()
       vim.cmd([[highlight NvimSeparator guifg=]] .. getColors().mocha.overlay0)
     end,
@@ -36,6 +39,9 @@ return {
   {
     "RRethy/vim-illuminate",
     config = function()
+      if vim.g.vscode then
+        return
+      end
       require("illuminate").configure({
         providers = {
           "lsp",
@@ -77,6 +83,9 @@ return {
     "jake-stewart/multicursor.nvim",
     branch = "1.0",
     config = function()
+      if vim.g.vscode then
+        return
+      end
       local mc = require("multicursor-nvim")
       mc.setup()
     end,
@@ -90,6 +99,9 @@ return {
     "max397574/colortils.nvim",
     cmd = "Colortils",
     config = function()
+      if vim.g.vscode then
+        return
+      end
       require("colortils").setup()
     end,
   },
@@ -232,6 +244,9 @@ return {
     "bloznelis/before.nvim",
     config = function()
       local before = require("before")
+      if vim.g.vscode then
+        return
+      end
       before.setup()
 
       -- Jump to previous entry in the edit history
@@ -244,6 +259,9 @@ return {
   {
     "nvim-lua/lsp-status.nvim", -- LSP
     config = function()
+      if vim.g.vscode then
+        return
+      end
       require("lsp-status").register_progress()
     end,
   },
