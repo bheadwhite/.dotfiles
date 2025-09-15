@@ -317,9 +317,9 @@ vim.keymap.set("c", "<M-k>", "\\(.*\\)", {
   desc = "one eyed fighting kirby",
 })
 
-vim.keymap.set("n", "<leader><leader>", function()
-  vim.cmd("!cursor %")
-end, add_desc("open in cursor"))
+-- vim.keymap.set("n", "<leader><leader>", function()
+--   vim.cmd("!cursor %")
+-- end, add_desc("open in cursor"))
 
 function handleEscape()
   vim.cmd("noh")

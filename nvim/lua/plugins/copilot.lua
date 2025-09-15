@@ -4,7 +4,39 @@ end
 
 local hyper_key = require("bdub.globals").hyper_space_key
 vim.keymap.set({ "i" }, hyper_key, function()
-  require("copilot.suggestion").next()
+  -- Check if suggestions are already visible
+  if require("copilot.suggestion").is_visible() then
+    require("copilot.suggestion").next()
+  else
+    -- Try to trigger new suggestions
+    vim.print('requesting new suggestions...')
+    
+    -- Method 1: Try using the internal API to request suggestions
+    pcall(function()
+      local copilot = require("copilot.suggestion")
+      copilot.dismiss() -- Clear any existing state
+      
+      -- Simulate text change to trigger suggestions
+      local pos = vim.api.nvim_win_get_cursor(0)
+      local line = vim.api.nvim_get_current_line()
+      
+      -- Insert and immediately delete a space to trigger Copilot
+      vim.api.nvim_set_current_line(line .. " ")
+      vim.schedule(function()
+        vim.api.nvim_set_current_line(line)
+        vim.api.nvim_win_set_cursor(0, pos)
+        
+        -- Small delay then try to get suggestions
+        vim.defer_fn(function()
+          if copilot.is_visible() then
+            vim.print('suggestions now visible!')
+          else
+            vim.print('no suggestions available')
+          end
+        end, 200)
+      end)
+    end)
+  end
 end, { noremap = true, silent = true })
 
 vim.keymap.set("v", hyper_key, function()
@@ -21,7 +53,6 @@ end, { noremap = true, silent = true })
 
 return {
   "zbirenbaum/copilot.lua",
-  commit = "1ff8ab7baae8dab4a9e078350624374cff0d5e71",
   init = function()
     vim.g.copilot_no_tab_map = true
   end,

@@ -147,9 +147,9 @@ end, { silent = true, desc = "tag file in current scope" })
 -- 	grapple.toggle_tags({ scope = M.get_active_scope() })
 -- end, { silent = true, desc = "toggle active tags in grapple window" })
 
-vim.keymap.set("n", require("bdub.globals").hyper_space_key, function()
-  open_grapple_telescope_picker({ scope = M.get_active_scope() })
-end, { silent = true, desc = "telescope tags", noremap = true })
+-- vim.keymap.set("n", require("bdub.globals").hyper_space_key, function()
+--   open_grapple_telescope_picker({ scope = M.get_active_scope() })
+-- end, { silent = true, desc = "telescope tags", noremap = true })
 
 vim.keymap.set("n", "<C-M-1>", function()
   active_index = 1
