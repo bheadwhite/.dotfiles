@@ -1,5 +1,6 @@
 return {
   "hrsh7th/nvim-cmp",
+  enabled = false, -- Disabled in favor of native LSP completion (see native_completion.lua)
   dependencies = {
     "luckasRanarison/tailwind-tools.nvim",
     "onsails/lspkind-nvim",
@@ -9,10 +10,7 @@ return {
     local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
     local function fast_cmp_visible()
-      if not (cmp.core.view and cmp.core.view.custom_entries_view) then
-        return false
-      end
-      return cmp.core.view.custom_entries_view:visible()
+      return cmp.visible()
     end
 
     local handleDown = function(fallback)

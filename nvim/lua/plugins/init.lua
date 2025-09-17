@@ -72,13 +72,14 @@ return {
       })
     end,
   },
-  {
-    "hrsh7th/cmp-nvim-lsp-signature-help",
-    "hrsh7th/cmp-nvim-lsp",
-    "hrsh7th/cmp-nvim-lua",
-    "hrsh7th/cmp-buffer",
-    "hrsh7th/cmp-path",
-  },
+  -- Disabled nvim-cmp sources (using native LSP completion instead)
+  -- {
+  --   "hrsh7th/cmp-nvim-lsp-signature-help",
+  --   "hrsh7th/cmp-nvim-lsp",
+  --   "hrsh7th/cmp-nvim-lua",
+  --   "hrsh7th/cmp-buffer",
+  --   "hrsh7th/cmp-path",
+  -- },
   {
     "jake-stewart/multicursor.nvim",
     branch = "1.0",

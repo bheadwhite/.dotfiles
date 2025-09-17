@@ -10,22 +10,22 @@ vim.keymap.set({ "i" }, hyper_key, function()
   else
     -- Try to trigger new suggestions
     vim.print('requesting new suggestions...')
-    
+
     -- Method 1: Try using the internal API to request suggestions
     pcall(function()
       local copilot = require("copilot.suggestion")
       copilot.dismiss() -- Clear any existing state
-      
+
       -- Simulate text change to trigger suggestions
       local pos = vim.api.nvim_win_get_cursor(0)
       local line = vim.api.nvim_get_current_line()
-      
+
       -- Insert and immediately delete a space to trigger Copilot
       vim.api.nvim_set_current_line(line .. " ")
       vim.schedule(function()
         vim.api.nvim_set_current_line(line)
         vim.api.nvim_win_set_cursor(0, pos)
-        
+
         -- Small delay then try to get suggestions
         vim.defer_fn(function()
           if copilot.is_visible() then
@@ -61,7 +61,7 @@ return {
   config = function()
     require("copilot").setup({
       panel = {
-        enabled = true,
+        enabled = false,
       },
       suggestion = {
         enabled = true,
