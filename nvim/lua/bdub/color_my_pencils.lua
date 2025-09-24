@@ -28,7 +28,7 @@ local colors = {
 }
 
 function colorMyPencils()
-  vim.cmd([[highlight WinSeparator guifg=]] .. colors.white_bright)
+  vim.cmd([[highlight WinSeparator guifg=]] .. colors.bg)
   vim.cmd([[highlight CursorLine guibg=]] .. colors.deep_blue)
   vim.cmd([[highlight QuickFixLine guibg=]] .. colors.dark)
   vim.cmd([[highlight Visual guibg=]] .. colors.white .. [[ guifg=]] .. colors.black)

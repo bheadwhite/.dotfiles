@@ -255,8 +255,8 @@ local normal_keymaps = {
   { "<C-Left>", ":vertical resize -2<CR>", "resize vertical split -2" },
   { "<C-Right>", ":vertical resize +2<CR>", "resize vertical split +2" },
   { "<leader>GPT", "<cmd>CopilotChat<CR>", "new gpt split" },
-  { "<C-,>", vim.cmd.tabp, "prev tab" },
-  { "<C-.>", vim.cmd.tabn, "next tab" },
+  { "<C-S-,>", vim.cmd.tabp, "prev tab" },
+  { "<C-S-.>", vim.cmd.tabn, "next tab" },
   { "*", highlight_under_cursor, "for jumps" },
   { ",", highlight_under_cursor, "for jumps" },
   { "gn", goToConstructor, "go to constructor" },
@@ -323,6 +323,11 @@ vim.keymap.set("c", "<M-k>", "\\(.*\\)", {
 
 function handleEscape()
   vim.cmd("noh")
+
+  if vim.b[vim.api.nvim_get_current_buf()].nes_state ~= nil then
+    require("copilot-lsp.nes").clear()
+  end
+
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
   local mc = require("multicursor-nvim")
   require("hlslens").disable()
@@ -344,6 +349,8 @@ vim.keymap.set({ "n", "v" }, "<C-M-t>", vim.cmd.tabe, add_desc("new tab"))
 
 vim.keymap.set({ "n", "v", "x" }, "<C-.>", "<C-w>l", add_desc("move to right window"))
 vim.keymap.set({ "n", "v", "x" }, "<C-,>", "<C-w>h", add_desc("move to left window"))
+vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", add_desc("move to right window"))
+vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("move to left window"))
 -- vim.keymap.set("n", "<leader>c", ":Bdelete<cr>", { noremap = true, desc = "close buffer" })
 -- vim.keymap.set("n", "<leader>C", ":Bdelete!<cr>", { noremap = true, desc = "close buffer" })
 
