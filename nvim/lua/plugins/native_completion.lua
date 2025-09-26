@@ -102,6 +102,18 @@ return {
     map("i", "<C-e>", "<C-e>", { desc = "Close completion menu" })
     map({"i", "n"}, "<C-v>", handle_ctrl_v, { expr = true, desc = "Accept Copilot or completion" })
 
+    -- Close completion menu when typing closing brackets
+    local close_brackets = { '>', ')', '}', ']' }
+    for _, bracket in ipairs(close_brackets) do
+      map("i", bracket, function()
+        if completion_visible() then
+          return vim.api.nvim_replace_termcodes("<C-c>" .. bracket, true, false, true)
+        else
+          return vim.api.nvim_replace_termcodes(bracket, true, false, true)
+        end
+      end, { expr = true, desc = "Close completion and type " .. bracket })
+    end
+
     -- Navigation keymaps with tracking
     local nav_mappings = {
       ["<C-n>"] = { next = "<C-n>", trigger = "<C-x><C-o>" },
@@ -153,7 +165,7 @@ return {
 
       if completion_visible() then
         user_navigated = false
-        return vim.api.nvim_replace_termcodes("<C-e><Esc>", true, false, true)
+        return vim.api.nvim_replace_termcodes("<C-c>", true, false, true)
       else
         return vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
       end
@@ -221,12 +233,26 @@ return {
           end)
           :use_key(']')
       })
+
     end
 
     -- Auto-close preview window
     vim.api.nvim_create_autocmd({ "InsertLeave", "CompleteDone" }, {
       callback = function()
         pcall(vim.cmd, "pclose")
+      end
+    })
+
+    -- Close completion menu when typing closing characters
+    vim.api.nvim_create_autocmd("InsertCharPre", {
+      callback = function()
+        local char = vim.v.char
+        local close_chars = { '>', ')', '}', ']', ';', ',', ' ', '\t' }
+        if vim.tbl_contains(close_chars, char) and completion_visible() then
+          vim.schedule(function()
+            vim.fn.complete(1, {})
+          end)
+        end
       end
     })
   end,
