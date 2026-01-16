@@ -1,7 +1,11 @@
+-- Module-level variable to track navigation state
+local user_navigated = false
+
 return {
   name = "native-completion",
+  cond = not vim.g.vscode,
   dir = vim.fn.stdpath("config"), -- dummy directory since this isn't a real plugin
-  dependencies = { 
+  dependencies = {
     "windwp/nvim-autopairs",
     "zbirenbaum/copilot.lua",
   },
@@ -28,36 +32,8 @@ return {
     pcall(vim.keymap.del, "i", "<C-v>")
     pcall(vim.keymap.del, "n", "<C-v>")
 
-    -- NES integration functions
-    local triggerNes = function()
-      local ok, nes = pcall(require, "copilot-lsp.nes")
-      if not ok then return end
-      
-      local copilotClient = vim.lsp.get_clients({ name = "copilot" })[1]
-      if copilotClient then
-        return nes.request_nes(copilotClient)
-      end
-    end
-
-    local acceptNes = function()
-      local ok, nes = pcall(require, "copilot-lsp.nes")
-      if not ok then return end
-      return nes.apply_pending_nes()
-    end
-
-    local isNesActive = function()
-      return vim.b[vim.api.nvim_get_current_buf()].nes_state ~= nil
-    end
-
     -- Handle Ctrl-V for Copilot and completion
     local function handle_ctrl_v()
-      if isNesActive() then
-        acceptNes()
-        return ""
-      else
-        triggerNes()
-      end
-
       local copilot_ok, copilot = pcall(require, "copilot.suggestion")
       if copilot_ok and copilot.is_visible() then
         copilot.accept()
@@ -65,45 +41,47 @@ return {
       end
 
       if completion_visible() then
-        return vim.api.nvim_replace_termcodes("<C-n><C-y>", true, false, true)
-      else
-        -- Only trigger Copilot in insert mode
-        local mode = vim.api.nvim_get_mode().mode
-        if mode == "i" and copilot_ok then
-          vim.schedule(function()
-            copilot.dismiss()
-            local pos = vim.api.nvim_win_get_cursor(0)
-            local line = vim.api.nvim_get_current_line()
-
-            vim.api.nvim_set_current_line(line .. " ")
-            vim.schedule(function()
-              vim.api.nvim_set_current_line(line)
-              vim.api.nvim_win_set_cursor(0, pos)
-
-              vim.defer_fn(function()
-                if copilot.is_visible() then
-                  vim.notify("Copilot suggestions triggered", vim.log.levels.INFO)
-                end
-              end, 200)
-            end)
-          end)
+        -- Use the existing user_navigated flag to determine behavior
+        if user_navigated then
+          -- User has navigated, so something is selected - just accept it
+          return vim.api.nvim_replace_termcodes("<C-y>", true, false, true)
+        else
+          -- No navigation yet, select first item and accept
+          return vim.api.nvim_replace_termcodes("<C-n><C-y>", true, false, true)
         end
-        return ""
       end
     end
 
     -- Set up autopairs integration with navigation tracking
-    local npairs_ok, npairs = pcall(require, 'nvim-autopairs')
-    local user_navigated = false
+    local npairs_ok, npairs = pcall(require, "nvim-autopairs")
 
     -- Main completion keymaps
     map("i", "<C-Space>", "<C-x><C-o>", { desc = "Trigger completion" })
     map("i", "<M-Space>", "<C-x><C-o>", { desc = "Trigger completion" })
     map("i", "<C-e>", "<C-e>", { desc = "Close completion menu" })
-    map({"i", "n"}, "<C-v>", handle_ctrl_v, { expr = true, desc = "Accept Copilot or completion" })
+    map("i", "<C-v>", handle_ctrl_v, { expr = true, desc = "Accept Copilot or trigger completion" })
+
+    map("n", "<C-v>", function()
+      local sidekick_ok, sidekick = pcall(require, "sidekick.nes")
+      if not sidekick_ok then
+        vim.notify("sidekick.nes plugin not available", vim.log.levels.WARN)
+        return
+      end
+
+      if not sidekick.enabled then
+        sidekick.enable()
+        return
+      end
+
+      if sidekick.have() then
+        sidekick.apply()
+      else
+        sidekick.update()
+      end
+    end)
 
     -- Close completion menu when typing closing brackets
-    local close_brackets = { '>', ')', '}', ']' }
+    local close_brackets = { ">", ")", "}", "]" }
     for _, bracket in ipairs(close_brackets) do
       map("i", bracket, function()
         if completion_visible() then
@@ -118,8 +96,6 @@ return {
     local nav_mappings = {
       ["<C-n>"] = { next = "<C-n>", trigger = "<C-x><C-o>" },
       ["<C-p>"] = { next = "<C-p>", trigger = "<C-x><C-o>" },
-      ["<Down>"] = { next = "<C-n>", fallback = "<Down>" },
-      ["<Up>"] = { next = "<C-p>", fallback = "<Up>" },
       ["<M-j>"] = { next = "<C-n>", fallback = "<M-j>" },
       ["<M-k>"] = { next = "<C-p>", fallback = "<M-k>" },
     }
@@ -135,6 +111,25 @@ return {
         end
       end, { expr = true, desc = "Navigate completion" })
     end
+
+    -- Handle arrow keys separately to avoid termcode issues
+    map("i", "<Down>", function()
+      if completion_visible() then
+        user_navigated = true
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-n>", true, false, true), "n", true)
+      else
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Down>", true, false, true), "n", true)
+      end
+    end, { desc = "Navigate completion or move down" })
+
+    map("i", "<Up>", function()
+      if completion_visible() then
+        user_navigated = true
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-p>", true, false, true), "n", true)
+      else
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Up>", true, false, true), "n", true)
+      end
+    end, { desc = "Navigate completion or move up" })
 
     -- Documentation scrolling
     map("i", "<C-f>", function()
@@ -155,13 +150,14 @@ return {
 
     -- Handle Escape
     map("i", "<Esc>", function()
-      if vim.b[vim.api.nvim_get_current_buf()].nes_state ~= nil then
-        local ok, nes = pcall(require, "copilot-lsp.nes")
-        if ok then
-          nes.clear()
-        end
-        return ""
-      end
+      -- if vim.b[vim.api.nvim_get_current_buf()].nes_state ~= nil then
+      --   local ok, nes = pcall(require, "copilot-lsp.nes")
+      --   if ok then
+      --     nes.clear()
+      --   end
+      --   -- Still need to send escape to actually exit insert mode
+      --   return vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+      -- end
 
       if completion_visible() then
         user_navigated = false
@@ -171,13 +167,11 @@ return {
       end
     end, { expr = true, desc = "Close completion or escape" })
 
-    -- Reset navigation flag
-    vim.api.nvim_create_autocmd("CompleteChanged", {
+    -- Reset navigation flag only when completion menu closes
+    vim.api.nvim_create_autocmd({ "InsertLeave", "CompleteDone" }, {
       callback = function()
-        if vim.fn.pumvisible() == 0 then
-          user_navigated = false
-        end
-      end
+        user_navigated = false
+      end,
     })
 
     -- Completion CR handler with autopairs
@@ -206,54 +200,73 @@ return {
 
     -- Set up autopairs integration
     if npairs_ok then
-      local Rule = require('nvim-autopairs.rule')
+      local Rule = require("nvim-autopairs.rule")
 
       npairs.add_rules({
-        Rule(' ', ' ')
-          :with_pair(function(opts)
-            local pair = opts.line:sub(opts.col - 1, opts.col)
-            return vim.tbl_contains({ '()', '[]', '{}' }, pair)
-          end),
-        Rule('( ', ' )')
-          :with_pair(function() return false end)
-          :with_move(function(opts)
-            return opts.prev_char:match('.%)') ~= nil
+        Rule(" ", " "):with_pair(function(opts)
+          local pair = opts.line:sub(opts.col - 1, opts.col)
+          return vim.tbl_contains({ "()", "[]", "{}" }, pair)
+        end),
+        Rule("( ", " )")
+          :with_pair(function()
+            return false
           end)
-          :use_key(')'),
-        Rule('{ ', ' }')
-          :with_pair(function() return false end)
           :with_move(function(opts)
-            return opts.prev_char:match('.%}') ~= nil
+            return opts.prev_char:match(".%)") ~= nil
           end)
-          :use_key('}'),
-        Rule('[ ', ' ]')
-          :with_pair(function() return false end)
+          :use_key(")"),
+        Rule("{ ", " }")
+          :with_pair(function()
+            return false
+          end)
           :with_move(function(opts)
-            return opts.prev_char:match('.%]') ~= nil
+            return opts.prev_char:match(".%}") ~= nil
           end)
-          :use_key(']')
+          :use_key("}"),
+        Rule("[ ", " ]")
+          :with_pair(function()
+            return false
+          end)
+          :with_move(function(opts)
+            return opts.prev_char:match(".%]") ~= nil
+          end)
+          :use_key("]"),
       })
-
     end
 
     -- Auto-close preview window
     vim.api.nvim_create_autocmd({ "InsertLeave", "CompleteDone" }, {
       callback = function()
         pcall(vim.cmd, "pclose")
-      end
+      end,
     })
 
     -- Close completion menu when typing closing characters
     vim.api.nvim_create_autocmd("InsertCharPre", {
       callback = function()
         local char = vim.v.char
-        local close_chars = { '>', ')', '}', ']', ';', ',', ' ', '\t' }
+        local close_chars = { ">", ")", "}", "]", ";", ",", " ", "\t" }
         if vim.tbl_contains(close_chars, char) and completion_visible() then
           vim.schedule(function()
             vim.fn.complete(1, {})
           end)
         end
-      end
+      end,
     })
+
+    local ok_bdub, bdub = pcall(require, "bdub")
+    if ok_bdub and type(bdub.hyper_space_key) == "string" and bdub.hyper_space_key ~= "" then
+      pcall(vim.keymap.del, "i", bdub.hyper_space_key)
+
+      map("i", bdub.hyper_space_key, function()
+        -- Check for Copilot suggestions first
+        local copilot_ok, copilot = pcall(require, "copilot.suggestion")
+        if copilot_ok then
+          -- Cycle to next Copilot suggestion
+          copilot.next()
+          return ""
+        end
+      end, { expr = true, desc = "Trigger completion or next Copilot suggestion (bdub hyper space)" })
+    end
   end,
 }

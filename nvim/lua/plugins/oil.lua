@@ -1,7 +1,3 @@
-if vim.g.vscode then
-  return {}
-end
-
 -- Declare a global function to retrieve the current directory
 function _G.get_oil_winbar()
   local bufnr = vim.api.nvim_win_get_buf(vim.g.statusline_winid)
@@ -16,6 +12,7 @@ end
 
 return {
   "stevearc/oil.nvim",
+  cond = not vim.g.vscode,
   config = function()
     local oil = require("oil")
     local oil_config = require("bdub.oil_config")

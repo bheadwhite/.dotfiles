@@ -1,6 +1,7 @@
 return {
   "hrsh7th/nvim-cmp",
   enabled = false, -- Disabled in favor of native LSP completion (see native_completion.lua)
+  cond = not vim.g.vscode,
   dependencies = {
     "luckasRanarison/tailwind-tools.nvim",
     "onsails/lspkind-nvim",

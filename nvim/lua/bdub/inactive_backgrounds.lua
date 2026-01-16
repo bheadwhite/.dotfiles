@@ -1,13 +1,11 @@
-local utils = require("bdub.win_utils")
-
 vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
   callback = function()
+    local utils = require("bdub.win_utils")
     utils.set_window_backgrounds()
   end,
 })
 
 -- Call the function to apply the highlights initially
-utils.set_window_backgrounds()
 
 local zoomed = false
 vim.keymap.set("n", "<leader>z", function()

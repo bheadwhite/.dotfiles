@@ -41,6 +41,13 @@ function colorMyPencils()
   vim.cmd([[highlight DropBarKindDir gui=italic guifg=]] .. colors.black_bright)
   vim.cmd([[highlight DropBarFileName gui=bold guifg=]] .. colors.red_bright)
 
+  -- Diagnostic underline colors for red squiggles
+  -- Use both undercurl and underline for better terminal compatibility
+  vim.cmd([[highlight DiagnosticUnderlineError guisp=]] .. colors.red_bright .. [[ guifg=]] .. colors.red_bright .. [[ gui=undercurl,underline]])
+  vim.cmd([[highlight DiagnosticUnderlineWarn guisp=]] .. colors.yellow_bright .. [[ guifg=]] .. colors.yellow_bright .. [[ gui=undercurl,underline]])
+  vim.cmd([[highlight DiagnosticUnderlineInfo guisp=]] .. colors.blue_bright .. [[ guifg=]] .. colors.blue_bright .. [[ gui=undercurl,underline]])
+  vim.cmd([[highlight DiagnosticUnderlineHint guisp=]] .. colors.cyan_bright .. [[ guifg=]] .. colors.cyan_bright .. [[ gui=undercurl,underline]])
+
   -- vim.cmd([[highlight Cursor guibg=]] .. colors.cursor)
   -- vim.cmd([[highlight Search guibg=]] .. colors.search .. [[ guifg=#000000]])
   -- vim.cmd([[highlight IncSearch guibg=]] .. colors.headerBg .. [[ guifg=#ffffff]])
@@ -56,5 +63,19 @@ function colorMyPencils()
 end
 
 colorMyPencils()
+
+-- Ensure diagnostic colors are applied after colorscheme changes
+vim.api.nvim_create_autocmd("ColorScheme", {
+  pattern = "*",
+  callback = function()
+    -- Reapply diagnostic colors after any colorscheme change
+    vim.cmd([[highlight DiagnosticUnderlineError guisp=]] .. colors.red_bright .. [[ guifg=]] .. colors.red_bright .. [[ gui=undercurl,underline]])
+    vim.cmd(
+      [[highlight DiagnosticUnderlineWarn guisp=]] .. colors.yellow_bright .. [[ guifg=]] .. colors.yellow_bright .. [[ gui=undercurl,underline]]
+    )
+    vim.cmd([[highlight DiagnosticUnderlineInfo guisp=]] .. colors.blue_bright .. [[ guifg=]] .. colors.blue_bright .. [[ gui=undercurl,underline]])
+    vim.cmd([[highlight DiagnosticUnderlineHint guisp=]] .. colors.cyan_bright .. [[ guifg=]] .. colors.cyan_bright .. [[ gui=undercurl,underline]])
+  end,
+})
 
 return colorMyPencils

@@ -1,4 +1,4 @@
-  return {}
+return {}
 
 -- return {
 --   "olimorris/persisted.nvim",

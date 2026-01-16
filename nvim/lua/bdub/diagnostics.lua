@@ -4,7 +4,13 @@ local default_diagnostic_config = {
   underline = true,
   signs = true,
   update_in_insert = false,
-  virtual_text = false,
+  virtual_text = {
+    spacing = 4,
+    prefix = "●",
+    severity = {
+      min = vim.diagnostic.severity.WARN, -- Only show virtual text for warnings and errors
+    },
+  },
   severity_sort = true,
 }
 
@@ -61,13 +67,30 @@ function M.GetDiagnosticConfig(on_or_off)
   end
 end
 
--- vim.diagnostic.config(M.GetDiagnosticConfig("on"))
-vim.diagnostic.config(default_diagnostic_config)
+-- Configure diagnostic signs using vim.diagnostic.config instead of deprecated sign_define
+local signs = {
+  Error = "💀",
+  Warn = "",
+  Info = "",
+  Hint = "",
+}
 
-vim.fn.sign_define("DiagnosticSignError", { text = "💀", texthl = "DiagnosticSignError" })
-vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
-vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
-vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
+-- Update diagnostic config to include signs
+vim.diagnostic.config(vim.tbl_deep_extend("force", default_diagnostic_config, {
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = signs.Error,
+      [vim.diagnostic.severity.WARN] = signs.Warn,
+      [vim.diagnostic.severity.INFO] = signs.Info,
+      [vim.diagnostic.severity.HINT] = signs.Hint,
+    },
+  },
+}))
+
+-- Removed deprecated sign_define calls - replaced with vim.diagnostic.config approach above
+-- vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
+-- vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
+-- vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
 
 -- -- show diagnostics on cursor hold if no floating window is open
 -- vim.api.nvim_create_autocmd({ "CursorHold" }, {
@@ -103,5 +126,14 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSig
 --     })
 --   end,
 -- })
+--
+M.typescript_ignore_codes = {
+  2311, -- Did you mean to write this in an async function?
+  80006, -- This may be converted to an async function.
+  80001, -- File is a CommonJS module; it may be converted to an ES module.
+  7044, -- Parameter '{0}' implicitly has an '{1}' type, but a better type may be inferred from usage.
+  7043, -- Variable '{0}' implicitly has an '{1}' type, but a better type may be inferred from usage.
+  -- filter codes list - https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
+}
 
 return M

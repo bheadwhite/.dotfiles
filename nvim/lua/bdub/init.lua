@@ -73,3 +73,8 @@ vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
 
 vim.g.copilot_no_tab_map = true
+
+return {
+  hyper_space_key = "<C-S-F15>",
+  hello = "yes",
+}

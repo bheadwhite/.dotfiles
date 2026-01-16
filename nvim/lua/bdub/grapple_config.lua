@@ -19,7 +19,7 @@ local function handle_grapple_win_sync()
 end
 
 local function getNameFromInput()
-  local name = vim.fn.input(M.get_active_scope() .. " - a man needs a name: ")
+  local name = vim.fn.input(M.get_active_scope() .. " (grapple) - [a man] needs a name: ")
   if name == nil or name == "" then
     return nil
   end
@@ -38,6 +38,7 @@ vim.api.nvim_create_autocmd("WinClosed", {
 
 local function activate_scope()
   originalNotify = vim.notify
+  ---@diagnostic disable-next-line: duplicate-set-field
   vim.notify = function() end -- Override print to do nothing
   grapple.use_scope(M.get_active_scope())
   handle_grapple_win_sync()
@@ -137,19 +138,19 @@ function open_grapple_telescope_picker(grapple_opts)
     :find()
 end
 
-vim.keymap.set("n", "<leader>a", function()
+vim.keymap.set("n", "<leader>ga", function()
   local name = getNameFromInput()
   grapple.tag({ name = name, scope = M.get_active_scope() })
   vim.cmd("normal! mf")
 end, { silent = true, desc = "tag file in current scope" })
 
--- vim.keymap.set("n", "<C-S-M-p>", function()
--- 	grapple.toggle_tags({ scope = M.get_active_scope() })
--- end, { silent = true, desc = "toggle active tags in grapple window" })
+vim.keymap.set("n", "<leader>gl", function()
+  grapple.toggle_tags({ scope = M.get_active_scope() })
+end, { silent = true, desc = "toggle active tags in grapple window" })
 
--- vim.keymap.set("n", require("bdub.globals").hyper_space_key, function()
---   open_grapple_telescope_picker({ scope = M.get_active_scope() })
--- end, { silent = true, desc = "telescope tags", noremap = true })
+vim.keymap.set("n", "<leader>gt", function()
+  open_grapple_telescope_picker({ scope = M.get_active_scope() })
+end, { silent = true, desc = "telescope tags", noremap = true })
 
 vim.keymap.set("n", "<C-M-1>", function()
   active_index = 1

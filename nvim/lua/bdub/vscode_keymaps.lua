@@ -26,7 +26,6 @@ local function goToConstructor()
   vim.cmd("nohlsearch")
 end
 
-
 function cursorToParent()
   --find constructor if none found then notify such and return
   local found = vim.fn.search("constructor(")
@@ -49,68 +48,60 @@ function cursorToParent()
   return true
 end
 
-keymap({"n", "v"}, "<leader>f", "<cmd>lua require('vscode').action('workbench.action.quickOpen')<CR>")
-keymap({"n", "v"}, "<leader>p", "<cmd>lua require('vscode').action('workbench.action.quickOpen')<CR>")
-keymap({"n", "v"}, "<leader>q", "<cmd>lua require('vscode').action('workbench.action.closeActiveEditor')<CR>")
-keymap({"n", "v"}, "<leader>z", "<cmd>lua require('vscode').action('workbench.action.toggleMaximizeEditorGroup')<CR>")
-keymap({"n", "v"}, "<leader>gr", "<cmd>lua require('vscode').action('git.revertSelectedRanges')<CR>")
-keymap({"n", "v"}, "<leader>gR", "<cmd>lua require('vscode').action('git.clean')<CR>")
-keymap({"n", "v"}, "<leader>gp", "<cmd>lua require('vscode').action('editor.action.dirtydiff.next')<CR>")
-keymap({"n", "v"}, "<leader>gd", "<cmd>lua require('vscode').action('workbench.scm.focus')<CR>")
-keymap({"n", "v"}, "<leader>r", "<cmd>lua require('vscode').action('editor.action.renameFile')<CR>")
-keymap({"n", "v"}, "<leader>lr", "<cmd>lua require('vscode').action('references-view.tree.focus')<CR>")
-keymap({"n", "v"}, "<leader>s", "<cmd>lua require('vscode').action('workbench.action.findInFiles')<CR>")
-keymap({"n", "v"}, "<leader>o", "<cmd>lua require('vscode').action('workbench.action.closeOtherEditors')<CR>")
-keymap({"n", "v"}, "<leader>O", "<cmd>lua require('vscode').action('workbench.action.closeEditorsInOtherGroups')<CR>")
-keymap({"n", "v"}, "<leader>.", "<cmd>lua require('vscode').action('editor.action.quickFix')<CR>")
+keymap({ "n", "v" }, "<leader>f", "<cmd>lua require('vscode').action('workbench.action.quickOpen')<CR>")
+keymap({ "n", "v" }, "<leader>p", "<cmd>lua require('vscode').action('workbench.action.quickOpen')<CR>")
+keymap({ "n", "v" }, "<leader>q", "<cmd>lua require('vscode').action('workbench.action.closeActiveEditor')<CR>")
+keymap({ "n", "v" }, "<leader>z", "<cmd>lua require('vscode').action('workbench.action.toggleMaximizeEditorGroup')<CR>")
+keymap({ "n", "v" }, "<leader>gr", "<cmd>lua require('vscode').action('git.revertSelectedRanges')<CR>")
+keymap({ "n", "v" }, "<leader>gR", "<cmd>lua require('vscode').action('git.clean')<CR>")
+keymap({ "n", "v" }, "<leader>gp", "<cmd>lua require('vscode').action('editor.action.dirtydiff.next')<CR>")
+keymap({ "n", "v" }, "<leader>gd", "<cmd>lua require('vscode').action('workbench.scm.focus')<CR>")
+keymap({ "n", "v" }, "<leader>r", "<cmd>lua require('vscode').action('editor.action.renameFile')<CR>")
+keymap({ "n", "v" }, "<leader>lr", "<cmd>lua require('vscode').action('references-view.tree.focus')<CR>")
+keymap({ "n", "v" }, "<leader>s", "<cmd>lua require('vscode').action('workbench.action.findInFiles')<CR>")
+keymap({ "n", "v" }, "<leader>o", "<cmd>lua require('vscode').action('workbench.action.closeOtherEditors')<CR>")
+keymap({ "n", "v" }, "<leader>O", "<cmd>lua require('vscode').action('workbench.action.closeEditorsInOtherGroups')<CR>")
+keymap({ "n", "v" }, "<leader>.", "<cmd>lua require('vscode').action('editor.action.quickFix')<CR>")
+-- keymap({"n", "v"}, "<leader>b", "<cmd>lua require('vscode').action('workbench.action.focusSideBar')<CR>")
 
-keymap({"n", "v"}, "gi", "<cmd>lua require('vscode').action('editor.action.referenceSearch.trigger')<CR>")
-keymap({"n", "v"}, "gr", "<cmd>lua require('vscode').action('editor.action.goToReferences')<CR>")
-keymap({"n", "v"}, "gR", "<cmd>lua require('vscode').action('references-view.findReferences')<CR>")
-keymap({"n", "v"}, "gI", function()
-  local action = require('vscode').action
+keymap({ "n", "v" }, "gi", "<cmd>lua require('vscode').action('editor.action.referenceSearch.trigger')<CR>")
+keymap({ "n", "v" }, "gr", "<cmd>lua require('vscode').action('editor.action.goToReferences')<CR>")
+keymap({ "n", "v" }, "gR", "<cmd>lua require('vscode').action('references-view.findReferences')<CR>")
+keymap({ "n", "v" }, "gI", function()
+  local action = require("vscode").action
   action("workbench.action.splitEditor")
   action("editor.action.revealDefinition")
   vim.wait(1000)
   action("workbench.action.closeOtherEditors")
 end)
 
-keymap({"n", "v"}, "gD", function()
-  local action = require('vscode').action
+keymap({ "n", "v" }, "gD", function()
+  local action = require("vscode").action
   action("workbench.action.splitEditor")
   action("editor.action.goToImplementation")
   vim.wait(1000)
   action("workbench.action.closeOtherEditors")
 end)
 
-keymap({"n", "v"}, "gp", function()
+keymap({ "n", "v" }, "gp", function()
   if not cursorToParent() then
     return
   end
 
-  local vscode = require('vscode')
-  local symbol = vim.fn.expand('<cword>')
+  local vscode = require("vscode")
+  local symbol = vim.fn.expand("<cword>")
 
   -- Use VSCode's reference search with a callback to get count
-  vscode.action('editor.action.goToReferences' )
+  vscode.action("editor.action.goToReferences")
 end)
-keymap({"n", "v"}, "gn", function()
-  if not cursorToParent() then
-    return
-  end
-
-  local vscode = require('vscode')
-  local symbol = vim.fn.expand('<cword>')
-
-  -- Use VSCode's reference search with a callback to get count
-  vscode.action('editor.action.goToReferences' )
+keymap({ "n", "v" }, "gn", function()
+  cursorToParent()
 end)
-keymap({"n", "v"}, "gt", "<cmd>lua require('vscode').action('editor.action.goToTypeDefinition')<CR>")
-keymap({"n", "v"}, "gT", function()
-  local action = require('vscode').action
+keymap({ "n", "v" }, "gt", "<cmd>lua require('vscode').action('editor.action.goToTypeDefinition')<CR>")
+keymap({ "n", "v" }, "gT", function()
+  local action = require("vscode").action
   action("workbench.action.splitEditor")
   action("editor.action.goToTypeDefinition")
   vim.wait(1000)
   action("workbench.action.closeOtherEditors")
 end)
-

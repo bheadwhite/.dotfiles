@@ -1,8 +1,10 @@
 local M = {
   "nvim-telescope/telescope.nvim",
+  cond = not vim.g.vscode,
   dependencies = {
     "nvim-lua/plenary.nvim",
     "nvim-telescope/telescope-live-grep-args.nvim",
+    "nvim-treesitter/nvim-treesitter",
   },
 }
 
@@ -45,17 +47,8 @@ M.config = function()
 
   local default_opts = {
     initial_mode = "normal",
+    hidden = true,
     path_display = operator_path_display,
-    layout_strategy = "vertical",
-    layout_config = {
-      height = 0.9,
-      preview_cutoff = 60,
-    },
-  }
-
-  local reference_opts = {
-    initial_mode = "normal",
-    path_display = file_name_only,
     layout_strategy = "vertical",
     layout_config = {
       height = 0.9,
@@ -77,7 +70,15 @@ M.config = function()
       git_files = insert_mode_default,
       live_grep = insert_mode_default,
       oldfiles = default_opts,
-      lsp_references = reference_opts,
+      lsp_references = {
+        initial_mode = "normal",
+        path_display = file_name_only,
+        layout_strategy = "vertical",
+        layout_config = {
+          height = 0.9,
+          preview_cutoff = 60,
+        },
+      },
       lsp_definitions = default_opts,
       lsp_type_definitions = default_opts,
       lsp_implementations = default_opts,

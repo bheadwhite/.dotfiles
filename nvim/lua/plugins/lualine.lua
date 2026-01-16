@@ -2,6 +2,7 @@ local color_config = require("bdub.color_config")
 
 return {
   "nvim-lualine/lualine.nvim", -- statusline
+  cond = not vim.g.vscode,
   dependencies = {
     "nvim-tree/nvim-web-devicons",
   },

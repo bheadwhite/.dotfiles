@@ -38,6 +38,7 @@ config.window_decorations = "RESIZE"
 config.front_end = "OpenGL"
 config.color_scheme = colors.color_scheme
 config.enable_kitty_keyboard = true
+config.enable_kitty_graphics = false  -- Disable graphics to reduce key sequence conflicts
 config.foreground_text_hsb = {
 	brightness = 1.8,
 }

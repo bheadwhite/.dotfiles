@@ -3,27 +3,57 @@ local function getColors()
 end
 
 return {
+  { "fei6409/log-highlight.nvim" },
   { "mileszs/ack.vim" }, -- Integrates 'ack' search tool
+  { "neovim/nvim-lspconfig" },
   {
     "windwp/nvim-ts-autotag",
-    config = {
-      opts = {
-        enable_close = true,
-        enable_rename = false,
-        enable_close_on_slash = true
-      }
-    },
+    cond = not vim.g.vscode,
+    config = function()
+      require("nvim-ts-autotag").setup({
+        opts = {
+          enable_close = true, -- Auto close tags
+          enable_rename = false, -- Auto rename pairs of tags
+          enable_close_on_slash = true, -- Auto close on trailing </
+        },
+        -- Override individual filetype configurations if needed
+        per_filetype = {
+          ["html"] = {
+            enable_close = true,
+          },
+        },
+      })
+    end,
   }, -- Auto-closes HTML tags
   { "stevearc/dressing.nvim" }, -- Improved UI components
   { "sbulav/nredir.nvim" }, -- Redirects command output
-  { "dstein64/vim-startuptime" }, -- startup time
-  -- treesitter
   {
-    "nvim-treesitter/nvim-treesitter-context",
-    "RRethy/nvim-treesitter-textsubjects",
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    "nvim-treesitter/playground",
+    "MeanderingProgrammer/treesitter-modules.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      require("treesitter-modules").setup({
+        ensure_installed = { "lua", "typescript", "javascript", "tsx", "html", "css", "json", "yaml", "go" },
+        incremental_selection = {
+          enable = true,
+        },
+        highlight = {
+          enable = true,
+        },
+      })
+      vim.keymap.set("n", "<C-M-O>", function()
+        require("treesitter-modules").init_selection()
+      end)
+
+      vim.keymap.set("x", "<C-M-O>", function()
+        require("treesitter-modules").node_incremental()
+      end)
+      vim.keymap.set("x", "<C-M-i>", function()
+        require("treesitter-modules").node_decremental()
+      end)
+    end,
   },
+  -- { "dstein64/vim-startuptime" }, -- startup time
+  -- treesitter
   -- {
   --   "andymass/vim-matchup",
   --   dependencies = { "nvim-treesitter/nvim-treesitter" },
@@ -34,50 +64,48 @@ return {
   {
     "nvim-zh/colorful-winsep.nvim",
     config = function()
-      if vim.g.vscode then
-        return
-      end
       require("colorful-winsep").setup()
       vim.cmd([[highlight NvimSeparator guifg=]] .. getColors().mocha.overlay0)
     end,
+    cond = not vim.g.vscode,
     event = { "WinLeave" },
   },
-  {
-    "RRethy/vim-illuminate",
-    config = function()
-      if vim.g.vscode then
-        return
-      end
-      require("illuminate").configure({
-        providers = {
-          "lsp",
-        },
-      })
-      vim.cmd([[hi IlluminatedWordText guifg=#FFC83D guibg=#2A2F33 gui=bold,underline guisp=#FFB000]])
-      vim.cmd([[hi IlluminatedWordRead guifg=#FFC83D guibg=#2A2F33 gui=bold,underline guisp=#FFB000]])
-      vim.cmd([[hi IlluminatedWordWrite guifg=#FFC83D guibg=#2A2F33 gui=bold,underline guisp=#FFB000]])
-    end,
-  },
-  {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    ft = { "markdown" },
-    build = function()
-      vim.fn["mkdp#util#install"]()
-    end,
-  },
-  {
-    "mxsdev/nvim-dap-vscode-js",
-    lazy = false,
-    dependencies = { "mfussenegger/nvim-dap" },
-    config = function()
-      local home = os.getenv("HOME")
-      require("dap-vscode-js").setup({
-        adapters = { "pwa-chrome" },
-        debugger_path = home .. "/code/vscode-js-debug",
-      })
-    end,
-  },
+  -- {
+  --   "RRethy/vim-illuminate",
+  --   cond = not vim.g.vscode,
+  --   config = function()
+  --     require("illuminate").configure({
+  --       providers = {
+  --         "lsp",
+  --       },
+  --     })
+  --     vim.cmd([[hi IlluminatedWordText guifg=#FFC83D guibg=#2A2F33 gui=bold,underline guisp=#FFB000]])
+  --     vim.cmd([[hi IlluminatedWordRead guifg=#FFC83D guibg=#2A2F33 gui=bold,underline guisp=#FFB000]])
+  --     vim.cmd([[hi IlluminatedWordWrite guifg=#FFC83D guibg=#2A2F33 gui=bold,underline guisp=#FFB000]])
+  --   end,
+  -- },
+  -- {
+  --   "iamcco/markdown-preview.nvim",
+  --   cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+  --   ft = { "markdown" },
+  --   cond = not vim.g.vscode,
+  --   build = function()
+  --     vim.fn["mkdp#util#install"]()
+  --   end,
+  -- },
+  -- {
+  --   "mxsdev/nvim-dap-vscode-js",
+  --   lazy = false,
+  --   dependencies = { "mfussenegger/nvim-dap" },
+  --   cond = not vim.g.vscode,
+  --   config = function()
+  --     local home = os.getenv("HOME")
+  --     require("dap-vscode-js").setup({
+  --       adapters = { "pwa-chrome" },
+  --       debugger_path = home .. "/code/vscode-js-debug",
+  --     })
+  --   end,
+  -- },
   -- Disabled nvim-cmp sources (using native LSP completion instead)
   -- {
   --   "hrsh7th/cmp-nvim-lsp-signature-help",
@@ -86,32 +114,28 @@ return {
   --   "hrsh7th/cmp-buffer",
   --   "hrsh7th/cmp-path",
   -- },
-  {
-    "jake-stewart/multicursor.nvim",
-    branch = "1.0",
-    config = function()
-      if vim.g.vscode then
-        return
-      end
-      local mc = require("multicursor-nvim")
-      mc.setup()
-    end,
-  },
+  -- {
+  --   "jake-stewart/multicursor.nvim",
+  --   branch = "1.0",
+  --   cond = not vim.g.vscode,
+  --   config = function()
+  --     local mc = require("multicursor-nvim")
+  --     mc.setup()
+  --   end,
+  -- },
   -- { "yochem/jq-playground.nvim", opts = {
   --   query_window = {
   --     height = 0.2,
   --   },
   -- } },
-  {
-    "max397574/colortils.nvim",
-    cmd = "Colortils",
-    config = function()
-      if vim.g.vscode then
-        return
-      end
-      require("colortils").setup()
-    end,
-  },
+  -- {
+  --   "max397574/colortils.nvim",
+  --   cmd = "Colortils",
+  --   cond = not vim.g.vscode,
+  --   config = function()
+  --     require("colortils").setup()
+  --   end,
+  -- },
   -- {
   --   "anuvyklack/windows.nvim",
   --   dependencies = { "anuvyklack/middleclass" },
@@ -128,6 +152,7 @@ return {
     "CopilotC-Nvim/CopilotChat.nvim",
     branch = "main",
     build = "make tiktoken", -- Only on MacOS or Linux
+    cond = not vim.g.vscode,
     dependencies = { "zbirenbaum/copilot.lua", "nvim-lua/plenary.nvim" },
     config = function()
       require("CopilotChat").setup()
@@ -199,8 +224,10 @@ return {
   -- },
   {
     "dmmulroy/tsc.nvim", -- Typescript
+    cond = not vim.g.vscode,
     opts = {
-      -- use_diagnostics = true,
+      bin_name = "tsgo",
+      -- use_diagnostics = true, //populates the diagnostics list with the resulting tsc errors
       -- run_as_monorepo = true,
 
       -- if TSC runs and your expecting results but there arent any..
@@ -211,18 +238,23 @@ return {
       -- https://stackoverflow.com/questions/69080861/error-running-a-npx-tsc-command-regarding-typescript-this-is-not-the-tsc-comm
     },
   },
-  { "s1n7ax/nvim-window-picker" }, -- window picker
+  -- {
+  --   "s1n7ax/nvim-window-picker",
+  --   cond = not vim.g.vscode,
+  -- }, -- window picker
   {
     "nvim-telescope/telescope-fzf-native.nvim", -- Telescope
+    cond = not vim.g.vscode,
     build = "make",
   },
   {
     "nvim-telescope/telescope-dap.nvim",
+    cond = not vim.g.vscode,
   },
-  { "nvim-telescope/telescope-live-grep-args.nvim" },
+  { "nvim-telescope/telescope-live-grep-args.nvim", cond = not vim.g.vscode },
   { "nvim-telescope/telescope-ui-select.nvim" },
-  { "echasnovski/mini.nvim" }, -- mini. using for zooming in and out of windows
-  { "echasnovski/mini.splitjoin", version = false, config = true },
+  -- { "echasnovski/mini.nvim", cond = not vim.g.vscode }, -- mini. using for zooming in and out of windows
+  -- { "echasnovski/mini.splitjoin", version = false, config = true, cond = not vim.g.vscode },
   -- {
   --   "bheadwhite/vim-bookmarks",
   --   init = function()
@@ -245,40 +277,50 @@ return {
   { "tpope/vim-abolish", "tpope/vim-surround" },
   { "tpope/vim-dispatch", event = "VeryLazy" },
   { "nvim-zh/better-escape.vim", event = "InsertEnter" }, -- better escape from insert mode
-  { "JoosepAlviste/nvim-ts-context-commentstring" }, -- comments
-  { "camilledejoye/nvim-lsp-selection-range" },
-  {
-    "bloznelis/before.nvim",
-    config = function()
-      local before = require("before")
-      if vim.g.vscode then
-        return
-      end
-      before.setup()
-
-      -- Jump to previous entry in the edit history
-      vim.keymap.set("n", "<c-s-h>", before.jump_to_last_edit, {})
-
-      -- Jump to next entry in the edit history
-      vim.keymap.set("n", "<c-s-l>", before.jump_to_next_edit, {})
-    end,
-  },
-  {
-    "nvim-lua/lsp-status.nvim", -- LSP
-    config = function()
-      if vim.g.vscode then
-        return
-      end
-      require("lsp-status").register_progress()
-    end,
-  },
-  { "AckslD/messages.nvim", config = true }, -- messages
+  { "folke/ts-comments.nvim" },
+  -- { "JoosepAlviste/nvim-ts-context-commentstring" }, -- comments
+  -- { "camilledejoye/nvim-lsp-selection-range" },
   -- {
-  -- 	"numToStr/Comment.nvim",
-  -- 	opts = {
-  -- 		pre_hook = function()
-  -- 			return vim.bo.commentstring
-  -- 		end,
-  -- 	},
+  --   "bloznelis/before.nvim",
+  --   cond = not vim.g.vscode,
+  --   config = function()
+  --     local before = require("before")
+  --     before.setup()
+  --
+  --     -- Jump to previous entry in the edit history
+  --     vim.keymap.set("n", "<c-s-h>", before.jump_to_last_edit, {})
+  --
+  --     -- Jump to next entry in the edit history
+  --     vim.keymap.set("n", "<c-s-l>", before.jump_to_next_edit, {})
+  --   end,
   -- },
+  -- {
+  --   "nvim-lua/lsp-status.nvim", -- LSP
+  --   cond = not vim.g.vscode,
+  --   config = function()
+  --     require("lsp-status").register_progress()
+  --   end,
+  -- },
+  { "AckslD/messages.nvim", config = true, cond = not vim.g.vscode }, -- messages
+  {
+    "numToStr/Comment.nvim",
+    cond = not vim.g.vscode,
+    opts = {
+      pre_hook = function()
+        return vim.bo.commentstring
+      end,
+      mappings = {
+        basic = true,
+        extra = false, -- Disable extra mappings to avoid conflicts
+      },
+      opleader = {
+        line = "<leader>cc", -- Change from 'gc' to '<leader>cc'
+        block = "<leader>cb", -- Change from 'gb' to '<leader>cb'
+      },
+      toggler = {
+        line = "<leader>cc", -- Change from 'gcc' to '<leader>cc'
+        block = "<leader>cb", -- Change from 'gbc' to '<leader>cb'
+      },
+    },
+  },
 }

@@ -28,6 +28,7 @@ end
 return {
   {
     "mfussenegger/nvim-dap",
+    cond = not vim.g.vscode,
     dependencies = {
       "leoluz/nvim-dap-go",
       "rcarriga/nvim-dap-ui",
@@ -259,7 +260,7 @@ return {
         },
       })
 
-      local known_configs = require("bdub.dap_known_configurations")
+      local known_configs = require("bdub.dap_configs")
       for _, config in ipairs(known_configs) do
         table.insert(dap.configurations.go, config)
       end

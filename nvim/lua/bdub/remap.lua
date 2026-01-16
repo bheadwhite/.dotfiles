@@ -77,18 +77,16 @@ local function handleClose()
     end
   end
 
-  vim.print(listed_buffers .. " listed buffers found")
-
   -- If only one buffer is listed and loaded, use :bd, else use :q
   if listed_buffers == 1 then
     local success, err = pcall(vim.cmd, "bd")
     if not success then
-      vim.print("Error closing buffer: " .. err, vim.log.levels.ERROR)
+      vim.notify("Error closing buffer: " .. tostring(err), vim.log.levels.ERROR)
     end
   else
     local success, err = pcall(vim.cmd, "q")
     if not success then
-      vim.print("Error closing window: " .. err, vim.log.levels.ERROR)
+      vim.notify("Error closing window: " .. tostring(err), vim.log.levels.ERROR)
     end
   end
 end
@@ -134,7 +132,9 @@ local highlight_under_cursor = function()
   -- Get current word under cursor
   local current_word = vim.fn.expand("<cword>")
   if current_word == "" then
-    require("notify").notify("No valid word under cursor", vim.log.levels.WARN, { title = "Highlight" })
+    if not vim.g.vscode then
+      require("notify").notify("No valid word under cursor", vim.log.levels.WARN, { title = "Highlight" })
+    end
     return
   end
 
@@ -153,7 +153,9 @@ local highlight_under_cursor = function()
 
     -- Enable hlslens if it's not already active
     if not hlslens_ok then
-      require("notify").notify("hlslens not found", vim.log.levels.ERROR, { title = "Highlight" })
+      if not vim.g.vscode then
+        require("notify").notify("hlslens not found", vim.log.levels.ERROR, { title = "Highlight" })
+      end
       return
     end
 
@@ -169,20 +171,28 @@ local highlight_under_cursor = function()
   -- If it's the same word as before, proceed to add a cursor
   local foundNext = vim.fn.search(search_pattern, "nw")
   if foundNext == 0 then
-    require("notify").notify("No other matches found", vim.log.levels.INFO, { title = "Highlight" })
+    if not vim.g.vscode then
+      require("notify").notify("No other matches found", vim.log.levels.INFO, { title = "Highlight" })
+    end
     return
   end
 
-  -- Try to load multicursor-nvim safely
-  local mc_ok, mc = pcall(require, "multicursor-nvim")
-  if not mc_ok then
-    require("notify").notify("multicursor-nvim not found", vim.log.levels.ERROR, { title = "Highlight" })
-    return
-  end
-
-  -- Add cursor for the next match
-  require("notify").notify("Adding a cursor", "info", { title = "Lens" })
-  mc.matchAddCursor(1)
+  -- -- Try to load multicursor-nvim safely
+  -- local mc_ok, mc = pcall(require, "multicursor-nvim")
+  -- if not mc_ok then
+  --   if not vim.g.vscode then
+  --     require("notify").notify("multicursor-nvim not found", vim.log.levels.ERROR, { title = "Highlight" })
+  --   end
+  --
+  --   return
+  --
+  -- end
+  --
+  -- -- Add cursor for the next match
+  -- if not vim.g.vscode then
+  --   require("notify").notify("Adding a cursor", "info", { title = "Lens" })
+  -- end
+  -- mc.matchAddCursor(1)
 end
 
 local active_tab = 1
@@ -207,6 +217,30 @@ vim.api.nvim_create_autocmd("FocusGained", {
     pcall(tryNavToActive)
   end,
 })
+
+function dedupe_quickfix()
+  local qf_list = vim.fn.getqflist()
+  if #qf_list == 0 then
+    vim.notify("Quickfix list is empty", vim.log.levels.INFO)
+    return
+  end
+
+  local seen_files = {}
+  local deduped_list = {}
+
+  for _, item in ipairs(qf_list) do
+    local bufnr = item.bufnr
+    local filename = vim.api.nvim_buf_get_name(bufnr)
+
+    if not seen_files[filename] then
+      seen_files[filename] = true
+      table.insert(deduped_list, item)
+    end
+  end
+
+  vim.fn.setqflist(deduped_list, "r")
+  vim.notify(string.format("Deduped quickfix: %d -> %d items", #qf_list, #deduped_list), vim.log.levels.INFO)
+end
 
 local normal_keymaps = {
   { "gj", "mzJ`z", "join" },
@@ -243,6 +277,7 @@ local normal_keymaps = {
   { "<C-M-S-k>", "<cmd>cprev<CR>zz", "prev quickfix" },
   { "<C-M-S-q>", "<cmd>cclose<CR>", "close quickfix" },
   { "<leader>q", handleClose, "close buffer" },
+  { "<leader>Q", dedupe_quickfix, "dedupe quickfix by file" },
   {
     "<C-M-r>",
     function()
@@ -324,15 +359,26 @@ vim.keymap.set("c", "<M-k>", "\\(.*\\)", {
 function handleEscape()
   vim.cmd("noh")
 
-  if vim.b[vim.api.nvim_get_current_buf()].nes_state ~= nil then
-    require("copilot-lsp.nes").clear()
-  end
+  -- -- Clear copilot NES state safely
+  -- local ok, nes = pcall(require, "copilot-lsp.nes")
+  -- if ok and vim.b[vim.api.nvim_get_current_buf()].nes_state ~= nil then
+  --   nes.clear()
+  -- end
 
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
-  local mc = require("multicursor-nvim")
-  require("hlslens").disable()
+  -- Clear multicursor and hlslens safely
+  -- local mc_ok, mc = pcall(require, "multicursor-nvim")
+  -- if mc_ok then
+  --   mc.clearCursors()
+  -- end
+
+  -- local hlslens_ok, hlslens = pcall(require, "hlslens")
+  -- if hlslens_ok then
+  --   hlslens.disable()
+  -- end
+
   _G.last_searched_word = nil
-  mc.clearCursors()
+
+  -- Don't feed additional escape keys here to avoid conflicts
 end
 
 vim.keymap.set("v", "/", "<Esc>/\\%V", add_desc("search visual selection"))
@@ -356,11 +402,11 @@ vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("move to left wind
 
 vim.keymap.set("n", "<esc>", handleEscape, add_desc("esc normal"))
 
-vim.keymap.set('n', '<leader>c', function()
+vim.keymap.set("n", "<leader>c", function()
   local file = vim.api.nvim_buf_get_name(0)
   if file ~= "" then
     vim.fn.jobstart({ "open", "-a", "Cursor", file }, { detach = true })
   end
-end, { desc = 'Open current buffer in Cursor app' })
+end, { desc = "Open current buffer in Cursor app" })
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", options)

@@ -248,7 +248,11 @@ function M.on_attach(client, attached_bufnr)
 
   local function goToDefinition()
     local yesFn = function(target_uri, target_line, target_character)
-      vim.cmd("e " .. target_uri)
+      local current_file = vim.api.nvim_buf_get_name(0)
+      -- Only edit the file if it's different from the current buffer
+      if target_uri ~= current_file then
+        vim.cmd("e " .. vim.fn.fnameescape(target_uri))
+      end
       vim.api.nvim_win_set_cursor(0, { target_line, target_character })
     end
     local noFn = function()
@@ -319,24 +323,16 @@ function M.on_attach(client, attached_bufnr)
     current_line_diagnostics = d.lnum
 
     notify.dismiss()
-    notify.notify(formatDiagnostic(d), "info", {
+    local message = formatDiagnostic(d)
+    notify.notify(message, "info", {
       title = "Diagnostic",
       timeout = 5000,
       on_close = function()
         current_line_diagnostics = nil
       end,
       keep = function()
-        local line_nr = vim.api.nvim_win_get_cursor(0)[1] - 1 -- Get zero-indexed line number
-        if current_line_diagnostics ~= line_nr then
-          return false
-        end
-
-        local line_diagnostics = vim.diagnostic.get(0, { lnum = line_nr })
-        if #line_diagnostics > 0 then
-          showLineDiagnostic(line_diagnostics[1])
-        end
-
-        return false
+        local line_nr = vim.api.nvim_win_get_cursor(0)[1] - 1
+        return current_line_diagnostics == line_nr
       end,
     })
   end
@@ -604,7 +600,7 @@ function M.on_attach(client, attached_bufnr)
     { "<leader>vs", vim.lsp.buf.workspace_symbol, "workspace symbols" },
     { "<leader>.", vim.lsp.buf.code_action, "code action" },
     { "<C-A-n>", vim.lsp.buf.rename, "rename symbol" },
-    -- { "<leader>t", M.changeGlanceState, "toggle glance filter" },
+    { "<leader>T", M.changeGlanceState, "toggle glance filter" },
     {
       "gh",
       function()
@@ -613,6 +609,7 @@ function M.on_attach(client, attached_bufnr)
       "hover",
     },
     { "gH", vim.lsp.buf.signature_help, "signature help" },
+    { "gr", lspFinder, "lsp references (glance)" },
   }
 
   for _, value in ipairs(normal_keymaps) do

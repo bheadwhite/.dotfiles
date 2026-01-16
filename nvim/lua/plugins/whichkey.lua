@@ -1,5 +1,6 @@
 return {
   "folke/which-key.nvim",
+  cond = not vim.g.vscode,
   config = function()
     local which_key = require("which-key")
     local commands = require("bdub.commands")
@@ -7,40 +8,13 @@ return {
       {
         mode = { "v", "n" },
         {
-          "<leader>r",
+          "<leader>rf",
           function()
             local path = vim.fn.expand("%:.")
             print(path)
             vim.fn.setreg("+", path)
           end,
           desc = "get relative path",
-          nowait = true,
-          remap = false,
-        },
-        {
-          "<leader>T",
-          group = "Telescope",
-          nowait = true,
-          remap = false,
-        },
-        {
-          "<leader>Td",
-          commands.find_files_within_directories,
-          desc = "Find File in Directory",
-          nowait = true,
-          remap = false,
-        },
-        {
-          "<leader>Th",
-          "<cmd>Telescope help_tags<cr>",
-          desc = "Help Tags",
-          nowait = true,
-          remap = false,
-        },
-        {
-          "<leader>Ts",
-          commands.grep_string_within_directories,
-          desc = "Grep String in Directory",
           nowait = true,
           remap = false,
         },
@@ -101,6 +75,9 @@ return {
       show_help = true, -- show help message on the command line when the popup is visible
       -- triggers = "auto", -- automatically setup triggers
       -- triggers = {"<leader>"} -- or specifiy a list manually
+      triggers_blacklist = {
+        i = { "<leader>" }, -- Disable which-key in insert mode to prevent delay
+      },
     })
 
     which_key.add(mappings)

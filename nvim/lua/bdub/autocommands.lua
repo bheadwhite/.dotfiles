@@ -36,10 +36,10 @@ vim.cmd([[
   augroup end
 
 
-  augroup refresh_lsp_progress
-    autocmd!
-    autocmd User LspProgressUpdate redrawstatus
-  augroup END
+  "augroup refresh_lsp_progress
+  "  autocmd!
+  "  autocmd User LspProgressUpdate redrawstatus
+  "augroup END
 
   "augroup strdr4605
   "  autocmd FileType typescript,typescriptreact set makeprg=./node_modules/.bin/tsc\ \\\|\ sed\ 's/(\\(.*\\),\\(.*\\)):/:\\1:\\2:/'
@@ -56,6 +56,15 @@ vim.cmd([[
   " augroup END
 
 ]])
+
+--prevent active snippets from persisting after leaving insert mode
+vim.api.nvim_create_autocmd("InsertLeave", {
+  callback = function()
+    if vim.snippet and vim.snippet.active() then
+      vim.snippet.stop()
+    end
+  end,
+})
 
 -- v2
 vim.api.nvim_create_user_command("Govet", function()

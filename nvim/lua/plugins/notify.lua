@@ -1,5 +1,6 @@
 return {
   "rcarriga/nvim-notify",
+  cond = not vim.g.vscode,
   config = function()
     notify = require("notify")
 
@@ -10,6 +11,12 @@ return {
       top_down = false,
     })
 
-    vim.notify = notify
+    vim.notify = function(msg, log_level, opts)
+      if msg == nil then
+        return
+      end
+
+      notify(msg, log_level, opts)
+    end
   end,
 }

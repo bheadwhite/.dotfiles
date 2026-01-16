@@ -24,6 +24,8 @@ end
 
 return {
   "stevearc/conform.nvim",
+
+  cond = not vim.g.vscode,
   opts = {
     log_level = vim.log.levels.TRACE,
     formatters = {

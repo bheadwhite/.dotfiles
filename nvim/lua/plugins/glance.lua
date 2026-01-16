@@ -1,5 +1,6 @@
 return {
   "dnlhc/glance.nvim",
+  cond = not vim.g.vscode,
   dependencies = {
     "rcarriga/nvim-notify",
   },

@@ -39,6 +39,8 @@ end
 return {
   "stevearc/aerial.nvim",
   dependencies = { "nvim-tree/nvim-web-devicons" },
+
+  cond = not vim.g.vscode,
   config = function()
     require("aerial").setup({
       layout = {

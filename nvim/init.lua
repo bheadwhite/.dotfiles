@@ -14,6 +14,10 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.localleader = ","
 
+-- Temporarily suppress deprecation warnings from external plugins
+-- These will be addressed when the plugins are updated by their maintainers
+vim.deprecate = function() end
+
 local luarocksPath = os.getenv("LUAROCKS_PATH") or ""
 
 if luarocksPath ~= "" then
@@ -43,27 +47,59 @@ if vim.g.vscode then
   require("bdub.vscode_keymaps")
   vim.opt.cmdheight = 1
 else
+  vim.keymap.set("n", "<leader>t", function()
+    local ok, tsc = pcall(require, "tsc")
+    if not ok then
+      vim.notify("tsc.nvim plugin not available", vim.log.levels.WARN)
+      return
+    end
+    tsc.run()
+  end, {
+    desc = "Run TypeScript compiler",
+  })
 
-vim.keymap.set("n", "<leader>t", function()
-  local tsc = require("tsc")
-  tsc.run()
-end, {
-  desc = "Run TypeScript compiler",
-})
+  vim.api.nvim_create_user_command("CursorQF", function()
+    require("bdub.commands").open_qf_in_cursor()
+  end, {
+    desc = "Run TypeScript compiler and open errors in Cursor",
+  })
 
-vim.api.nvim_create_user_command("CursorQF", function()
-  require("bdub.commands").open_qf_in_cursor()
-end, {
-  desc = "Run TypeScript compiler and open errors in Cursor",
-})
+  function dedupe_quickfix()
+    local qf_list = vim.fn.getqflist()
+    if #qf_list == 0 then
+      vim.notify("Quickfix list is empty", vim.log.levels.INFO)
+      return
+    end
 
-vim.keymap.set("n", "<leader>-", "<cmd>CursorQF<CR>", {
-  noremap = true,
-  silent = true,
-  desc = "Run TypeScript compiler and open errors in Cursor",
-})
+    local seen_files = {}
+    local deduped_list = {}
+
+    for _, item in ipairs(qf_list) do
+      local bufnr = item.bufnr
+      local filename = vim.api.nvim_buf_get_name(bufnr)
+
+      if not seen_files[filename] then
+        seen_files[filename] = true
+        table.insert(deduped_list, item)
+      end
+    end
+
+    vim.fn.setqflist(deduped_list, "r")
+    vim.notify(string.format("Deduped quickfix: %d -> %d items", #qf_list, #deduped_list), vim.log.levels.INFO)
+  end
+
+  vim.keymap.set("n", "<leader>c", function()
+    dedupe_quickfix()
+    vim.cmd("CursorQF")
+  end, {
+    noremap = true,
+    silent = true,
+    desc = "Run TypeScript compiler and open errors in Cursor",
+  })
+
+  vim.keymap.set("n", "<leader>-", "<cmd>CursorQF<CR>", {
+    noremap = true,
+    silent = true,
+    desc = "Run TypeScript compiler and open errors in Cursor",
+  })
 end
-
-
-
-

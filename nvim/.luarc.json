@@ -3,5 +3,9 @@
     "diagnostics.globals": [
         "vim",
         "continue"
-    ]
+    ],
+    "runtime": {
+        "version": "LuaJIT"
+    },
+    "workspace.library": []
 }

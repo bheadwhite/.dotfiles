@@ -2,40 +2,18 @@ if vim.version().minor < 10 then
   return {}
 end
 
-local hyper_key = require("bdub.globals").hyper_space_key
-
-local triggerNes = function()
-  local copilotClient = vim.lsp.get_clients({ name = "copilot" })[1]
-  return require("copilot-lsp.nes").request_nes(copilotClient)
+-- Safe access to hyper_space_key for CopilotChat
+local ok_bdub, bdub = pcall(require, "bdub")
+if ok_bdub and type(bdub.hyper_space_key) == "string" and bdub.hyper_space_key ~= "" then
+  vim.keymap.set("v", bdub.hyper_space_key, function()
+    vim.cmd("CopilotChat")
+  end, { noremap = true, silent = true, desc = "Open CopilotChat" })
 end
-
-local isNesActive = function()
-  return vim.b[vim.api.nvim_get_current_buf()].nes_state ~= nil
-end
-
-vim.keymap.set({ "i", "n" }, hyper_key, function()
-  -- Check if suggestions are already visible
-  require("copilot.suggestion").next()
-
-  if not isNesActive() then
-    triggerNes()
-  end
-
-end, { noremap = true, silent = true })
-
-vim.keymap.set("v", hyper_key, function()
-  vim.cmd("CopilotChat")
-end, { noremap = true, silent = true })
-
 
 return {
   "zbirenbaum/copilot.lua",
-  dependencies = {
-    "copilotlsp-nvim/copilot-lsp"
-  },
   init = function()
     vim.g.copilot_no_tab_map = true
-    vim.g.copilot_nes_debounce = 500
   end,
   cmd = "Copilot",
   event = "InsertEnter",
@@ -43,9 +21,6 @@ return {
     require("copilot").setup({
       panel = {
         enabled = false,
-      },
-      nes = {
-        enabled = true,
       },
       suggestion = {
         enabled = true,

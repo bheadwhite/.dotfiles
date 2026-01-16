@@ -1,13 +1,3 @@
-local diagnostic_filters = {
-  2311, -- Did you mean to write this in an async function?
-  80006, -- This may be converted to an async function.
-  80001, -- File is a CommonJS module; it may be converted to an ES module.
-  7044, -- Parameter '{0}' implicitly has an '{1}' type, but a better type may be inferred from usage.
-  7043, -- Variable '{0}' implicitly has an '{1}' type, but a better type may be inferred from usage.
-}
--- filter codes list - https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json
---
---
 local ACTIONS = {
   sort = "source.sortImports.ts",
   add_missing = "source.addMissingImports.ts",
@@ -40,19 +30,20 @@ local function apply_code_actions(result, client)
   end
 end
 
-
 local function codeAction(action, bufnr)
   if not action then
     return
   end
 
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
   local client = get_client(bufnr)
   if not client then
     return
   end
-  local params = vim.lsp.util.make_range_params(nil, "utf-8")
+  local params = vim.lsp.util.make_range_params(bufnr, "utf-8")
   params.context = {
     only = { action },
+    diagnostics = {}, -- Empty array - server will determine actions from range
   }
 
   pcall(function()
@@ -85,7 +76,7 @@ return {
   },
   settings = {
     diagnostics = {
-      ignoredCodes = diagnostic_filters,
+      ignoredCodes = require("bdub.diagnostics").typescript_ignore_codes,
     },
   },
   on_attach = function(client, bufnr)

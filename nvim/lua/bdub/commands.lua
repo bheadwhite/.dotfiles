@@ -22,7 +22,7 @@ local function get_vim_path()
   return file_path
 end
 
-M.open_qf_in_cursor = function ()
+M.open_qf_in_cursor = function()
   local files = {}
 
   -- Get files from quickfix list
@@ -518,10 +518,12 @@ function _G.printK(obj)
 end
 
 -- Map the function to a key combination, e.g., <leader>rf
-vim.keymap.set("n", "<leader>rf", print_symbols, {
-  noremap = true,
-  silent = true,
-})
+if not vim.g.vscode then
+  vim.keymap.set("n", "<leader>rf", print_symbols, {
+    noremap = true,
+    silent = true,
+  })
+end
 
 -- function M.buf_update_diagnostics()
 -- 	local clients = vim.lsp.get_clients()

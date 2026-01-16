@@ -1,5 +1,6 @@
 return {
   "windwp/nvim-autopairs",
+  cond = not vim.g.vscode,
   event = "InsertEnter",
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
