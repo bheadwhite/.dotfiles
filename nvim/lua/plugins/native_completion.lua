@@ -56,8 +56,8 @@ return {
     local npairs_ok, npairs = pcall(require, "nvim-autopairs")
 
     -- Main completion keymaps
-    map("i", "<C-Space>", "<C-x><C-o>", { desc = "Trigger completion" })
-    map("i", "<M-Space>", "<C-x><C-o>", { desc = "Trigger completion" })
+    -- map("i", "<C-Space>", "<C-x><C-o>", { desc = "Trigger completion" })
+    -- map("i", "<M-Space>", "<C-x><C-o>", { desc = "Trigger completion" })
     map("i", "<C-e>", "<C-e>", { desc = "Close completion menu" })
     map("i", "<C-v>", handle_ctrl_v, { expr = true, desc = "Accept Copilot or trigger completion" })
 

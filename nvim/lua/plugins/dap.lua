@@ -121,6 +121,18 @@ return {
         enabled = false,
       })
 
+      -- Auto-open dapui when debugging starts
+      local dapui = require("dapui")
+      dap.listeners.after.event_initialized["dapui_config"] = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated["dapui_config"] = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited["dapui_config"] = function()
+        dapui.close()
+      end
+
       dap.adapters["pwa-chrome"] = {
         type = "server",
         host = "localhost",

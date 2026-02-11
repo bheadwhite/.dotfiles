@@ -4,13 +4,13 @@ local default_diagnostic_config = {
   underline = true,
   signs = true,
   update_in_insert = false,
-  virtual_text = {
-    spacing = 4,
-    prefix = "●",
-    severity = {
-      min = vim.diagnostic.severity.WARN, -- Only show virtual text for warnings and errors
-    },
-  },
+  -- virtual_text = {
+  --   spacing = 4,
+  --   prefix = "●",
+  --   severity = {
+  --     min = vim.diagnostic.severity.WARN, -- Only show virtual text for warnings and errors
+  --   },
+  -- },
   severity_sort = true,
 }
 

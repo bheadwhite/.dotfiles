@@ -88,7 +88,7 @@ else
     vim.notify(string.format("Deduped quickfix: %d -> %d items", #qf_list, #deduped_list), vim.log.levels.INFO)
   end
 
-  vim.keymap.set("n", "<leader>c", function()
+  vim.keymap.set("n", "<leader>C", function()
     dedupe_quickfix()
     vim.cmd("CursorQF")
   end, {

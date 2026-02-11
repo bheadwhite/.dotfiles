@@ -313,26 +313,37 @@ function M.on_attach(client, attached_bufnr)
     return message
   end
 
-  local current_line_diagnostics = nil
+  local tiny_inline_autocmd_id = nil
 
   local function showLineDiagnostic(d)
     if not d then
+      require("tiny-inline-diagnostic").disable()
       return
     end
 
-    current_line_diagnostics = d.lnum
+    -- Clean up previous autocmd if it exists
+    if tiny_inline_autocmd_id then
+      vim.api.nvim_del_autocmd(tiny_inline_autocmd_id)
+      tiny_inline_autocmd_id = nil
+    end
 
-    notify.dismiss()
-    local message = formatDiagnostic(d)
-    notify.notify(message, "info", {
-      title = "Diagnostic",
-      timeout = 5000,
-      on_close = function()
-        current_line_diagnostics = nil
-      end,
-      keep = function()
-        local line_nr = vim.api.nvim_win_get_cursor(0)[1] - 1
-        return current_line_diagnostics == line_nr
+    vim.print("Showing diagnostic inline")
+    require("tiny-inline-diagnostic").enable()
+
+    -- Disable tiny-inline-diagnostic when moving up or down in normal mode
+    local last_line = vim.fn.line(".")
+    tiny_inline_autocmd_id = vim.api.nvim_create_autocmd("CursorMoved", {
+      callback = function()
+        local current_line = vim.fn.line(".")
+        if current_line ~= last_line then
+          vim.print("Disabling tiny-inline-diagnostic due to cursor move")
+          require("tiny-inline-diagnostic").disable()
+          -- Clean up this autocmd after it fires
+          if tiny_inline_autocmd_id then
+            vim.api.nvim_del_autocmd(tiny_inline_autocmd_id)
+            tiny_inline_autocmd_id = nil
+          end
+        end
       end,
     })
   end
@@ -578,10 +589,10 @@ function M.on_attach(client, attached_bufnr)
       "<M-S-l>",
       function()
         local d = vim.diagnostic.get_next()
+        vim.diagnostic.goto_next({ float = false })
         if d then
           showLineDiagnostic(d)
         end
-        vim.diagnostic.goto_next({ float = false })
       end,
       "next diagnostic",
     },
@@ -589,10 +600,10 @@ function M.on_attach(client, attached_bufnr)
       "<M-S-h>",
       function()
         local d = vim.diagnostic.get_prev()
+        vim.diagnostic.goto_prev({ float = false })
         if d then
           showLineDiagnostic(d)
         end
-        vim.diagnostic.goto_prev({ float = false })
       end,
       "prev diagnostic",
     },

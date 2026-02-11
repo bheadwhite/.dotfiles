@@ -359,6 +359,12 @@ vim.keymap.set("c", "<M-k>", "\\(.*\\)", {
 function handleEscape()
   vim.cmd("noh")
 
+  -- Close blink.cmp if open
+  local blink_ok, blink = pcall(require, "blink.cmp")
+  if blink_ok and blink.is_visible() then
+    blink.hide()
+  end
+
   -- -- Clear copilot NES state safely
   -- local ok, nes = pcall(require, "copilot-lsp.nes")
   -- if ok and vim.b[vim.api.nvim_get_current_buf()].nes_state ~= nil then
@@ -402,7 +408,7 @@ vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", add_desc("move to left wind
 
 vim.keymap.set("n", "<esc>", handleEscape, add_desc("esc normal"))
 
-vim.keymap.set("n", "<leader>c", function()
+vim.keymap.set("n", "<leader><C-M-c>", function()
   local file = vim.api.nvim_buf_get_name(0)
   if file ~= "" then
     vim.fn.jobstart({ "open", "-a", "Cursor", file }, { detach = true })

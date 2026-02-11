@@ -18,6 +18,30 @@ return {
       "start",
     },
   },
+  {
+    name = "launch integrations api",
+    type = "go",
+    request = "launch",
+    mode = "debug",
+    program = "${workspaceFolder}/attachmentsctl",
+    console = "integratedTerminal",
+    outputMode = "remote",
+    args = {
+      "start",
+    },
+  },
+  {
+    name = "launch integrations api v2",
+    type = "go",
+    request = "launch",
+    mode = "debug",
+    program = "${workspaceFolder}/attachmentsctl",
+    console = "integratedTerminal",
+    outputMode = "remote",
+    args = {
+      "start",
+    },
+  },
   -- {
   --   name = "launch campaigns",
   --   type = "go",

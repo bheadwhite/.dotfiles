@@ -104,37 +104,37 @@ vim.api.nvim_create_user_command("Govet", function()
   })
 end, {})
 
-vim.api.nvim_create_user_command("BiomeLint", function()
-  require("notify").notify("Running yarn check-lint", "info", { title = "Lint" })
+vim.api.nvim_create_user_command("TypeCheck", function()
+  require("notify").notify("Running yarn check:types", "info", { title = "TypeCheck" })
 
-  vim.fn.jobstart("yarn check-lint 2>&1", {
+  vim.fn.jobstart("yarn check:types 2>&1", {
     stdout_buffered = true,
     stderr_buffered = true,
 
-    on_stdout = function(a, output, c)
-      vim.print(a)
-      vim.print(c)
+    on_stdout = function(_, output, _)
       local qf_items = {}
 
       for _, line in ipairs(output) do
-        -- Match this pattern:
-        -- ./src/file.ts:67:14 lint/correctness/noUnusedVariables  ...
-        local filename, lnum, col, msg = line:match("^(.-):(%d+):(%d+)%s+([%w/]+)")
-        if filename and lnum and col and msg then
+        -- Match TypeScript error format:
+        -- src/path/file.ts(53,36): error TS2344: message...
+        local filename, lnum, col, errcode, msg = line:match("^([^%(]+)%((%d+),(%d+)%): error (TS%d+): (.+)$")
+        if filename and lnum and col then
           table.insert(qf_items, {
             filename = filename,
             lnum = tonumber(lnum),
             col = tonumber(col),
-            text = msg,
+            text = errcode .. ": " .. msg,
+            type = "E",
           })
         end
       end
 
       if vim.tbl_isempty(qf_items) then
-        require("notify").notify("No issues found", "info", { title = "Lint" })
+        require("notify").notify("No type errors found", "info", { title = "TypeCheck" })
       else
         vim.fn.setqflist(qf_items, "r")
         vim.cmd("copen")
+        require("notify").notify(#qf_items .. " type errors found", "warn", { title = "TypeCheck" })
       end
     end,
   })

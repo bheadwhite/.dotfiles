@@ -133,14 +133,14 @@ return {
       mode = { "n", "x" },
       desc = "Debug Code",
     },
-    {
-      "<leader>at",
-      function()
-        require("sidekick.cli").send({ msg = "Can you write tests for {this}?" })
-      end,
-      mode = { "n", "x" },
-      desc = "Generate Tests",
-    },
+    -- {
+    --   "<leader>at",
+    --   function()
+    --     require("sidekick.cli").send({ msg = "Can you write tests for {this}?" })
+    --   end,
+    --   mode = { "n", "x" },
+    --   desc = "Generate Tests",
+    -- },
     {
       "<leader>ai",
       function()

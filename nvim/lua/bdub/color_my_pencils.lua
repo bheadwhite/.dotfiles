@@ -1,3 +1,31 @@
+local catp_colors = require("bdub.catppuccin_colors")
+local shadow = {
+  bg = "#1D2326",
+  bg_dark = "#182924",
+  bg_bright = "#252A2E",
+  bg_green = "#1A2A1A",
+  bg_blue = "#1A2A2F",
+  bg_blue_bright = "#28343D",
+  fg = "#E6E7E6",
+  fg_dark = "#A0A1A0",
+  black = "#242B2D",
+  black_bright = "#485457",
+  red = "#BC8F7D",
+  red_bright = "#D4A394",
+  green = "#96B088",
+  green_bright = "#ABC49E",
+  yellow = "#CCAC7D",
+  yellow_bright = "#E2BF8F",
+  blue = "#7E9AAB",
+  blue_bright = "#94B1C4",
+  magenta = "#A68CAA",
+  magenta_bright = "#BC9EC0",
+  cyan = "#839C98",
+  cyan_bright = "#97B3AF",
+  white = "#CED3DC",
+  white_bright = "#E8EBF0",
+}
+
 local colors = {
   muted_teal = "#2A3D40",
   dark_olive = "#2C322E",
@@ -13,8 +41,10 @@ local colors = {
   black_bright = "#485457",
   red = "#BC8F7D",
   red_bright = "#D4A394",
+  red_dark = "#4E362C",
   green = "#96B088",
   green_bright = "#ABC49E",
+  green_dark = "#374833",
   yellow = "#CCAC7D",
   yellow_bright = "#E2BF8F",
   blue = "#7E9AAB",
@@ -47,6 +77,11 @@ function colorMyPencils()
   vim.cmd([[highlight DiagnosticUnderlineWarn guisp=]] .. colors.yellow_bright .. [[ guifg=]] .. colors.yellow_bright .. [[ gui=undercurl,underline]])
   vim.cmd([[highlight DiagnosticUnderlineInfo guisp=]] .. colors.blue_bright .. [[ guifg=]] .. colors.blue_bright .. [[ gui=undercurl,underline]])
   vim.cmd([[highlight DiagnosticUnderlineHint guisp=]] .. colors.cyan_bright .. [[ guifg=]] .. colors.cyan_bright .. [[ gui=undercurl,underline]])
+
+  vim.api.nvim_set_hl(0, "DiffAdd", { bg = shadow.bg_green_dark })
+  -- vim.api.nvim_set_hl(0, "DiffDelete", { fg = shadow.red })
+  vim.api.nvim_set_hl(0, "DiffChange", { bg = shadow.bg_blue_bright })
+  vim.api.nvim_set_hl(0, "DiffText", { bg = shadow.black })
 
   -- vim.cmd([[highlight Cursor guibg=]] .. colors.cursor)
   -- vim.cmd([[highlight Search guibg=]] .. colors.search .. [[ guifg=#000000]])

@@ -3,9 +3,18 @@ local function getColors()
 end
 
 return {
+  { "tpope/vim-abolish", "tpope/vim-surround" },
+  { "tpope/vim-dispatch", event = "VeryLazy" },
+  { "nvim-zh/better-escape.vim", event = "InsertEnter" }, -- better escape from insert mode
+  { "folke/ts-comments.nvim" },
   { "fei6409/log-highlight.nvim" },
   { "mileszs/ack.vim" }, -- Integrates 'ack' search tool
-  { "neovim/nvim-lspconfig" },
+  { "stevearc/dressing.nvim" }, -- Improved UI components
+  {
+    "neovim/nvim-lspconfig",
+  },
+  { "AckslD/messages.nvim", config = true, cond = not vim.g.vscode }, -- messages
+  { "sbulav/nredir.nvim" }, -- Redirects command output
   {
     "windwp/nvim-ts-autotag",
     cond = not vim.g.vscode,
@@ -25,32 +34,40 @@ return {
       })
     end,
   }, -- Auto-closes HTML tags
-  { "stevearc/dressing.nvim" }, -- Improved UI components
-  { "sbulav/nredir.nvim" }, -- Redirects command output
   {
-    "MeanderingProgrammer/treesitter-modules.nvim",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    config = function()
-      require("treesitter-modules").setup({
-        ensure_installed = { "lua", "typescript", "javascript", "tsx", "html", "css", "json", "yaml", "go" },
-        incremental_selection = {
-          enable = true,
-        },
-        highlight = {
-          enable = true,
-        },
-      })
-      vim.keymap.set("n", "<C-M-O>", function()
-        require("treesitter-modules").init_selection()
-      end)
+    "dmmulroy/tsc.nvim", -- Typescript
+    cond = not vim.g.vscode,
+    opts = {
+      bin_name = "tsgo",
+      -- use_diagnostics = true, //populates the diagnostics list with the resulting tsc errors
+      -- run_as_monorepo = true,
 
-      vim.keymap.set("x", "<C-M-O>", function()
-        require("treesitter-modules").node_incremental()
-      end)
-      vim.keymap.set("x", "<C-M-i>", function()
-        require("treesitter-modules").node_decremental()
-      end)
+      -- if TSC runs and your expecting results but there arent any..
+      -- it could be that your getting the "this is not the TSC your looking for" error when running TSC
+      -- find the path to the tsc bin by running require("tsc.utils").find_tsc_bin()
+      -- troubleshoot why thats not running as a standalone
+      -- references:
+      -- https://stackoverflow.com/questions/69080861/error-running-a-npx-tsc-command-regarding-typescript-this-is-not-the-tsc-comm
+    },
+  },
+  {
+    "CopilotC-Nvim/CopilotChat.nvim",
+    branch = "main",
+    build = "make tiktoken", -- Only on MacOS or Linux
+    cond = not vim.g.vscode,
+    dependencies = { "zbirenbaum/copilot.lua", "nvim-lua/plenary.nvim" },
+    config = function()
+      require("CopilotChat").setup()
     end,
+  },
+  {
+    "nvim-zh/colorful-winsep.nvim",
+    config = function()
+      require("colorful-winsep").setup()
+      vim.cmd([[highlight NvimSeparator guifg=]] .. getColors().mocha.overlay0)
+    end,
+    cond = not vim.g.vscode,
+    event = { "WinLeave" },
   },
   -- { "dstein64/vim-startuptime" }, -- startup time
   -- treesitter
@@ -61,15 +78,6 @@ return {
   --     vim.g.matchup_matchparen_offscreen = { method = "popup" }
   --   end,
   -- },
-  {
-    "nvim-zh/colorful-winsep.nvim",
-    config = function()
-      require("colorful-winsep").setup()
-      vim.cmd([[highlight NvimSeparator guifg=]] .. getColors().mocha.overlay0)
-    end,
-    cond = not vim.g.vscode,
-    event = { "WinLeave" },
-  },
   -- {
   --   "RRethy/vim-illuminate",
   --   cond = not vim.g.vscode,
@@ -148,16 +156,6 @@ return {
   --   config = true,
   -- },
   -- { "nanotee/zoxide.vim" },
-  {
-    "CopilotC-Nvim/CopilotChat.nvim",
-    branch = "main",
-    build = "make tiktoken", -- Only on MacOS or Linux
-    cond = not vim.g.vscode,
-    dependencies = { "zbirenbaum/copilot.lua", "nvim-lua/plenary.nvim" },
-    config = function()
-      require("CopilotChat").setup()
-    end,
-  },
   -- {
   --   "folke/trouble.nvim",
   --   keys = {
@@ -222,37 +220,10 @@ return {
   --     -- <cmd>noh<cr><esc>
   --   end),
   -- },
-  {
-    "dmmulroy/tsc.nvim", -- Typescript
-    cond = not vim.g.vscode,
-    opts = {
-      bin_name = "tsgo",
-      -- use_diagnostics = true, //populates the diagnostics list with the resulting tsc errors
-      -- run_as_monorepo = true,
-
-      -- if TSC runs and your expecting results but there arent any..
-      -- it could be that your getting the "this is not the TSC your looking for" error when running TSC
-      -- find the path to the tsc bin by running require("tsc.utils").find_tsc_bin()
-      -- troubleshoot why thats not running as a standalone
-      -- references:
-      -- https://stackoverflow.com/questions/69080861/error-running-a-npx-tsc-command-regarding-typescript-this-is-not-the-tsc-comm
-    },
-  },
   -- {
   --   "s1n7ax/nvim-window-picker",
   --   cond = not vim.g.vscode,
   -- }, -- window picker
-  {
-    "nvim-telescope/telescope-fzf-native.nvim", -- Telescope
-    cond = not vim.g.vscode,
-    build = "make",
-  },
-  {
-    "nvim-telescope/telescope-dap.nvim",
-    cond = not vim.g.vscode,
-  },
-  { "nvim-telescope/telescope-live-grep-args.nvim", cond = not vim.g.vscode },
-  { "nvim-telescope/telescope-ui-select.nvim" },
   -- { "echasnovski/mini.nvim", cond = not vim.g.vscode }, -- mini. using for zooming in and out of windows
   -- { "echasnovski/mini.splitjoin", version = false, config = true, cond = not vim.g.vscode },
   -- {
@@ -274,10 +245,6 @@ return {
   --     end)
   --   end,
   -- },
-  { "tpope/vim-abolish", "tpope/vim-surround" },
-  { "tpope/vim-dispatch", event = "VeryLazy" },
-  { "nvim-zh/better-escape.vim", event = "InsertEnter" }, -- better escape from insert mode
-  { "folke/ts-comments.nvim" },
   -- { "JoosepAlviste/nvim-ts-context-commentstring" }, -- comments
   -- { "camilledejoye/nvim-lsp-selection-range" },
   -- {
@@ -301,26 +268,25 @@ return {
   --     require("lsp-status").register_progress()
   --   end,
   -- },
-  { "AckslD/messages.nvim", config = true, cond = not vim.g.vscode }, -- messages
-  {
-    "numToStr/Comment.nvim",
-    cond = not vim.g.vscode,
-    opts = {
-      pre_hook = function()
-        return vim.bo.commentstring
-      end,
-      mappings = {
-        basic = true,
-        extra = false, -- Disable extra mappings to avoid conflicts
-      },
-      opleader = {
-        line = "<leader>cc", -- Change from 'gc' to '<leader>cc'
-        block = "<leader>cb", -- Change from 'gb' to '<leader>cb'
-      },
-      toggler = {
-        line = "<leader>cc", -- Change from 'gcc' to '<leader>cc'
-        block = "<leader>cb", -- Change from 'gbc' to '<leader>cb'
-      },
-    },
-  },
+  -- {
+  --   "numToStr/Comment.nvim",
+  --   cond = not vim.g.vscode,
+  --   opts = {
+  --     pre_hook = function()
+  --       return vim.bo.commentstring
+  --     end,
+  --     mappings = {
+  --       basic = true,
+  --       extra = false, -- Disable extra mappings to avoid conflicts
+  --     },
+  --     opleader = {
+  --       line = "<leader>cc", -- Change from 'gc' to '<leader>cc'
+  --       block = "<leader>cb", -- Change from 'gb' to '<leader>cb'
+  --     },
+  --     toggler = {
+  --       line = "<leader>cc", -- Change from 'gcc' to '<leader>cc'
+  --       block = "<leader>cb", -- Change from 'gbc' to '<leader>cb'
+  --     },
+  --   },
+  -- },
 }

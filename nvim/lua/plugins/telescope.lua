@@ -1,13 +1,3 @@
-local M = {
-  "nvim-telescope/telescope.nvim",
-  cond = not vim.g.vscode,
-  dependencies = {
-    "nvim-lua/plenary.nvim",
-    "nvim-telescope/telescope-live-grep-args.nvim",
-    "nvim-treesitter/nvim-treesitter",
-  },
-}
-
 local function file_name_only(_, file_path)
   return string.gsub(file_path, ".*/(.*)$", "%1")
 end
@@ -28,113 +18,155 @@ local function operator_path_display(_, file_path) -- absolute path
   return relative_path
 end
 
-M.config = function()
-  local plenary = require("plenary")
-  local action_state = require("telescope.actions.state")
-  local actions = require("telescope.actions")
-  -- local winshift_lib = require("winshift.lib")
-
-  local function copy_path_from_selection(bufnr)
-    local commands = require("bdub.commands")
-    local current_picker = action_state.get_current_picker(bufnr)
-    local selection = current_picker:get_selection()
-    local path = selection[1]
-    local cwd = vim.loop.cwd()
-    local relative_path = plenary.Path:new(path):make_relative(cwd)
-
-    commands.copy_operator_file_path(relative_path)
-  end
-
-  local default_opts = {
-    initial_mode = "normal",
-    hidden = true,
-    path_display = operator_path_display,
-    layout_strategy = "vertical",
-    layout_config = {
-      height = 0.9,
-      preview_cutoff = 60,
+return {
+  {
+    "nvim-telescope/telescope-fzf-native.nvim",
+    cond = not vim.g.vscode,
+    build = "make",
+    config = function()
+      require("telescope").load_extension("fzf")
+    end,
+  },
+  {
+    "nvim-telescope/telescope-dap.nvim",
+    cond = not vim.g.vscode,
+    dependencies = {
+      "mfussenegger/nvim-dap",
+      "nvim-telescope/telescope.nvim",
     },
-  }
+    config = function()
+      require("telescope").load_extension("dap")
+    end,
+  },
+  {
+    "nvim-telescope/telescope-live-grep-args.nvim",
+    cond = not vim.g.vscode,
+    config = function()
+      require("telescope").load_extension("live_grep_args")
+    end,
+  },
+  {
+    "nvim-telescope/telescope-ui-select.nvim",
+    config = function()
+      require("telescope").load_extension("ui-select")
+    end,
+  },
+  {
+    "nvim-telescope/telescope.nvim",
+    cond = not vim.g.vscode,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope-live-grep-args.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    config = function()
+      local plenary = require("plenary")
+      local action_state = require("telescope.actions.state")
+      local actions = require("telescope.actions")
+      -- local winshift_lib = require("winshift.lib")
 
-  local insert_mode_default = vim.tbl_extend("force", default_opts, {
-    initial_mode = "insert",
-  })
+      local function copy_path_from_selection(bufnr)
+        local commands = require("bdub.commands")
+        local current_picker = action_state.get_current_picker(bufnr)
+        local selection = current_picker:get_selection()
+        local path = selection[1]
+        local cwd = vim.loop.cwd()
+        local relative_path = plenary.Path:new(path):make_relative(cwd)
 
-  require("telescope").setup({
-    pickers = {
-      buffers = {
+        commands.copy_operator_file_path(relative_path)
+      end
+
+      local default_opts = {
         initial_mode = "normal",
-        path_display = { "tail" },
-      },
-      find_files = insert_mode_default,
-      git_files = insert_mode_default,
-      live_grep = insert_mode_default,
-      oldfiles = default_opts,
-      lsp_references = {
-        initial_mode = "normal",
-        path_display = file_name_only,
+        hidden = true,
+        path_display = operator_path_display,
         layout_strategy = "vertical",
         layout_config = {
           height = 0.9,
           preview_cutoff = 60,
         },
-      },
-      lsp_definitions = default_opts,
-      lsp_type_definitions = default_opts,
-      lsp_implementations = default_opts,
-    },
-    defaults = {
-      prompt_prefix = " ",
-      selection_caret = " ",
-      file_ignore_patterns = {
-        -- ".*/webphone/",
-        -- ".*/pb_description/",
-      },
-      dynamic_preview_title = true,
-      mappings = {
-        i = {
-          ["<C-M-r>"] = copy_path_from_selection,
-          ["<c-f>"] = actions.to_fuzzy_refine,
-          ["<C-v>"] = actions.file_vsplit,
-          ["<C-u>"] = false,
-          ["<C-M-S-l>"] = function()
-            -- print("target rpc references")
-            local val = vim.api.nvim_win_get_cursor(0)
-            local string = "!mock !fixture !test"
-            local startRow = val[1] - 1
-            local startCol = val[2]
-            vim.api.nvim_buf_set_text(0, startRow, startCol, startRow, startCol, { string })
-            vim.api.nvim_win_set_cursor(0, { 1, #tostring(vim.api.nvim_get_current_line()) })
-          end,
-        },
-        n = {
-          ["<C-M-r>"] = copy_path_from_selection,
-          ["<C-v>"] = actions.file_vsplit,
-          ["<M-S-q>"] = actions.add_to_qflist,
-        },
-      },
-    },
-    extensions = {
-      fzf = {
-        fuzzy = true,
-        override_generic_sorter = true,
-        override_file_sorter = true,
-        case_mode = "smart_case",
-      },
-      aerial = {
-        sorting_strategy = "ascending",
-      },
-      ["ui-select"] = {
-        require("telescope.themes").get_dropdown({
-          layout_config = {
-            width = 0.7,
+      }
+
+      local insert_mode_default = vim.tbl_extend("force", default_opts, {
+        initial_mode = "insert",
+      })
+
+      require("telescope").setup({
+        pickers = {
+          buffers = {
+            initial_mode = "normal",
+            path_display = { "tail" },
           },
-        }),
-      },
-    },
-  })
+          find_files = insert_mode_default,
+          git_files = insert_mode_default,
+          live_grep = insert_mode_default,
+          oldfiles = default_opts,
+          lsp_references = {
+            initial_mode = "normal",
+            path_display = file_name_only,
+            layout_strategy = "vertical",
+            layout_config = {
+              height = 0.9,
+              preview_cutoff = 60,
+            },
+          },
+          lsp_definitions = default_opts,
+          lsp_type_definitions = default_opts,
+          lsp_implementations = default_opts,
+        },
+        defaults = {
+          prompt_prefix = " ",
+          selection_caret = " ",
+          file_ignore_patterns = {
+            ".git",
+            -- ".*/webphone/",
+            -- ".*/pb_description/",
+          },
+          dynamic_preview_title = true,
+          mappings = {
+            i = {
+              ["<C-M-r>"] = copy_path_from_selection,
+              ["<c-f>"] = actions.to_fuzzy_refine,
+              ["<C-v>"] = actions.file_vsplit,
+              ["<C-u>"] = false,
+              ["<C-M-S-l>"] = function()
+                -- print("target rpc references")
+                local val = vim.api.nvim_win_get_cursor(0)
+                local string = "!mock !fixture !test"
+                local startRow = val[1] - 1
+                local startCol = val[2]
+                vim.api.nvim_buf_set_text(0, startRow, startCol, startRow, startCol, { string })
+                vim.api.nvim_win_set_cursor(0, { 1, #tostring(vim.api.nvim_get_current_line()) })
+              end,
+            },
+            n = {
+              ["<C-M-r>"] = copy_path_from_selection,
+              ["<C-v>"] = actions.file_vsplit,
+              ["<M-S-q>"] = actions.add_to_qflist,
+            },
+          },
+        },
+        extensions = {
+          fzf = {
+            fuzzy = true,
+            override_generic_sorter = true,
+            override_file_sorter = true,
+            case_mode = "smart_case",
+          },
+          aerial = {
+            sorting_strategy = "ascending",
+          },
+          ["ui-select"] = {
+            require("telescope.themes").get_dropdown({
+              layout_config = {
+                width = 0.7,
+              },
+            }),
+          },
+        },
+      })
 
-  require("bdub.telescope_config")
-end
-
-return M
+      require("bdub.telescope_config")
+    end,
+  },
+}

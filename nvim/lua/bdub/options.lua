@@ -17,6 +17,7 @@ local options = {
   splitright = true, -- force all vertical splits to go to the right of current window
   swapfile = false, -- creates a swapfile
   timeoutlen = 500, -- time to wait for a mapped sequence to complete (in milliseconds)
+  diffopt = { "internal", "algorithm:histogram", "indent-heuristic", "linematch:60", "closeoff", "context:999" },
   smartindent = true, -- make indenting smarter again
   undofile = true, -- enable persistent undo
   termguicolors = false, -- set term gui colors (most terminals support this)

@@ -75,9 +75,9 @@ return {
       show_help = true, -- show help message on the command line when the popup is visible
       -- triggers = "auto", -- automatically setup triggers
       -- triggers = {"<leader>"} -- or specifiy a list manually
-      triggers_blacklist = {
-        i = { "<leader>" }, -- Disable which-key in insert mode to prevent delay
-      },
+      -- triggers_blacklist = {
+      --   i = { "<leader>" }, -- Disable which-key in insert mode to prevent delay
+      -- },
     })
 
     which_key.add(mappings)

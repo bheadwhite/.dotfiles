@@ -1,10 +1,11 @@
 return {
   "hrsh7th/nvim-cmp",
-  enabled = false, -- Disabled in favor of native LSP completion (see native_completion.lua)
+  enabled = false, -- Migrated to blink.cmp
   cond = not vim.g.vscode,
   dependencies = {
-    "luckasRanarison/tailwind-tools.nvim",
-    "onsails/lspkind-nvim",
+    "hrsh7th/cmp-nvim-lsp",
+    -- "luckasRanarison/tailwind-tools.nvim",
+    -- "onsails/lspkind-nvim",
   },
   config = function()
     local cmp = require("cmp")
@@ -72,7 +73,15 @@ return {
       ["<C-d>"] = cmp.mapping.scroll_docs(-4),
       ["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
       ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
-      ["<M-Space>"] = cmp.mapping.complete(cmp_select),
+      ["<M-Space>"] = cmp.mapping(function()
+        cmp.complete({
+          config = {
+            sources = {
+              { name = "nvim_lsp" },
+            },
+          },
+        })
+      end, { "i", "s" }),
       ["<Up>"] = cmp.mapping.select_prev_item(cmp_select),
       ["<Down>"] = cmp.mapping.select_next_item(cmp_select),
       ["<M-j>"] = cmp.mapping(handleDown, { "i", "s" }),
@@ -88,11 +97,11 @@ return {
         { name = "nvim_lsp" },
         { name = "neorg" },
       },
-      formatting = {
-        format = require("lspkind").cmp_format({
-          before = require("tailwind-tools.cmp").lspkind_format,
-        }),
-      },
+      -- formatting = {
+      --   format = require("lspkind").cmp_format({
+      --     before = require("tailwind-tools.cmp").lspkind_format,
+      --   }),
+      -- },
       sorting = {
         priority_weight = 2,
         comparators = {
