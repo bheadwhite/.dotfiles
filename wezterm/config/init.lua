@@ -28,6 +28,7 @@ local window_frame = {
 -- 	},
 -- }
 
+config.debug_key_events = true
 config.font_size = 15
 config.command_palette_font_size = 19
 config.native_macos_fullscreen_mode = false
@@ -35,10 +36,10 @@ config.send_composed_key_when_left_alt_is_pressed = false
 config.send_composed_key_when_right_alt_is_pressed = false
 config.tab_max_width = 30
 config.window_decorations = "RESIZE"
-config.front_end = "OpenGL"
+config.front_end = "WebGpu"
 config.color_scheme = colors.color_scheme
 config.enable_kitty_keyboard = true
-config.enable_kitty_graphics = false  -- Disable graphics to reduce key sequence conflicts
+config.enable_kitty_graphics = false -- Disable graphics to reduce key sequence conflicts
 config.foreground_text_hsb = {
 	brightness = 1.8,
 }

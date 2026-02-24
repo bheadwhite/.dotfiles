@@ -5,6 +5,14 @@ return {
   config = function()
     require("mason").setup()
 
+    vim.lsp.config("*", {
+      capabilities = {
+        general = {
+          positionEncodings = { "utf-16" },
+        },
+      },
+    })
+
     vim.lsp.enable({ "lua-language-server", "gopls", "biome", "pyright", "typescript-language-server", "protols" })
 
     vim.api.nvim_create_autocmd("LspAttach", {

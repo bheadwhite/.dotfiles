@@ -104,40 +104,56 @@ vim.api.nvim_create_user_command("Govet", function()
   })
 end, {})
 
-vim.api.nvim_create_user_command("TypeCheck", function()
-  require("notify").notify("Running yarn check:types", "info", { title = "TypeCheck" })
+local function parse_typecheck_output(output)
+  local qf_items = {}
+  for _, line in ipairs(output) do
+    -- Match TypeScript error format:
+    -- src/path/file.ts(53,36): error TS2344: message...
+    local filename, lnum, col, errcode, msg = line:match("^([^%(]+)%((%d+),(%d+)%): error (TS%d+): (.+)$")
+    if filename and lnum and col then
+      table.insert(qf_items, {
+        filename = filename,
+        lnum = tonumber(lnum),
+        col = tonumber(col),
+        text = errcode .. ": " .. msg,
+        type = "E",
+      })
+    end
+  end
+  return qf_items
+end
 
-  vim.fn.jobstart("yarn check:types 2>&1", {
+local function show_typecheck_results(qf_items)
+  if vim.tbl_isempty(qf_items) then
+    require("notify").notify("No type errors found", "info", { title = "TypeCheck" })
+  else
+    vim.fn.setqflist(qf_items, "r")
+    vim.cmd("copen")
+    require("notify").notify(#qf_items .. " type errors found", "warn", { title = "TypeCheck" })
+  end
+end
+
+local function run_typecheck(cmd, fallback_cmd)
+  vim.fn.jobstart(cmd .. " 2>&1", {
     stdout_buffered = true,
     stderr_buffered = true,
-
     on_stdout = function(_, output, _)
-      local qf_items = {}
-
-      for _, line in ipairs(output) do
-        -- Match TypeScript error format:
-        -- src/path/file.ts(53,36): error TS2344: message...
-        local filename, lnum, col, errcode, msg = line:match("^([^%(]+)%((%d+),(%d+)%): error (TS%d+): (.+)$")
-        if filename and lnum and col then
-          table.insert(qf_items, {
-            filename = filename,
-            lnum = tonumber(lnum),
-            col = tonumber(col),
-            text = errcode .. ": " .. msg,
-            type = "E",
-          })
-        end
-      end
-
-      if vim.tbl_isempty(qf_items) then
-        require("notify").notify("No type errors found", "info", { title = "TypeCheck" })
-      else
-        vim.fn.setqflist(qf_items, "r")
-        vim.cmd("copen")
-        require("notify").notify(#qf_items .. " type errors found", "warn", { title = "TypeCheck" })
+      local qf_items = parse_typecheck_output(output)
+      show_typecheck_results(qf_items)
+    end,
+    on_exit = function(_, exit_code, _)
+      if exit_code ~= 0 and fallback_cmd then
+        -- Check if the script doesn't exist (yarn error)
+        require("notify").notify("Trying " .. fallback_cmd, "info", { title = "TypeCheck" })
+        run_typecheck(fallback_cmd, nil)
       end
     end,
   })
+end
+
+vim.api.nvim_create_user_command("TypeCheck", function()
+  require("notify").notify("Running yarn check:types", "info", { title = "TypeCheck" })
+  run_typecheck("yarn check:types", "yarn check-types")
 end, {})
 
 --

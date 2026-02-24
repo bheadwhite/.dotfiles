@@ -72,7 +72,6 @@ function M.toggle_background(window, pane)
 		overrides.color_scheme = themes.default
 	end
 
-	options.window_frame.border_left_color = getWindowColor(overrides.color_scheme)
 	window:set_config_overrides(overrides)
 end
 
@@ -106,20 +105,25 @@ end
 function M.apply_color_scheme(window)
 	local focused = window:is_focused()
 	local overrides = window:get_config_overrides() or {}
-	overrides.window_frame = options.window_frame
 
+	local border_color
 	if focused then
-		options.window_frame.border_top_color = getWindowColor(overrides.color_scheme)
-		options.window_frame.border_left_color = getWindowColor(overrides.color_scheme)
-		options.window_frame.border_bottom_color = getWindowColor(overrides.color_scheme)
-		options.window_frame.border_right_color = getWindowColor(overrides.color_scheme)
+		border_color = getWindowColor(overrides.color_scheme)
 	else
-		options.window_frame.border_top_color = options.everforestGreen
-		options.window_frame.border_left_color = options.everforestGreen
-		options.window_frame.border_bottom_color = options.everforestGreen
-		options.window_frame.border_right_color = options.everforestGreen
+		border_color = options.everforestGreen
 	end
 
+	-- Build a fresh window_frame table to avoid mutating shared config state
+	local new_frame = {}
+	for k, v in pairs(options.window_frame) do
+		new_frame[k] = v
+	end
+	new_frame.border_top_color = border_color
+	new_frame.border_left_color = border_color
+	new_frame.border_bottom_color = border_color
+	new_frame.border_right_color = border_color
+
+	overrides.window_frame = new_frame
 	window:set_config_overrides(overrides)
 end
 

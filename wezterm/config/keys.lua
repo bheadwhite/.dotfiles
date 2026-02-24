@@ -58,6 +58,8 @@ return {
 	{ key = "=", mods = "CMD", action = act.IncreaseFontSize },
 	{ key = ",", mods = "CMD|SHIFT", action = act.ActivateTabRelative(-1) },
 	{ key = ".", mods = "CMD|SHIFT", action = act.ActivateTabRelative(1) },
+	{ key = "phys:Comma", mods = "CTRL|SHIFT", action = act.SendString("\x1b[44;6u") },
+	{ key = "phys:Period", mods = "CTRL|SHIFT", action = act.SendString("\x1b[46;6u") },
 	{ key = " ", mods = "CTRL|SHIFT", action = act.QuickSelect },
 	{ key = "m", mods = "CMD", action = wezterm.action.ToggleFullScreen },
 	{ key = " ", mods = "CMD|CTRL", action = act.CharSelect },
