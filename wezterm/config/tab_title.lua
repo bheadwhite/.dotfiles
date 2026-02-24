@@ -5,6 +5,7 @@ local working_directories = {
 	"/code/playgrounds/",
 	"/code/blackcat/",
 	"/Projects/",
+	"/code/extra/",
 	"/code/",
 }
 local special_directories = { ".dotfiles" }
@@ -79,24 +80,13 @@ function M.formatTabTitle(tab, tabs, panes, config, hover, max_width)
 					local count = split_path_and_count(working_dir)
 
 					local slug = working_dir:gsub("/$", ""):match("([^/]+)$")
-					if count == 1 then
-						local relative = pwd:sub(#working_dir + 1)
-						local next_segment = relative:match("([^/]+)")
-						if next_segment then
-							project = next_segment
-						else
-							project = slug
-						end
-					elseif count == 2 then
-						local relative = pwd:sub(#working_dir + 1)
-						local next_segment = relative:match("([^/]+)")
-
-						if slug and next_segment then
-							project = slug .. "/" .. next_segment
-						else
-							project = slug
-						end
-					end
+				local relative = pwd:sub(#working_dir + 1)
+				local next_segment = relative:match("([^/]+)")
+				if next_segment then
+					project = next_segment
+				else
+					project = slug
+				end
 
 					break
 				end
