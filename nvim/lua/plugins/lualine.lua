@@ -1,7 +1,7 @@
 local color_config = require("bdub.color_config")
 
 return {
-  "nvim-lualine/lualine.nvim", -- statusline
+  "nvim-lualine/lualine.nvim",
   cond = not vim.g.vscode,
   dependencies = {
     "nvim-tree/nvim-web-devicons",
@@ -9,20 +9,6 @@ return {
   config = function()
     local colors = require("bdub.catppuccin_colors")
     local lualine = require("lualine")
-
-    local hide_in_width = function()
-      return vim.fn.winwidth(0) > 80
-    end
-
-    local full_path_minus_filename = function()
-      return vim.fn.expand("%:.:h") .. "/"
-    end
-
-    local function get_branch()
-      require("lualine.components.branch.git_branch").init()
-      local branch = require("lualine.components.branch.git_branch").get_branch()
-      return string.sub(branch, 1, 40)
-    end
 
     local function is_zoomed()
       local current_tab = vim.api.nvim_get_current_tabpage()
@@ -32,32 +18,6 @@ return {
       else
         return false
       end
-    end
-
-    local anchor_icon = vim.fn.nr2char(0xf13d)
-
-    local dap = require("dap")
-
-    local dap_status = function()
-      -- Check if a debugging session is active
-      if dap.session() ~= nil then
-        return " DAP Active" -- Icon + message when DAP is running
-      else
-        return "" -- Empty when DAP is not active
-      end
-    end
-
-    local function get_tabbar_widths()
-      local total_width = vim.o.columns
-      local left_width = math.floor(total_width * 0.30)
-      local right_width = math.floor(total_width * 0.30)
-      local center_width = total_width - left_width - right_width -- Remaining width
-
-      return {
-        left = left_width,
-        center = center_width,
-        right = right_width,
-      }
     end
 
     lualine.setup({
@@ -72,9 +32,6 @@ return {
       tabline = {
         lualine_a = {
           function()
-            --display the current working directory
-            --from the home directory
-            --ie ~/Projects/tcn
             local cwd = vim.fn.getcwd()
             local home = os.getenv("HOME")
             if cwd:sub(1, #home) == home then
@@ -100,69 +57,20 @@ return {
       sections = {
         lualine_a = {
           {},
-          -- {
-          --   "aerial",
-          --   depth = 3,
-          --   colored = true,
-          --   color = { bg = colors.mocha.crust, fg = colors.mocha.rosewater },
-          -- },
-          -- {
-          -- full_path_minus_filename,
-          -- color = function()
-          --   -- local winid = vim.fn.win_getid()
-          --   -- local isDup = win_utils.isWindowDuplicate(winid)
-          --   --
-          --   -- if isDup then
-          --   --   return { bg = colors.orange, fg = colors.fg }
-          --   -- end
-          --
-          --   return { bg = color_config.sectionFilePathBg, fg = color_config.sectionFilePathFg }
-          -- end,
-          -- },
         },
-        lualine_b = {
-          -- {
-          --   "mode",
-          --   fmt = function(mode)
-          --     return "-- " .. mode .. " --"
-          --   end,
-          --   -- color = function()
-          --   --   local bg = colors.bg1
-          --   --   local fg = colors.gray2
-          --   --   if vim.bo.modified then
-          --   --     bg = colors.red
-          --   --     fg = "#ffffff"
-          --   --   end
-          --   --
-          --   --   return {
-          --   --     fg = fg,
-          --   --     bg = bg,
-          --   --   }
-          --   -- end,
-          -- },
-        },
+        lualine_b = {},
         lualine_c = {},
         lualine_x = {
           {
             "tabs",
             tabs_color = {
-              -- Same values as the general color option can be used here.
               active = { bg = color_config.activeTabBg, fg = color_config.activeTabFg },
             },
             mode = 2,
             cond = function()
-              -- if only one buffer is open, don't show tabs
               return vim.fn.tabpagenr("$") > 1
             end,
           },
-          -- function()
-          --   local current_line = vim.fn.line(".")
-          --   local total_lines = vim.fn.line("$")
-          --   local chars = { "__", "▁▁", "▂▂", "▃▃", "▄▄", "▅▅", "▆▆", "▇▇", "██" }
-          --   local line_ratio = current_line / total_lines
-          --   local index = math.ceil(line_ratio * #chars)
-          --   return chars[index]
-          -- end,
         },
         lualine_z = {
           {

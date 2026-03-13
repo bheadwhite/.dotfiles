@@ -64,30 +64,6 @@ else
     desc = "Run TypeScript compiler and open errors in Cursor",
   })
 
-  function dedupe_quickfix()
-    local qf_list = vim.fn.getqflist()
-    if #qf_list == 0 then
-      vim.notify("Quickfix list is empty", vim.log.levels.INFO)
-      return
-    end
-
-    local seen_files = {}
-    local deduped_list = {}
-
-    for _, item in ipairs(qf_list) do
-      local bufnr = item.bufnr
-      local filename = vim.api.nvim_buf_get_name(bufnr)
-
-      if not seen_files[filename] then
-        seen_files[filename] = true
-        table.insert(deduped_list, item)
-      end
-    end
-
-    vim.fn.setqflist(deduped_list, "r")
-    vim.notify(string.format("Deduped quickfix: %d -> %d items", #qf_list, #deduped_list), vim.log.levels.INFO)
-  end
-
   vim.keymap.set("n", "<leader>C", function()
     dedupe_quickfix()
     vim.cmd("CursorQF")

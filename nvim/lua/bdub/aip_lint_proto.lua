@@ -35,7 +35,7 @@ end
 -- Function to run the api-linter command and set diagnostics
 function M.run_linter(bufnr)
   local filepath = vim.api.nvim_buf_get_name(bufnr)
-  local cmd = string.format("api-linter -I ~/Projects/googleapis --output-format=json %s", filepath)
+  local cmd = string.format("api-linter -I ~/code/googleapis --output-format=json %s", filepath)
   local handle = io.popen(cmd)
   if not handle then
     return

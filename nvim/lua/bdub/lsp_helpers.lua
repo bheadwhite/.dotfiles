@@ -170,21 +170,6 @@ function getRangeFromDefinitionResult(result)
 end
 
 function M.on_attach(client, attached_bufnr)
-  local cmp_capabilities = {}
-  -- Safely attempt to load cmp_nvim_lsp capabilities
-  local status, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-  if status then
-    cmp_capabilities = cmp_nvim_lsp.default_capabilities()
-  end
-
-  -- Ensure client.capabilities exists and safely extend capabilities
-  local base_capabilities = vim.lsp.protocol.make_client_capabilities()
-  client.capabilities = vim.tbl_deep_extend(
-    "force",
-    base_capabilities, -- Base capabilities
-    client.capabilities or {}, -- Existing client capabilities
-    cmp_capabilities -- cmp_nvim_lsp capabilities
-  )
 
   function isDefinitionResultLessThan2WithConstructor(ifYesCb, ifNoCb)
     local params = vim.lsp.util.make_position_params(0, "utf-8")
@@ -327,7 +312,7 @@ function M.on_attach(client, attached_bufnr)
       tiny_inline_autocmd_id = nil
     end
 
-    vim.print("Showing diagnostic inline")
+    
     require("tiny-inline-diagnostic").enable()
 
     -- Disable tiny-inline-diagnostic when moving up or down in normal mode
@@ -336,7 +321,7 @@ function M.on_attach(client, attached_bufnr)
       callback = function()
         local current_line = vim.fn.line(".")
         if current_line ~= last_line then
-          vim.print("Disabling tiny-inline-diagnostic due to cursor move")
+          
           require("tiny-inline-diagnostic").disable()
           -- Clean up this autocmd after it fires
           if tiny_inline_autocmd_id then

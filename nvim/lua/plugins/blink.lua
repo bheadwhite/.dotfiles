@@ -3,6 +3,20 @@ return {
   cond = not vim.g.vscode,
   event = "InsertEnter",
   version = "1.*",
+  init = function()
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "BlinkCmpMenuOpen",
+      callback = function()
+        vim.b.copilot_suggestion_hidden = true
+      end,
+    })
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "BlinkCmpMenuClose",
+      callback = function()
+        vim.b.copilot_suggestion_hidden = false
+      end,
+    })
+  end,
   opts = {
     keymap = {
       preset = "none",
@@ -17,7 +31,10 @@ return {
           return false
         end,
         "accept",
-        "fallback",
+        function()
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, false, true), "n", true)
+          return true
+        end,
       },
       ["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
       ["<M-Space>"] = { "show", "show_documentation", "hide_documentation" },

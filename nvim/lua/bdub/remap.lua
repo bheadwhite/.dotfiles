@@ -31,37 +31,11 @@ local function goToConstructor()
 
   if found ~= 0 then
     vim.fn.setreg("/", constructor)
-    vim.cmd("normal! /" .. constructor)
-
-    vim.cmd("normal! n")
+    vim.fn.search(constructor, "w")
     vim.cmd("normal! zz")
   end
   vim.fn.setreg("/", after_search_pattern)
   vim.cmd("nohlsearch")
-end
-
-function get_prev_char()
-  local _, col = unpack(vim.api.nvim_win_get_cursor(0))
-  if col == 0 then
-    return ""
-  end
-  local line = vim.api.nvim_get_current_line()
-  return line:sub(col, col)
-end
-
--- Function to check if the previous character is a whitespace
-local function is_previous_char_whitespace()
-  -- Get the current cursor position
-  local _, col = unpack(vim.api.nvim_win_get_cursor(0))
-  -- If the cursor is at the start of a line, there's no previous character
-  if col == 0 then
-    return false
-  end
-  -- Get the previous character
-  local line = vim.api.nvim_get_current_line()
-  local prev_char = line:sub(col, col)
-  -- Check if the previous character is a whitespace
-  return prev_char:match("%s") ~= nil
 end
 
 local function handleClose()
@@ -251,8 +225,6 @@ local normal_keymaps = {
   { "S", "vg_", "select until EOL" },
   { "Q", "<nop>", "disable ex mode" },
   { "<C-M-g>", ToggleGit, "git" },
-  { "<leader>>", "<cmd>lnext<CR>zz", "next location" },
-  { "<leader><", "<cmd>lprev<CR>zz", "prev location" },
   {
     "<leader>Ofj",
     function()

@@ -19,6 +19,9 @@ return {
         ensure_installed = { "lua", "typescript", "javascript", "tsx", "html", "css", "json", "yaml", "go" },
         incremental_selection = {
           enable = true,
+          keymaps = {
+            init_selection = false,
+          },
         },
         highlight = {
           enable = true,
@@ -34,6 +37,7 @@ return {
       vim.keymap.set("x", "<C-M-i>", function()
         require("treesitter-modules").node_decremental()
       end)
+
     end,
   },
 }
