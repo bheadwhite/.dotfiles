@@ -24,11 +24,11 @@ vim.cmd([[
     autocmd VimResized * tabdo wincmd =
   augroup end
 
-   "on pre buf save, remove trailing whitespace"
-  augroup _remove_trailing_whitespace
-    autocmd!
-    autocmd BufWritePre * :%s/\s\+$//e
-  augroup end
+   "on pre buf save, remove trailing whitespace (moved to lua below)"
+  " augroup _remove_trailing_whitespace
+  "   autocmd!
+  "   autocmd BufWritePre * :%s/\s\+$//e
+  " augroup end
 
   augroup _help
     autocmd!
@@ -56,6 +56,25 @@ vim.cmd([[
   " augroup END
 
 ]])
+
+
+-- Remove trailing whitespace on save (LSP-safe, per-line to avoid desyncing LSP incremental sync)
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*",
+  callback = function()
+    local pos = vim.api.nvim_win_get_cursor(0)
+    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+    for i, line in ipairs(lines) do
+      local trimmed = line:gsub("%s+$", "")
+      if trimmed ~= line then
+        vim.api.nvim_buf_set_lines(0, i - 1, i, false, { trimmed })
+      end
+    end
+    local max_line = vim.api.nvim_buf_line_count(0)
+    pos[1] = math.min(pos[1], max_line)
+    vim.api.nvim_win_set_cursor(0, pos)
+  end,
+})
 
 --prevent active snippets from persisting after leaving insert mode
 vim.api.nvim_create_autocmd("InsertLeave", {
@@ -154,6 +173,57 @@ end
 vim.api.nvim_create_user_command("TypeCheck", function()
   require("notify").notify("Running yarn check:types", "info", { title = "TypeCheck" })
   run_typecheck("yarn check:types", "yarn check-types")
+end, {})
+
+local function parse_lint_output(output)
+  local qf_items = {}
+  for _, line in ipairs(output) do
+    -- Match Biome lint output format:
+    -- src/path/file.ts:10:5 lint/category/ruleName ━━━━━━
+    local filename, lnum, col, rule = line:match("^(%S+%.%w+):(%d+):(%d+) (%S+)")
+    if filename and lnum and col and rule then
+      table.insert(qf_items, {
+        filename = filename,
+        lnum = tonumber(lnum),
+        col = tonumber(col),
+        text = rule,
+        type = "W",
+      })
+    end
+  end
+  return qf_items
+end
+
+local function show_lint_results(qf_items)
+  if vim.tbl_isempty(qf_items) then
+    require("notify").notify("No lint errors found", "info", { title = "LintCheck" })
+  else
+    vim.fn.setqflist(qf_items, "r")
+    vim.cmd("copen")
+    require("notify").notify(#qf_items .. " lint errors found", "warn", { title = "LintCheck" })
+  end
+end
+
+local function run_lintcheck(cmd, fallback_cmd)
+  vim.fn.jobstart(cmd .. " 2>&1", {
+    stdout_buffered = true,
+    stderr_buffered = true,
+    on_stdout = function(_, output, _)
+      local qf_items = parse_lint_output(output)
+      show_lint_results(qf_items)
+    end,
+    on_exit = function(_, exit_code, _)
+      if exit_code ~= 0 and fallback_cmd then
+        require("notify").notify("Trying " .. fallback_cmd, "info", { title = "LintCheck" })
+        run_lintcheck(fallback_cmd, nil)
+      end
+    end,
+  })
+end
+
+vim.api.nvim_create_user_command("LintCheck", function()
+  require("notify").notify("Running yarn check:lint", "info", { title = "LintCheck" })
+  run_lintcheck("yarn check:lint", "yarn check-lint")
 end, {})
 
 --

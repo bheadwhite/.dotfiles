@@ -73,6 +73,12 @@ keybind = cmd+period=goto_split:next
 keybind = cmd+shift+j=goto_split:down
 keybind = cmd+shift+k=goto_split:up
 
+# Vim-style pane navigation with Ctrl+hjkl
+keybind = ctrl+h=goto_split:left
+keybind = ctrl+j=goto_split:down
+keybind = ctrl+k=goto_split:up
+keybind = ctrl+l=goto_split:right
+
 # Tab navigation
 keybind = alt+comma=previous_tab
 keybind = alt+period=next_tab

@@ -17,21 +17,29 @@ if ok_bdub and type(bdub.hyper_space_key) == "string" and bdub.hyper_space_key ~
 end
 
 vim.keymap.set("n", "<C-v>", function()
+  local feed_cr = function()
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, false, true), "n", false)
+  end
+
   local sidekick_ok, sidekick = pcall(require, "sidekick.nes")
   if not sidekick_ok then
+    feed_cr()
     return
   end
 
   if not sidekick.enabled then
     sidekick.enable()
+    feed_cr()
     return
   end
 
   if sidekick.have() then
     sidekick.apply()
-  else
-    sidekick.update()
+    return
   end
+
+  sidekick.update()
+  feed_cr()
 end, { noremap = true, silent = true, desc = "Apply/trigger NES" })
 
 return {

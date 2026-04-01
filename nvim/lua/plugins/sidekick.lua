@@ -9,16 +9,16 @@ return {
         inline = "words", -- Enable inline word-level diffs
       },
       trigger = {
-        events = { "ModeChanged i:n", "TextChanged", "User SidekickNesDone", "BufEnter", "WinEnter" },
+        events = { "ModeChanged i:n", "TextChanged", "User SidekickNesDone" },
       },
     },
     -- CLI configuration
     cli = {
       watch = true, -- Notify Neovim of file changes done by AI CLI tools
       mux = {
-        backend = "zellij", -- or "tmux"
+        backend = "tmux",
         enabled = true,
-        create = "terminal", -- "terminal"|"window"|"split"
+        create = "terminal",
       },
       win = {
         layout = "right", -- "float"|"left"|"bottom"|"top"|"right"
@@ -70,12 +70,40 @@ return {
   },
   keys = {
     {
-      "<leader>aa",
+      "<c-m-i>",
       function()
-        require("sidekick.cli").toggle({ name = "cursor", focus = true })
+        require("sidekick.cli").toggle()
+      end,
+      mode = { "n", "i", "t" },
+      desc = "Toggle Claude CLI",
+    },
+    {
+      "<c-m-i>",
+      function()
+        require("sidekick.cli").send({ msg = "{this}" })
+      end,
+      mode = { "x" },
+      desc = "Send Selection to Claude CLI",
+    },
+    {
+      "<leader>aR",
+      function()
+        local cli = require("sidekick.cli")
+        cli.close({ name = "claude" })
+        vim.defer_fn(function()
+          cli.toggle({ name = "claude", focus = true })
+        end, 200)
       end,
       mode = { "n" },
-      desc = "Toggle Cursor Agent",
+      desc = "Restart Claude CLI",
+    },
+    {
+      "<c-m-u>",
+      function()
+        require("sidekick.cli").send({ msg = "{this}" })
+      end,
+      mode = { "x", "n", "i" },
+      desc = "Send This to CLI",
     },
     {
       "<leader>ap",
@@ -86,14 +114,6 @@ return {
       desc = "Select Prompt",
     },
     -- Send content to CLI
-    {
-      "<leader>ath",
-      function()
-        require("sidekick.cli").send({ msg = "{this}" })
-      end,
-      mode = { "x", "n" },
-      desc = "Send This to CLI",
-    },
     {
       "<leader>af",
       function()

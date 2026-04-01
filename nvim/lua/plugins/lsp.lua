@@ -14,5 +14,14 @@ return {
     })
 
     vim.lsp.enable({ "lua-language-server", "gopls", "biome", "pyright", "typescript-language-server", "protols" })
+
+    vim.api.nvim_create_autocmd("LspAttach", {
+      callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if client and client.name == "typescript-language-server" then
+          client.server_capabilities.semanticTokensProvider = nil
+        end
+      end,
+    })
   end,
 }

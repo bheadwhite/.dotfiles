@@ -65,6 +65,61 @@ return {
       local actions = require("telescope.actions")
       -- local winshift_lib = require("winshift.lib")
 
+      local function toggle_fuzzy_refine(prompt_bufnr)
+        local conf = require("telescope.config").values
+        local finders = require("telescope.finders")
+        local picker = action_state.get_current_picker(prompt_bufnr)
+
+        if picker._fuzzy_refine_active then
+          -- exiting fuzzy refine: restore original state
+          picker._refine_prompt = action_state.get_current_line()
+          picker.sorter:_destroy()
+          picker.sorter = picker._orig_sorter
+          picker.sorter:_init()
+          picker.prompt_title = picker._orig_title
+          if picker.layout.prompt.border then
+            picker.layout.prompt.border:change_title(picker._orig_title)
+          end
+          picker._fuzzy_refine_active = false
+          -- swap finder back directly (it was never closed)
+          picker.finder = picker._orig_finder
+          picker:set_prompt(picker._orig_prompt or "")
+        else
+          -- entering fuzzy refine: snapshot current state
+          picker._orig_finder = picker.finder
+          picker._orig_sorter = picker.sorter
+          picker._orig_title = picker._orig_title or picker.prompt_title
+          picker._orig_prompt = action_state.get_current_line()
+
+          -- collect current results into a static table finder
+          local results = {}
+          for entry in picker.manager:iter() do
+            table.insert(results, entry)
+          end
+          local new_finder = finders.new_table({
+            results = results,
+            entry_maker = function(x)
+              return x
+            end,
+          })
+
+          -- swap to fuzzy sorter
+          local line = action_state.get_current_line()
+          local title = string.format("Fuzzy over (%s)", line)
+          picker.sorter:_destroy()
+          picker.sorter = conf.generic_sorter({})
+          picker.sorter:_init()
+          picker.prompt_title = title
+          if picker.layout.prompt.border then
+            picker.layout.prompt.border:change_title(title)
+          end
+          picker._fuzzy_refine_active = true
+          -- swap finder directly to avoid closing the original (job-based) finder
+          picker.finder = new_finder
+          picker:set_prompt(picker._refine_prompt or "")
+        end
+      end
+
       local function copy_path_from_selection(bufnr)
         local commands = require("bdub.commands")
         local current_picker = action_state.get_current_picker(bufnr)
@@ -126,7 +181,7 @@ return {
           mappings = {
             i = {
               ["<C-M-r>"] = copy_path_from_selection,
-              ["<c-f>"] = actions.to_fuzzy_refine,
+              ["<c-f>"] = toggle_fuzzy_refine,
               ["<C-v>"] = actions.file_vsplit,
               ["<C-u>"] = false,
               ["<C-M-S-l>"] = function()

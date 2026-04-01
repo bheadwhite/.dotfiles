@@ -12,7 +12,25 @@ return {
     explorer = { enabled = false },
     indent = { enabled = false },
     input = { enabled = false },
-    picker = { enabled = false },
+    picker = {
+      enabled = true,
+      sources = {
+        select = {
+          win = {
+            input = {
+              keys = {
+                ["<c-v>"] = { "confirm", mode = { "n", "i" } },
+              },
+            },
+            list = {
+              keys = {
+                ["<c-v>"] = "confirm",
+              },
+            },
+          },
+        },
+      },
+    },
     notifier = { enabled = false },
     quickfile = { enabled = false },
     scope = { enabled = false },

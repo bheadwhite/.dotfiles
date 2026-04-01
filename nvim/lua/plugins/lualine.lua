@@ -55,9 +55,7 @@ return {
         lualine_z = {},
       },
       sections = {
-        lualine_a = {
-          {},
-        },
+        lualine_a = {},
         lualine_b = {},
         lualine_c = {},
         lualine_x = {
@@ -73,6 +71,7 @@ return {
           },
         },
         lualine_z = {
+          { "mode" },
           {
             function()
               if is_zoomed() then

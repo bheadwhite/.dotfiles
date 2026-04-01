@@ -24,15 +24,20 @@ return {
       ["<C-v>"] = {
         function(cmp)
           local copilot_ok, copilot = pcall(require, "copilot.suggestion")
-          if copilot_ok and copilot.is_visible() then
-            copilot.accept()
-            return true
+          if not copilot_ok then
+            return false
           end
-          return false
-        end,
-        "accept",
-        function()
-          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, false, true), "n", true)
+          -- Dismiss blink menu so copilot suggestion can reappear
+          vim.b.copilot_suggestion_hidden = false
+          cmp.hide()
+          -- Schedule to let copilot re-evaluate visibility
+          vim.schedule(function()
+            if copilot.is_visible() then
+              copilot.accept()
+            else
+              vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, false, true), "n", true)
+            end
+          end)
           return true
         end,
       },

@@ -388,3 +388,4 @@ vim.keymap.set("n", "<leader><C-M-c>", function()
 end, { desc = "Open current buffer in Cursor app" })
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", options)
+vim.keymap.set("t", "<S-CR>", "\x1b[13;2u", { noremap = true, desc = "Forward shift+enter to terminal" })

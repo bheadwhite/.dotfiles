@@ -28,7 +28,9 @@ return {
         },
       })
       vim.keymap.set("n", "<C-M-O>", function()
-        require("treesitter-modules").init_selection()
+        if vim.api.nvim_buf_line_count(0) > 0 and vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] ~= "" then
+          require("treesitter-modules").init_selection()
+        end
       end)
 
       vim.keymap.set("x", "<C-M-O>", function()

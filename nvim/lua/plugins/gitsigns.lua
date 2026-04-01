@@ -44,39 +44,39 @@ return {
     -- undo_stage_hunk = { "<cmd>lua require 'gitsigns'.undo_stage_hunk()<cr>", "Undo Stage Hunk" },
     -- diff = { "<cmd>Gitsigns diffthis HEAD<cr>", "Diff" },
 
-    local last_func = nil
+    -- local last_func = nil
     -- use last command function
-    local function use_last_func()
-      if last_func then
-        last_func()
-      end
-    end
+    -- local function use_last_func()
+    -- if last_func then
+    --   last_func()
+    -- end
+    -- end
 
-    function function_decorator(func)
-      return function()
-        last_func = func
-        func()
-      end
-    end
+    -- function function_decorator(func)
+    --   return function()
+    --     last_func = func
+    --     func()
+    --   end
+    -- end
 
-    local nextHunk = function_decorator(function()
+    local nextHunk = function()
       local current_line_nr = vim.fn.line(".")
       require("gitsigns").next_hunk()
       local did_change = vim.fn.line(".") ~= current_line_nr
       if did_change then
         vim.cmd([[normal! zz]])
       end
-    end)
+    end
 
-    local prevHunk = function_decorator(function()
+    local prevHunk = function()
       local current_line_nr = vim.fn.line(".")
       require("gitsigns").prev_hunk()
       if vim.fn.line(".") ~= current_line_nr then
         vim.cmd([[normal! zz]])
       end
-    end)
+    end
 
-    vim.keymap.set("n", "<C-M-Enter>", use_last_func, { noremap = true, silent = true, desc = "use last func" })
+    -- vim.keymap.set("n", "<C-M-Enter>", use_last_func, { noremap = true, silent = true, desc = "use last func" })
 
     -- Key mappings to invoke the commands
     vim.keymap.set("n", "<C-M-]>", nextHunk, { noremap = true, silent = true, desc = "next hunk" })
