@@ -13,7 +13,7 @@ return {
       },
     })
 
-    vim.lsp.enable({ "lua-language-server", "gopls", "biome", "pyright", "typescript-language-server", "protols" })
+    vim.lsp.enable({ "lua-language-server", "gopls", "biome", "pyright", "typescript-language-server", "protols", "svelte-language-server" })
 
     vim.api.nvim_create_autocmd("LspAttach", {
       callback = function(args)

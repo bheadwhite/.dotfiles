@@ -16,7 +16,7 @@ return {
     lazy = false, -- Load with treesitter (not lazy)
     config = function()
       require("treesitter-modules").setup({
-        ensure_installed = { "lua", "typescript", "javascript", "tsx", "html", "css", "json", "yaml", "go" },
+        ensure_installed = { "lua", "typescript", "javascript", "tsx", "html", "css", "json", "yaml", "go", "svelte" },
         incremental_selection = {
           enable = true,
           keymaps = {
