@@ -169,6 +169,20 @@ local highlight_under_cursor = function()
   -- mc.matchAddCursor(1)
 end
 
+local function refreshBuffer()
+  -- Reload the current buffer from disk so we're looking at the latest version.
+  if vim.bo.modified then
+    local choice = vim.fn.confirm("Buffer has unsaved changes. Discard and reload from disk?", "&Yes\n&No", 2)
+    if choice ~= 1 then
+      return
+    end
+    vim.cmd("edit!")
+  else
+    vim.cmd("edit")
+  end
+  vim.notify("Buffer reloaded", vim.log.levels.INFO, { title = "Refresh" })
+end
+
 local active_tab = 1
 
 vim.api.nvim_create_autocmd("TabEnter", {
@@ -266,7 +280,14 @@ local normal_keymaps = {
   { "<C-S-.>", vim.cmd.tabn, "next tab" },
   { "*", highlight_under_cursor, "for jumps" },
   { ",", highlight_under_cursor, "for jumps" },
+  { "m", function()
+    local word = vim.fn.expand("<cword>")
+    if word == "" then return end
+    vim.fn.setreg("/", "\\<" .. word .. "\\>")
+    vim.o.hlsearch = true
+  end, "highlight word under cursor (no jump)" },
   { "gn", goToConstructor, "go to constructor" },
+  { "=", refreshBuffer, "reload buffer from disk" },
 }
 
 for _, value in ipairs(normal_keymaps) do
