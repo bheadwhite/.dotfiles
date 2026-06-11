@@ -182,7 +182,7 @@ return {
             i = {
               ["<C-M-r>"] = copy_path_from_selection,
               ["<c-f>"] = toggle_fuzzy_refine,
-              ["<C-v>"] = actions.file_vsplit,
+              ["<C-M-F14>"] = actions.file_vsplit,
               ["<C-u>"] = false,
               ["<C-M-S-l>"] = function()
                 -- print("target rpc references")
@@ -196,7 +196,7 @@ return {
             },
             n = {
               ["<C-M-r>"] = copy_path_from_selection,
-              ["<C-v>"] = actions.file_vsplit,
+              ["<C-M-F14>"] = actions.file_vsplit,
               ["<M-S-q>"] = actions.add_to_qflist,
             },
           },

@@ -21,7 +21,7 @@ return {
     keymap = {
       preset = "none",
       ["<CR>"] = { "accept", "fallback" },
-      ["<C-v>"] = {
+      ["<C-M-F14>"] = {
         function(cmp)
           local copilot_ok, copilot = pcall(require, "copilot.suggestion")
           if not copilot_ok then

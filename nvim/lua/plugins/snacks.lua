@@ -19,12 +19,12 @@ return {
           win = {
             input = {
               keys = {
-                ["<c-v>"] = { "confirm", mode = { "n", "i" } },
+                ["<C-M-F14>"] = { "confirm", mode = { "n", "i" } },
               },
             },
             list = {
               keys = {
-                ["<c-v>"] = "confirm",
+                ["<C-M-F14>"] = "confirm",
               },
             },
           },

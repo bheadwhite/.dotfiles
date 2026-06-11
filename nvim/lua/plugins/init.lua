@@ -4,8 +4,13 @@ end
 
 return {
   { "tpope/vim-abolish", "tpope/vim-surround" },
-  { "tpope/vim-dispatch", event = "VeryLazy" },
-  { "nvim-zh/better-escape.vim", event = "InsertEnter" }, -- better escape from insert mode
+  {
+    "tpope/vim-dispatch",
+    event = "VeryLazy",
+    init = function()
+      vim.g.dispatch_no_maps = 1
+    end,
+  },
   { "folke/ts-comments.nvim" },
   { "fei6409/log-highlight.nvim" },
   { "mileszs/ack.vim" }, -- Integrates 'ack' search tool

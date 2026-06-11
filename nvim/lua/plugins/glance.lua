@@ -31,7 +31,7 @@ return {
       detached = true,
       mappings = {
         list = {
-          ["<c-v>"] = glance.actions.jump_vsplit,
+          ["<C-M-F14>"] = glance.actions.jump_vsplit,
         },
       },
       hooks = {

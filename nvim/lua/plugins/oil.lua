@@ -28,7 +28,7 @@ return {
         ["<C-l>"] = false,
         ["<C-j>"] = false,
         ["<C-k>"] = false,
-        ["<C-v>"] = oil_config.openFileAndSwap,
+        ["<C-M-F14>"] = oil_config.openFileAndSwap,
         ["="] = "actions.refresh",
         ["<C-S-S>"] = function()
           require("oil.actions").select_split()
