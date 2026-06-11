@@ -44,9 +44,23 @@ function M.setRightStatus(window, pane)
 	-- "Wed Mar 3 08:14"
 	local date = wezterm.strftime("%a %b %-d %H:%M ")
 
-	window:set_right_status(wezterm.format({
-		{ Text = date },
-	}))
+	local elements = {}
+
+	-- confirm-mode banner: shown while the confirm_close key table is armed.
+	-- Re-fires automatically because wezterm emits update-right-status on key
+	-- table push/pop. cmd+w again (or y) closes; Esc / any other key cancels.
+	if window:active_key_table() == "confirm_close" then
+		table.insert(elements, { Background = { Color = colors.red } })
+		table.insert(elements, { Foreground = { Color = colors.bg_dim } })
+		table.insert(elements, { Attribute = { Intensity = "Bold" } })
+		table.insert(elements, { Text = "  close pane? cmd+w / y · esc  " })
+		table.insert(elements, "ResetAttributes")
+		table.insert(elements, { Text = " " })
+	end
+
+	table.insert(elements, { Text = date })
+
+	window:set_right_status(wezterm.format(elements))
 end
 
 function M.toggle_background(window, pane)

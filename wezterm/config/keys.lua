@@ -3,9 +3,16 @@ local act = wezterm.action
 
 return {
 	{
+		-- First cmd+w arms confirm-mode (see key_tables.confirm_close in wezterm.lua).
+		-- A second cmd+w or y within the timeout closes the pane; any other key cancels.
 		key = "w",
 		mods = "CMD",
-		action = wezterm.action({ CloseCurrentPane = { confirm = true } }),
+		action = act.ActivateKeyTable({
+			name = "confirm_close",
+			one_shot = true,
+			timeout_milliseconds = 1500,
+			until_unknown = true,
+		}),
 	},
 	{
 		key = "z",
