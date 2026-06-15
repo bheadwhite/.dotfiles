@@ -32,6 +32,15 @@ function M.zoomToggle(window, pane)
 	window:perform_action(action, pane)
 end
 
+function M.smartPaste(window, pane)
+	local action = nvim.wez_nvim_actions.smart_paste.wez
+	if nvim.is_nvim_process(window) then
+		action = nvim.wez_nvim_actions.smart_paste.nvim
+	end
+
+	window:perform_action(action, pane)
+end
+
 local themes = {
 	default = options.color_scheme,
 	aqua = "aqua",

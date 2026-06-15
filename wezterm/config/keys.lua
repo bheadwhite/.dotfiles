@@ -20,7 +20,7 @@ return {
 		action = wezterm.action({ EmitEvent = "zoom-toggle" }),
 	},
 	{ key = "c", mods = "CMD|SHIFT", action = act.ActivateCopyMode },
-	{ key = "v", mods = "CMD", action = act.PasteFrom("Clipboard") },
+	{ key = "v", mods = "CMD", action = wezterm.action({ EmitEvent = "smart-paste" }) },
 	{ key = "n", mods = "CMD", action = act.SpawnWindow },
 	{
 		key = "t",

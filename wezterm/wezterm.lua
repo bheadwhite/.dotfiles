@@ -33,6 +33,7 @@ wezterm.on("move-prev", events.movePrevPane)
 wezterm.on("split-right", events.splitRight)
 wezterm.on("zoom-toggle", events.zoomToggle)
 wezterm.on("split-down", events.splitDown)
+wezterm.on("smart-paste", events.smartPaste)
 wezterm.on("toggle_background", events.toggle_background)
 
 wezterm.on("update-right-status", events.setRightStatus)
