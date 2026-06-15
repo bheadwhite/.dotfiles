@@ -456,15 +456,19 @@ end
 
 -- Kill the worker for the task under the cursor AND re-queue it. Use when a task
 -- is *thrashing* — spinning without converging toward the timeout.
+local restart_seq = 0
 function M.restart()
   need_id(function(id)
     local killed = stop_worker(id)
     vim.ui.input({ prompt = "#" .. id .. " restart note (optional): " }, function(note)
       note = (note or ""):gsub("^%s+", ""):gsub("%s+$", "")
       if note == "" then
-        note = "restart — previous attempt was thrashing; start fresh with the simplest "
-          .. "approach, and write a .blocked.md early instead of riding the timeout"
+        note = "restart — previous attempt failed/stalled; start fresh with the simplest approach"
       end
+      -- The daemon fires each note-hash ONCE, so an identical (default) note on a
+      -- repeat restart is deduped → "nothing happens". Stamp every restart unique.
+      restart_seq = restart_seq + 1
+      note = note .. " (restart " .. os.date("%H:%M:%S") .. "." .. restart_seq .. ")"
       append(p("REVIEW.md"), "#" .. id .. " " .. note .. "\n")
       vim.notify(("taskloop: ↻ restarting #%s (%s + re-queued)"):format(
         id, killed and "worker killed" or "flagged"))
