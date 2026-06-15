@@ -217,10 +217,22 @@ function M.new_task()
     for _, l in ipairs(lines) do
       if not l:match("^# %^ line 1") then body[#body + 1] = l end
     end
+    -- Title is line 1 and must be text — an image pasted there would otherwise
+    -- become the task title. Lift any image placeholder off the title line and
+    -- push it into the body so the screenshot is kept, not lost.
+    if body[1] then
+      local moved = {}
+      body[1] = body[1]:gsub("%[image #%d+%]", function(m) moved[#moved + 1] = m; return "" end)
+      body[1] = body[1]:gsub("^%s+", ""):gsub("%s+$", "")
+      for i = #moved, 1, -1 do table.insert(body, 2, moved[i]) end
+    end
     expand_images(buf, body)
     while #body > 0 and body[#body] == "" do body[#body] = nil end
     local title = (body[1] or ""):gsub("^%s+", ""):gsub("%s+$", "")
-    if title == "" then vim.notify("taskloop: title (line 1) is empty", vim.log.levels.WARN); return end
+    if title == "" then
+      vim.notify("taskloop: line 1 must be a text title — type one above the image",
+        vim.log.levels.WARN); return
+    end
     local block = "\n### " .. title .. "\n" .. table.concat({ unpack(body, 2) }, "\n") .. "\n"
     append(p("TASKS.md"), block)
     vim.bo[buf].modified = false
