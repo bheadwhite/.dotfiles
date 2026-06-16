@@ -51,11 +51,29 @@ verify, then:
   the full thread + your note,
 - **question** → `#NN ?<text>` (answered in chat, not by a worker).
 
-## Verifying runtime/visual behavior (important)
+## Verifying runtime/visual behavior — the probe loop (important)
 
-Workers can't see the browser. For UI/runtime behavior, the **user is the sensor**.
-If a fix's correctness depends on something only visible at runtime (DOM, events,
-styling, selection — e.g. a shadow-DOM MFE), don't guess: have the worker
-**instrument** with `console.log('[probe]', JSON.stringify({…}))`, tell the user
-the exact action to trigger it, and paste the line back as a rework note. Then fix
-from that signal.
+Workers can't see the browser, so for UI/runtime bugs the **user is the sensor** —
+especially when feedback says a fix *didn't work*. Don't re-guess; instrument with a
+**copy-paste-friendly** console probe and ask the user to run it.
+
+Convention (logs must survive copy-paste, and one reproduction = one block):
+
+```js
+// install once, guarded — TEMP, remove when fixed
+if (!window.__probe) {
+  window.__probe = (l) => { try { console.groupEnd(); } catch {}
+    console.groupCollapsed('[probe] ' + (l || '') + ' @' + new Date().toLocaleTimeString()); };
+}
+// at each suspect point — STRINGIFY (raw object refs don't survive paste):
+console.log(JSON.stringify({ step: 'closeOnScroll', open, target }));
+```
+
+- The user calls **`__probe('<scenario>')`** in the console right before reproducing →
+  that attempt's logs nest in one collapsible `[probe]` group to expand + copy.
+- **On-load** bugs (no user action): the worker calls `__probe('on load')` at init so a
+  refresh captures it.
+- The result's `Verify by` should say exactly: *call `__probe('<scenario>')`, reproduce,
+  paste the `[probe]` group back as a rework note.* Next round, fix and remove the probe.
+
+Related console helpers: `console.table(rows)`, `console.count(label)`, `console.dir(obj)`.
