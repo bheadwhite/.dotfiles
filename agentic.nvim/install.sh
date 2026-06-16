@@ -57,31 +57,49 @@ fi
 
 need nvim && ok "nvim found" || warn "nvim not found — the editor front-end needs Neovim + telescope.nvim."
 
-# --- the part the user must wire up themselves -----------------------------
-ESC_DIR=$(printf '%q' "$CLAUDE_DIR")
+# --- wire up settings.json automatically (idempotent) ----------------------
+# The daemon auto-start (SessionStart hook) + the one permission workers need
+# (`Bash(claude -p:*)`) are merged into settings.json for you — preserving any
+# existing settings. Set AGENTIC_NO_SETTINGS=1 to skip and do it by hand.
 say ""
-say "── Manual step (agents can't self-grant this) ───────────────────────────"
-say "Add to your Claude Code settings (~/.claude/settings.json or a project's"
-say ".claude/settings.local.json) so the daemon auto-starts and workers can run:"
-cat <<EOF
+say "Claude Code settings:"
+if [ "${AGENTIC_NO_SETTINGS:-}" = "1" ]; then
+  warn "AGENTIC_NO_SETTINGS=1 — skipped. Add a SessionStart hook running"
+  warn "  taskloop-ensure.sh and permission \"Bash(claude -p:*)\" yourself."
+elif need python3; then
+  python3 - "$CLAUDE_DIR/settings.json" "$CLAUDE_DIR/taskloop-ensure.sh" <<'PY' | while read -r l; do ok "$l"; done
+import json, os, sys
+path, ensure = sys.argv[1], sys.argv[2]
+try:
+    with open(path) as f: s = json.load(f)
+except Exception:
+    s = {}
+changed = []
+allow = s.setdefault("permissions", {}).setdefault("allow", [])
+if "Bash(claude -p:*)" not in allow:
+    allow.append("Bash(claude -p:*)"); changed.append("permission Bash(claude -p:*)")
+ss = s.setdefault("hooks", {}).setdefault("SessionStart", [])
+present = any("taskloop-ensure" in h.get("command", "")
+             for e in ss for h in e.get("hooks", []))
+if not present:
+    ss.append({"hooks": [{"type": "command", "command": f'bash "{ensure}"'}]})
+    changed.append("SessionStart hook -> taskloop-ensure.sh")
+if changed:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f: json.dump(s, f, indent=2); f.write("\n")
+    print("settings.json: added " + "; ".join(changed))
+else:
+    print("settings.json: hook + permission already present")
+PY
+else
+  warn "python3 not found — can't edit settings.json. Add the SessionStart hook +"
+  warn "  permission \"Bash(claude -p:*)\" by hand."
+fi
 
-  {
-    "permissions": { "allow": ["Bash(claude -p:*)"] },
-    "hooks": {
-      "SessionStart": [
-        { "hooks": [ { "type": "command",
-          "command": "CLAUDE_DIR=$ESC_DIR bash $ESC_DIR/taskloop-ensure.sh" } ] }
-      ]
-    }
-  }
-
-EOF
-say "  • The ensure script finds a loop in the CWD or any ancestor (so subdir"
-say "    loops like <repo>/ui work). Pass an explicit root to override:"
-say "      bash $CLAUDE_DIR/taskloop-ensure.sh /path/to/repo"
-say "  • Optional: export TASKLOOP_EXCLUDE_MD=\"\$CLAUDE_DIR/CLAUDE.md,…\" to trim"
-say "    worker context (default: none)."
-say "  • nvim: the lazy.nvim spec points \`dir\` at this repo; if you keep the"
-say "    agent dir elsewhere, pass setup({ claude_dir = \"$CLAUDE_DIR\" })."
 say ""
-ok "Done. Re-run after a git pull to refresh links."
+say "Notes:"
+say "  • To use the loop in a repo: create an empty TASKS.md at its root."
+say "  • ensure finds a loop in CWD or any ancestor (subdir loops like <repo>/ui work)."
+say "  • nvim front-end loads via your lazy.nvim spec (\`dir\` → this repo) + telescope.nvim."
+say ""
+ok "Done. Re-run anytime — idempotent (e.g. after a git pull)."

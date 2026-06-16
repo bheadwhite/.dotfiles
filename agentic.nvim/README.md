@@ -26,19 +26,22 @@ docs/
 
 ## Install
 
-This repo is vendored inside the dotfiles tree (`~/.dotfiles/agentic.nvim`). The
-daemon and helper scripts are referenced by path from the agent dir (default
-`~/.claude`), so they're **symlinked** there. `install.sh` does the linking, checks
-dependencies, and prints the SessionStart hook + permission you must add by hand
-(an agent can't self-grant a worker-launching hook):
+One command. `install.sh` symlinks the daemon + helper scripts into the agent dir
+(default `~/.claude`), checks dependencies, **and merges the SessionStart hook +
+the `Bash(claude -p:*)` permission into `settings.json` for you** (idempotent —
+existing settings are preserved):
 
 ```sh
-./install.sh                      # link into ~/.claude
+./install.sh                      # link into ~/.claude + wire settings.json
 CLAUDE_DIR=~/.config/claude ./install.sh   # or wherever you keep agent config
+AGENTIC_NO_SETTINGS=1 ./install.sh          # skip the settings merge (do it by hand)
 ```
 
-Re-run it after a `git pull`. The nvim plugin is loaded straight from this repo —
-the lazy.nvim spec (`~/.dotfiles/nvim/lua/plugins/taskloop.lua`) points `dir` here.
+That's it — re-run anytime (e.g. after a `git pull`). The nvim plugin loads
+straight from this repo: the lazy.nvim spec
+(`~/.dotfiles/nvim/lua/plugins/taskloop.lua`) points `dir` here (needs
+`telescope.nvim`). To use the loop in a project, create an empty `TASKS.md` at its
+root; the daemon auto-starts there on your next session.
 
 ### Configuration (all optional)
 
