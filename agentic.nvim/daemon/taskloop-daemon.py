@@ -53,6 +53,9 @@ WORKER_TIMEOUT = 900
 RETRY_INTERVAL = int(_opt("--retry-interval", "600"))  # rate-limited tasks re-try this
                            # often (cap on the API's resetsAt) so an early clear is picked
                            # up and the task keeps trying instead of sitting blocked
+FLAP_THRESHOLD = int(_opt("--flap-threshold", "3"))  # a task that blocks this many
+                           # times (without being accepted) is "flapping" — surfaced in
+                           # its own STATUS section instead of churning silently
 SCOPE_TIMEOUT  = 120        # Haiku scope pass; short -> fall back to exclusive fast (was 240)
 MAX_WORKERS = int(_opt("--max-workers", "3"))      # concurrent exec workers
 MAX_SCOPERS = int(_opt("--max-scopers", "3"))      # concurrent scope passes
@@ -658,7 +661,7 @@ def tick():
             clear_lock(WORKERS_DIR, tid); acted.append(f"VERIFY:#{tid}")
         elif os.path.exists(blk):
             reason = read(blk).replace("**Blocked:**", "").strip()
-            if t: t["status"] = "blocked"; t["blocked"] = reason
+            if t: t["status"] = "blocked"; t["blocked"] = reason; t["blocks"] = t.get("blocks", 0) + 1
             if not DRY: os.remove(blk)
             clear_lock(WORKERS_DIR, tid); acted.append(f"BLOCKED:#{tid}")
         else:
@@ -679,14 +682,14 @@ def tick():
                 # now with the real reason rather than waiting for the timeout — before
                 # pid_alive so a hung/zombie worker is caught too.
                 kill_pid(pid)
-                if t: t["status"] = "blocked"; t["blocked"] = reason
+                if t: t["status"] = "blocked"; t["blocked"] = reason; t["blocks"] = t.get("blocks", 0) + 1
                 clear_lock(WORKERS_DIR, tid); acted.append(f"FAILED:#{tid}({reason})")
             elif not pid_alive(pid):
-                if t: t["status"] = "blocked"; t["blocked"] = "worker exited without a result"
+                if t: t["status"] = "blocked"; t["blocked"] = "worker exited without a result"; t["blocks"] = t.get("blocks", 0) + 1
                 clear_lock(WORKERS_DIR, tid); acted.append(f"DIED:#{tid}")
             elif time.time() - start > WORKER_TIMEOUT:
                 kill_pid(pid)
-                if t: t["status"] = "blocked"; t["blocked"] = f"worker timed out after {WORKER_TIMEOUT}s"
+                if t: t["status"] = "blocked"; t["blocked"] = f"worker timed out after {WORKER_TIMEOUT}s"; t["blocks"] = t.get("blocks", 0) + 1
                 clear_lock(WORKERS_DIR, tid); acted.append(f"TIMEOUT:#{tid}")
 
     # --- A1. reap scope passes -> record claim (or exclusive fallback) ---
@@ -803,7 +806,7 @@ def tick():
         if kind == "accept":
             if t["status"] not in ("verify", "blocked"):
                 continue  # not acceptable yet — leave UNseen so it acts once verifiable
-            t["status"] = "done"
+            t["status"] = "done"; t["blocks"] = 0
             st["accepted"] = ([tid] + [x for x in st.get("accepted", []) if x != tid])[:20]
             acted.append(f"ACCEPT:#{tid}")
         elif kind == "rework":
@@ -982,8 +985,22 @@ def render_status(st):
             when = datetime.datetime.fromtimestamp(ra).strftime("%H:%M") if ra else "?"
             out.append(f"- #{tid} «{T[tid]['title']}» — retry at {when}")
 
-    # ⛔ Blocked
-    blocked = [t for t in sorted(T, key=lambda x: int(x)) if T[t]["status"] == "blocked"]
+    # 🔁 Flapping — has blocked FLAP_THRESHOLD+ times without landing. Pulled out of
+    # ⛔ Blocked so a churning task (re-dispatch → block → repeat, burning tokens) is
+    # obvious at a glance and you can fix the root cause (bad claim, wrong spec).
+    flapping = [t for t in sorted(T, key=lambda x: int(x))
+                if T[t].get("blocks", 0) >= FLAP_THRESHOLD and T[t]["status"] != "done"]
+    flap_set = set(flapping)
+    if flapping:
+        out += ["", "## 🔁 Flapping (re-dispatched & blocked repeatedly — needs you)"]
+        for tid in flapping:
+            t = T[tid]
+            out.append(f"- #{tid} «{t['title']}» — blocked {t.get('blocks', 0)}× · "
+                       f"{(t.get('blocked') or t.get('status') or '?')}")
+
+    # ⛔ Blocked (excluding flappers, shown above)
+    blocked = [t for t in sorted(T, key=lambda x: int(x))
+               if T[t]["status"] == "blocked" and t not in flap_set]
     out += ["", "## ⛔ Blocked"]
     if not blocked: out.append("- (none)")
     for tid in blocked:
