@@ -77,5 +77,11 @@ export VISUAL=vim
 export FZF_DEFAULT_COMMAND='fd --type f --follow --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
+# agentic.nvim task-loop: where the daemon + helpers live, and which global
+# CLAUDE.md docs to keep OUT of headless workers' context (~5.3k tok/dispatch).
+# These are just paths to skip — a no-op on any machine that lacks them.
+export CLAUDE_DIR="${CLAUDE_DIR:-$HOME/.claude}"
+export TASKLOOP_EXCLUDE_MD="$CLAUDE_DIR/CLAUDE.md,$CLAUDE_DIR/SPA.md,$CLAUDE_DIR/RTK.md"
+
 
 
