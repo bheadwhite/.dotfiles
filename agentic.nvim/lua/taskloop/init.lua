@@ -385,31 +385,33 @@ local RENDER = table.concat({
   "  sys.stdout.flush()",
 }, "\n")
 
-function M.tail()
-  need_id(function(id)
-    local log = p(".taskloop/T" .. id .. ".log")
-    if vim.fn.filereadable(log) == 0 then
-      vim.notify("taskloop: no log yet for #" .. id .. " (not dispatched?)", vim.log.levels.WARN); return
-    end
-    if cfg.tail == "float" then
-      local w, h = math.floor(vim.o.columns * 0.6), math.floor(vim.o.lines * 0.6)
-      local b = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_open_win(b, true, { relative = "editor", width = w, height = h,
-        row = math.floor((vim.o.lines - h) / 2), col = math.floor((vim.o.columns - w) / 2),
-        border = "rounded", title = " tail #" .. id .. " " })
-    else
-      -- `vnew`, not `vsplit`: the terminal gets its own empty buffer (a plain split
-      -- would termopen over the buffer you came from, e.g. STATUS.md, and show the
-      -- terminal in both windows). Vertical so the log tails beside STATUS.md.
-      vim.cmd("botright vnew")
-      vim.api.nvim_win_set_width(0, math.max(80, math.floor(vim.o.columns * 0.4)))
-    end
-    vim.bo.bufhidden = "wipe"
-    local cmd = string.format("tail -n +1 -F %s | python3 -c %s",
-      vim.fn.shellescape(log), vim.fn.shellescape(RENDER))
-    vim.fn.termopen({ "bash", "-lc", cmd })
-    vim.cmd("normal! G")
-  end)
+-- Open a worker's log tail. dir = "side" (vertical, default) | "below" (horizontal);
+-- cfg.tail == "float" forces a centered float regardless. Always its OWN empty
+-- buffer (`new`/`vnew`) so termopen never hijacks the buffer you came from.
+local function tail_open(id, dir)
+  local log = p(".taskloop/T" .. id .. ".log")
+  if vim.fn.filereadable(log) == 0 then
+    vim.notify("taskloop: no log yet for #" .. id .. " (not dispatched?)", vim.log.levels.WARN); return
+  end
+  if cfg.tail == "float" then
+    local w, h = math.floor(vim.o.columns * 0.6), math.floor(vim.o.lines * 0.6)
+    local b = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_open_win(b, true, { relative = "editor", width = w, height = h,
+      row = math.floor((vim.o.lines - h) / 2), col = math.floor((vim.o.columns - w) / 2),
+      border = "rounded", title = " tail #" .. id .. " " })
+  elseif dir == "below" then
+    vim.cmd("botright new"); vim.api.nvim_win_set_height(0, 16)
+  else
+    vim.cmd("botright vnew"); vim.api.nvim_win_set_width(0, math.max(80, math.floor(vim.o.columns * 0.4)))
+  end
+  vim.bo.bufhidden = "wipe"
+  vim.fn.termopen({ "bash", "-lc", string.format("tail -n +1 -F %s | python3 -c %s",
+    vim.fn.shellescape(log), vim.fn.shellescape(RENDER)) })
+  vim.cmd("normal! G")
+end
+
+function M.tail()  -- hyper+, : tail to the side (vertical)
+  need_id(function(id) tail_open(id, "side") end)
 end
 
 -- ---- cancel / restart a running worker -------------------------------------
@@ -512,7 +514,8 @@ local function set_status_keymaps(buf)
     vim.keymap.set("n", lhs, fn, { buffer = buf, nowait = true, silent = true,
       desc = "taskloop: " .. desc })
   end
-  bmap("<CR>",     M.tail,           "tail task under cursor")
+  bmap("<CR>",     function() need_id(function(id) tail_open(id, "below") end) end, "tail below")
+  bmap("<S-CR>",   function() need_id(function(id) tail_open(id, "side") end) end,  "tail to the side")
   bmap("f",        M.feedback,       "feedback / rework under cursor")
   bmap("<leader>a", M.accept,        "accept under cursor (guarded)")
   bmap("r",        M.restart,        "restart under cursor")
@@ -520,8 +523,8 @@ local function set_status_keymaps(buf)
   bmap("p",        M.image_feedback, "paste-image feedback under cursor")
   bmap("q",        function() vim.cmd("close") end, "close STATUS")
   bmap("?",        function()
-    vim.notify("STATUS: ⏎ tail · f rework · <leader>a accept · r restart · "
-      .. "c cancel · p image · q close", vim.log.levels.INFO, { title = "taskloop" })
+    vim.notify("STATUS: ⏎ tail below · ⇧⏎ tail side · f rework · <leader>a accept · "
+      .. "r restart · c cancel · p image · q close", vim.log.levels.INFO, { title = "taskloop" })
   end, "key help")
 end
 
@@ -590,17 +593,8 @@ function M.picker()
     end,
   }):find()
 end
-function M._tail_id(id)  -- tail by explicit id (from picker)
-  vim.schedule(function()
-    local log = p(".taskloop/T" .. id .. ".log")
-    -- `new` (not `split`) so the terminal opens in its own empty buffer rather
-    -- than hijacking the buffer the picker returned you to.
-    vim.cmd("botright new"); vim.api.nvim_win_set_height(0, 16)
-    vim.bo.bufhidden = "wipe"
-    vim.fn.termopen({ "bash", "-lc", string.format("tail -n +1 -F %s | python3 -c %s",
-      vim.fn.shellescape(log), vim.fn.shellescape(RENDER)) })
-    vim.cmd("normal! G")
-  end)
+function M._tail_id(id)  -- tail by explicit id (from picker) — open below
+  vim.schedule(function() tail_open(id, "below") end)
 end
 
 -- ---- blocked watcher: notify when a task lands in ⛔ -----------------------
