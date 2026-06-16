@@ -502,12 +502,36 @@ function M.prune()
 end
 
 -- ---- status view + picker --------------------------------------------------
+-- TUI-style single-key actions for the (read-only) STATUS buffer: they act on the
+-- task under the cursor, so you drive the board without the hyper prefix. The keys
+-- they rebind (a/f/r/c/p) are all edit ops that do nothing in a readonly buffer
+-- anyway. Opt out with setup({ status_keys = false }).
+local function set_status_keymaps(buf)
+  if cfg.status_keys == false then return end
+  local function bmap(lhs, fn, desc)
+    vim.keymap.set("n", lhs, fn, { buffer = buf, nowait = true, silent = true,
+      desc = "taskloop: " .. desc })
+  end
+  bmap("<CR>", M.tail,           "tail task under cursor")
+  bmap("f",    M.feedback,       "feedback / rework under cursor")
+  bmap("a",    M.accept,         "accept under cursor")
+  bmap("r",    M.restart,        "restart under cursor")
+  bmap("c",    M.cancel,         "kill worker under cursor")
+  bmap("p",    M.image_feedback, "paste-image feedback under cursor")
+  bmap("q",    function() vim.cmd("close") end, "close STATUS")
+  bmap("?",    function()
+    vim.notify("STATUS: ⏎ tail · f rework · a accept · r restart · c cancel · "
+      .. "p image · q close", vim.log.levels.INFO, { title = "taskloop" })
+  end, "key help")
+end
+
 -- Make a STATUS buffer non-editable AND live: poll `checktime` ~1s so it reloads
 -- as the daemon rewrites it, without you touching it. A timer beats fs_event here
 -- because the daemon writes via tmp+rename, which inode-based watchers miss.
 local function make_status_live(buf)
   if not vim.api.nvim_buf_is_valid(buf) or vim.b[buf].taskloop_live then return end
   vim.b[buf].taskloop_live = true
+  set_status_keymaps(buf)
   vim.bo[buf].autoread = true
   vim.bo[buf].readonly = true       -- you CAN'T edit it
   vim.bo[buf].modifiable = false    -- and edits are hard-blocked, not just warned
