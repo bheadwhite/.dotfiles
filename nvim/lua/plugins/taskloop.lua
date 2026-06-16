@@ -1,10 +1,11 @@
--- TASK-LOOP v2 editor front-end. Local plugin under taskloop.nvim/.
--- Prefix is the hyper key (caps lock -> right_ctrl+right_alt = <C-A->). If a chord
--- doesn't fire (depends on whether ghostty/Karabiner forwards hyper+<letter> to nvim),
--- change `prefix` below to something nvim definitely receives, e.g. "<leader>k".
+-- TASK-LOOP v2 editor front-end. The plugin + its daemon engine live together in
+-- the agentic.nvim repo (~/projects/agentic.nvim); the daemon/scripts are symlinked
+-- into ~/.claude. Prefix is the hyper key (caps lock -> right_ctrl+right_alt = <C-A->).
+-- If a chord doesn't fire (depends on whether ghostty/Karabiner forwards hyper+<letter>
+-- to nvim), change `prefix` below to something nvim definitely receives, e.g. "<leader>k".
 return {
-  dir = vim.fn.stdpath("config") .. "/taskloop.nvim",
-  name = "taskloop.nvim",
+  dir = vim.fn.expand("~/projects/agentic.nvim"),
+  name = "agentic.nvim",
   event = "VeryLazy",
   dependencies = { "nvim-telescope/telescope.nvim" },
   config = function()
