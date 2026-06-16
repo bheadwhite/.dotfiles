@@ -397,12 +397,11 @@ def build_prompt(st, tid):
     parts.append("\n" + HINTS)
     parts.append(f"\nWhen finished, WRITE .taskloop/T{tid}.md with these fields, each starting "
                  "on its own marker line: '**What I did:** <one sentence>', then '**Verify by:**' "
-                 "on its own line followed by a SHORT numbered list (1-3 steps) of the key things to "
-                 "CHECK. Assume the user already has the dev server running and the app open — DO NOT "
-                 "include setup steps (starting servers, installing, building, navigating from scratch). "
-                 "Start at the relevant screen and state only the high-level check per step (the "
-                 "observable outcome), NOT granular play-by-play. Then '**Files:** <path:line list>' "
-                 "and '**Issue/MR:** <none or refs>'. "
+                 "with the SINGLE most telling check — ONE terse line (the observable outcome at the "
+                 "relevant screen). Be as concise as possible: assume the dev server is up and the app "
+                 "open; no setup, no steps, no prose. Only add a 2nd line if truly necessary — the "
+                 "user asks if they want more. Then '**Files:** <path:line list>' and "
+                 "'**Issue/MR:** <none or refs>'. "
                  f"If you cannot finish cleanly, instead write .taskloop/T{tid}.blocked.md with "
                  "'**Blocked:** <what you need>' — do NOT thrash to the timeout.")
     return "\n".join(parts)
@@ -432,9 +431,9 @@ def build_resume_prompt(st, tid):
         parts.append("Still edit ONLY your claimed files: " + ", ".join(t["claim"]) +
                      f". If you need another, write .taskloop/T{tid}.blocked.md instead.")
     parts.append(f"When done, OVERWRITE .taskloop/T{tid}.md with the result fields "
-                 "(**What I did:** one sentence / **Verify by:** a SHORT numbered list, 1-3 high-level "
-                 "checks — assume the dev server is up and the app open, no setup steps, no granular "
-                 "play-by-play / **Files:** / **Issue/MR:**), "
+                 "(**What I did:** one sentence / **Verify by:** the SINGLE most telling check, ONE "
+                 "terse line — assume the app is up, no setup/steps/prose; only add more if truly "
+                 "necessary / **Files:** / **Issue/MR:**), "
                  f"or write .taskloop/T{tid}.blocked.md if blocked.")
     return "\n".join(parts)
 
