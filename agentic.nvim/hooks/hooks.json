@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/daemon/task-loop-ensure2.sh\""
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/daemon/taskloop-ensure.sh\""
           }
         ]
       }

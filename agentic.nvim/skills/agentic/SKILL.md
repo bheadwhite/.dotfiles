@@ -21,12 +21,12 @@ A file-based board with **one writer per file**, joined by a `[#NN]` id:
 The daemon dispatches one headless `claude -p` worker per task, schedules them in
 parallel by a file-lock "claim" model (tasks whose files can't be predicted run
 exclusively), reaps results into `STATUS.md`, and auto-retries rate-limited runs.
-Full protocol: `~/.claude/TASKLOOP2.md` (repo: `docs/TASKLOOP2.md`).
+Full protocol: `~/.claude/TASKLOOP.md` (repo: `docs/TASKLOOP.md`).
 
 ## Bootstrap the loop in a repo
 
 1. Ensure the daemon is running (idempotent):
-   `bash ~/.claude/task-loop-ensure2.sh /path/to/repo` — or just rely on the
+   `bash ~/.claude/taskloop-ensure.sh /path/to/repo` — or just rely on the
    SessionStart hook this plugin installs. It no-ops if already running and only
    acts in repos that have a `TASKS.md`.
 2. Create `TASKS.md` at the repo root if absent (an empty file is fine).

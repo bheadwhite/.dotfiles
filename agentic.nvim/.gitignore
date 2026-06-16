@@ -2,3 +2,6 @@
 .taskloop/
 *.pyc
 __pycache__/
+
+# this repo IS a plugin — its dev guide should ship
+!CLAUDE.md

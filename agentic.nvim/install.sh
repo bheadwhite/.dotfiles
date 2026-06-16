@@ -20,9 +20,9 @@ mkdir -p "$CLAUDE_DIR"
 
 # --- symlink the canonical files into the agent dir ------------------------
 LINKS=(
-  "daemon/task-loop-daemon2.py"
-  "daemon/task-loop-ensure2.sh"
-  "docs/TASKLOOP2.md"
+  "daemon/taskloop-daemon.py"
+  "daemon/taskloop-ensure.sh"
+  "docs/TASKLOOP.md"
   "scripts/taskloop-clip2png.sh"
   "scripts/taskloop-prune.py"
 )
@@ -70,7 +70,7 @@ cat <<EOF
     "hooks": {
       "SessionStart": [
         { "hooks": [ { "type": "command",
-          "command": "CLAUDE_DIR=$ESC_DIR bash $ESC_DIR/task-loop-ensure2.sh" } ] }
+          "command": "CLAUDE_DIR=$ESC_DIR bash $ESC_DIR/taskloop-ensure.sh" } ] }
       ]
     }
   }
@@ -78,7 +78,7 @@ cat <<EOF
 EOF
 say "  • The ensure script finds a loop in the CWD or any ancestor (so subdir"
 say "    loops like <repo>/ui work). Pass an explicit root to override:"
-say "      bash $CLAUDE_DIR/task-loop-ensure2.sh /path/to/repo"
+say "      bash $CLAUDE_DIR/taskloop-ensure.sh /path/to/repo"
 say "  • Optional: export TASKLOOP_EXCLUDE_MD=\"\$CLAUDE_DIR/CLAUDE.md,…\" to trim"
 say "    worker context (default: none)."
 say "  • nvim: the lazy.nvim spec points \`dir\` at this repo; if you keep the"

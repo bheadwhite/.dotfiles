@@ -1,6 +1,6 @@
 -- taskloop.nvim — editor front-end for the TASK-LOOP v2 daemon.
 -- You never type `###` or `#NN`: this writes the grammar for you, and tails any
--- dispatched job in a split. Protocol: ~/.claude/TASKLOOP2.md.
+-- dispatched job in a split. Protocol: ~/.claude/TASKLOOP.md.
 --   TASKS.md  (you write task blocks; daemon stamps the [#NN] id)
 --   STATUS.md (daemon renders; you read)
 --   REVIEW.md (you write verdicts `#NN gg | <note> | ?q`)
@@ -428,7 +428,7 @@ end
 
 -- Ensure the daemon is running for this repo (idempotent — restarts a dead one).
 local function ensure_daemon()
-  local helper = claude_helper("task-loop-ensure2.sh")
+  local helper = claude_helper("taskloop-ensure.sh")
   if vim.fn.filereadable(helper) == 1 then vim.fn.system({ "bash", helper, root() }) end
 end
 

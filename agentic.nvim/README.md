@@ -15,13 +15,13 @@ what stops them drifting apart.
 install.sh                symlink helpers into $CLAUDE_DIR + check deps + print the hook
 lua/taskloop/init.lua     nvim plugin (front-end). Loaded by lazy.nvim via `dir`.
 daemon/
-  task-loop-daemon2.py    the engine: dispatch, scope, reap, render, auto-retry
-  task-loop-ensure2.sh    idempotent launcher (SessionStart hook + by hand)
+  taskloop-daemon.py    the engine: dispatch, scope, reap, render, auto-retry
+  taskloop-ensure.sh    idempotent launcher (SessionStart hook + by hand)
 scripts/
   taskloop-clip2png.sh    clipboard image -> PNG (macOS / Wayland / X11)
   taskloop-prune.py       drop consumed verdicts from REVIEW.md
 docs/
-  TASKLOOP2.md            the v2 protocol / file-ownership spec
+  TASKLOOP.md            the v2 protocol / file-ownership spec
 ```
 
 ## Install
@@ -47,11 +47,11 @@ the lazy.nvim spec (`~/.dotfiles/nvim/lua/plugins/taskloop.lua`) points `dir` he
 | `CLAUDE_DIR` (env) | `~/.claude` | where helpers are symlinked + looked up (daemon, ensure, plugin all honor it) |
 | `TASKLOOP_EXCLUDE_MD` (env) | *(none)* | comma-list of global CLAUDE.md files to drop from worker context; a literal `$CLAUDE_DIR` token is expanded |
 | `setup({ claude_dir = … })` (nvim) | `$CLAUDE_DIR` or `~/.claude` | plugin's helper-script location |
-| `--worker-model / --scope-model / --max-workers / --exclude-md` | see `task-loop-daemon2.py` header | daemon tunables |
+| `--worker-model / --scope-model / --max-workers / --exclude-md` | see `taskloop-daemon.py` header | daemon tunables |
 
 The ensure script resolves the repo root from the **nearest ancestor of `$PWD`
 holding a `TASKS.md`** (so a loop in a subdir like `<repo>/ui` is found), falling
-back to the git root — or pass an explicit root: `task-loop-ensure2.sh /path/to/repo`.
+back to the git root — or pass an explicit root: `taskloop-ensure.sh /path/to/repo`.
 
 ### Dependencies
 
@@ -63,4 +63,4 @@ clipboard image tool for screenshot paste — `pngpaste`/`osascript` (macOS),
 
 Each project that uses the loop gets its own `.taskloop/` (state, logs, worker
 locks), plus `TASKS.md` (you write), `STATUS.md` (daemon renders), `REVIEW.md`
-(you write verdicts). See `docs/TASKLOOP2.md` for file ownership.
+(you write verdicts). See `docs/TASKLOOP.md` for file ownership.

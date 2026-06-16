@@ -8,7 +8,7 @@ disable-model-invocation: true
 Ensure the daemon is running, then show the board.
 
 ```!
-bash "${CLAUDE_PLUGIN_ROOT}/daemon/task-loop-ensure2.sh" "${CLAUDE_PROJECT_DIR}" >/dev/null 2>&1
+bash "${CLAUDE_PLUGIN_ROOT}/daemon/taskloop-ensure.sh" "${CLAUDE_PROJECT_DIR}" >/dev/null 2>&1
 f="${CLAUDE_PROJECT_DIR}/STATUS.md"; [ -f "$f" ] && cat "$f" || echo "No STATUS.md — is this a task-loop repo? (needs TASKS.md)"
 ```
 

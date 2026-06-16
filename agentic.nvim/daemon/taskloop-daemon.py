@@ -2,14 +2,14 @@
 """
 TASK-LOOP v2 daemon — single-writer-per-file board + context-bridging worker dispatch.
 
-See ~/.claude/TASKLOOP2.md for the protocol. The big change from v1: the daemon NEVER
+See ~/.claude/TASKLOOP.md for the protocol. The big change from v1: the daemon NEVER
 rewrites the file the user types in. Three files joined by an id:
   - TASKS.md  (user writes; daemon reads; daemon's only write is a fallback id-stamp)
   - STATUS.md (daemon regenerates; user reads)
   - REVIEW.md (user writes verdicts `#NN gg|<note>|?q`; daemon reads; never writes)
 Daemon state (ids, per-task thread, file->task touch index, consumed verdicts, accepted
 log) lives in .taskloop/state.json. Single instance via a lifetime flock. Kill switch:
-pkill -f task-loop-daemon2.py
+pkill -f taskloop-daemon.py
 
 PARALLEL EXECUTION (v2.1): workers run concurrently up to MAX_WORKERS, scheduled by a
 file-lock model so two workers never edit the same file at once. Each task carries a
@@ -23,7 +23,7 @@ is soft (the worker is told to edit only its claim) plus a collision backstop: i
 finished worker reports editing a file another live worker holds, the task is flagged for
 re-verify. Exclusive (unknown-claim) tasks head-of-line block to avoid starvation.
 
-Usage: python3 task-loop-daemon2.py <repo-root> [--tasks TASKS.md] [--dry-run]
+Usage: python3 taskloop-daemon.py <repo-root> [--tasks TASKS.md] [--dry-run]
        [--max-workers N] [--max-scopers N]
 """
 import os, sys, re, glob, json, time, signal, subprocess, datetime, fcntl, hashlib, traceback
