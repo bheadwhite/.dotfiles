@@ -1,0 +1,4 @@
+# per-project loop state never belongs here
+.taskloop/
+*.pyc
+__pycache__/
