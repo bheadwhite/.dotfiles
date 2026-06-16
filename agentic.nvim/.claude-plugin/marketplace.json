@@ -1,0 +1,12 @@
+{
+  "name": "agentic-nvim",
+  "description": "agentic.nvim — async task-board for driving background coding agents from Neovim.",
+  "owner": { "name": "Brent Whitehead" },
+  "plugins": [
+    {
+      "name": "agentic-nvim",
+      "source": ".",
+      "description": "Queue tasks; a daemon dispatches headless claude -p workers; review/rework/accept from the editor."
+    }
+  ]
+}

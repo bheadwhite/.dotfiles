@@ -1,0 +1,8 @@
+{
+  "name": "agentic-nvim",
+  "version": "0.1.0",
+  "description": "Async task-board for driving background coding agents from Neovim: you queue UI tasks, a daemon dispatches one headless `claude -p` worker per task, and you review/rework/accept from the editor.",
+  "author": { "name": "Brent Whitehead" },
+  "keywords": ["task-loop", "agents", "neovim", "automation", "background-tasks"],
+  "hooks": "./hooks/hooks.json"
+}
