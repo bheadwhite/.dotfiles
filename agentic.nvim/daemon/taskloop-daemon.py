@@ -53,9 +53,9 @@ WORKER_TIMEOUT = 900
 RETRY_INTERVAL = int(_opt("--retry-interval", "600"))  # rate-limited tasks re-try this
                            # often (cap on the API's resetsAt) so an early clear is picked
                            # up and the task keeps trying instead of sitting blocked
-FLAP_THRESHOLD = int(_opt("--flap-threshold", "3"))  # a task that blocks this many
-                           # times (without being accepted) is "flapping" — surfaced in
-                           # its own STATUS section instead of churning silently
+THRASH_THRESHOLD = int(_opt("--thrash-threshold", "3"))  # a task that blocks this many
+                           # times (without being accepted) is "thrashing" — surfaced in
+                           # its own STATUS section instead of churning (burning tokens) silently
 SCOPE_TIMEOUT  = 120        # Haiku scope pass; short -> fall back to exclusive fast (was 240)
 MAX_WORKERS = int(_opt("--max-workers", "3"))      # concurrent exec workers
 MAX_SCOPERS = int(_opt("--max-scopers", "3"))      # concurrent scope passes
@@ -985,22 +985,22 @@ def render_status(st):
             when = datetime.datetime.fromtimestamp(ra).strftime("%H:%M") if ra else "?"
             out.append(f"- #{tid} «{T[tid]['title']}» — retry at {when}")
 
-    # 🔁 Flapping — has blocked FLAP_THRESHOLD+ times without landing. Pulled out of
+    # 🔁 Thrashing — has blocked THRASH_THRESHOLD+ times without landing. Pulled out of
     # ⛔ Blocked so a churning task (re-dispatch → block → repeat, burning tokens) is
     # obvious at a glance and you can fix the root cause (bad claim, wrong spec).
-    flapping = [t for t in sorted(T, key=lambda x: int(x))
-                if T[t].get("blocks", 0) >= FLAP_THRESHOLD and T[t]["status"] != "done"]
-    flap_set = set(flapping)
-    if flapping:
-        out += ["", "## 🔁 Flapping (re-dispatched & blocked repeatedly — needs you)"]
-        for tid in flapping:
+    thrashing = [t for t in sorted(T, key=lambda x: int(x))
+                 if T[t].get("blocks", 0) >= THRASH_THRESHOLD and T[t]["status"] != "done"]
+    thrash_set = set(thrashing)
+    if thrashing:
+        out += ["", "## 🔁 Thrashing (re-dispatched & blocked repeatedly — needs you)"]
+        for tid in thrashing:
             t = T[tid]
             out.append(f"- #{tid} «{t['title']}» — blocked {t.get('blocks', 0)}× · "
                        f"{(t.get('blocked') or t.get('status') or '?')}")
 
-    # ⛔ Blocked (excluding flappers, shown above)
+    # ⛔ Blocked (excluding thrashers, shown above)
     blocked = [t for t in sorted(T, key=lambda x: int(x))
-               if T[t]["status"] == "blocked" and t not in flap_set]
+               if T[t]["status"] == "blocked" and t not in thrash_set]
     out += ["", "## ⛔ Blocked"]
     if not blocked: out.append("- (none)")
     for tid in blocked:
