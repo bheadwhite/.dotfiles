@@ -512,16 +512,16 @@ local function set_status_keymaps(buf)
     vim.keymap.set("n", lhs, fn, { buffer = buf, nowait = true, silent = true,
       desc = "taskloop: " .. desc })
   end
-  bmap("<CR>", M.tail,           "tail task under cursor")
-  bmap("f",    M.feedback,       "feedback / rework under cursor")
-  bmap("a",    M.accept,         "accept under cursor")
-  bmap("r",    M.restart,        "restart under cursor")
-  bmap("c",    M.cancel,         "kill worker under cursor")
-  bmap("p",    M.image_feedback, "paste-image feedback under cursor")
-  bmap("q",    function() vim.cmd("close") end, "close STATUS")
-  bmap("?",    function()
-    vim.notify("STATUS: ⏎ tail · f rework · a accept · r restart · c cancel · "
-      .. "p image · q close", vim.log.levels.INFO, { title = "taskloop" })
+  bmap("<CR>",     M.tail,           "tail task under cursor")
+  bmap("f",        M.feedback,       "feedback / rework under cursor")
+  bmap("<leader>a", M.accept,        "accept under cursor (guarded)")
+  bmap("r",        M.restart,        "restart under cursor")
+  bmap("c",        M.cancel,         "kill worker under cursor")
+  bmap("p",        M.image_feedback, "paste-image feedback under cursor")
+  bmap("q",        function() vim.cmd("close") end, "close STATUS")
+  bmap("?",        function()
+    vim.notify("STATUS: ⏎ tail · f rework · <leader>a accept · r restart · "
+      .. "c cancel · p image · q close", vim.log.levels.INFO, { title = "taskloop" })
   end, "key help")
 end
 
