@@ -1,3 +1,5 @@
+local wezterm = require("wezterm")
+local act = wezterm.action
 local colors = require("config.colors")
 local color_pointer = require("config.color_pointer")
 
@@ -12,21 +14,28 @@ local window_frame = {
 	border_right_width = ".3cell",
 }
 
--- config.mouse_bindings = {
--- 	{
--- 		event = { Down = { streak = 1, button = "Right" } },
--- 		mods = "NONE",
--- 		action = wezterm.action_callback(function(window, pane)
--- 			local has_selection = window:get_selection_text_for_pane(pane) ~= ""
--- 			if has_selection then
--- 				window:perform_action(act.CopyTo("ClipboardAndPrimarySelection"), pane)
--- 				window:perform_action(act.ClearSelection, pane)
--- 			else
--- 				window:perform_action(act({ PasteFrom = "Clipboard" }), pane)
--- 			end
--- 		end),
--- 	},
--- }
+-- ── Copy/paste model: explicit, predictable ──────────────────────────────────
+-- The clipboard ONLY changes when you press ⌘C. Selecting text just highlights
+-- it (no auto-copy), so you never have to wonder whether something was copied.
+--   • ⌘C  → copy selection (WezTerm macOS default)
+--   • ⌘⇧C → copy mode (keyboard select/yank; see config/keys.lua)
+-- Inside TUIs that capture the mouse (Claude Code, nvim, pagers), hold SHIFT
+-- while dragging to highlight — SHIFT is the bypass-mouse-reporting modifier.
+config.bypass_mouse_reporting_modifiers = "SHIFT"
+config.mouse_bindings = {
+	-- Finish a selection WITHOUT copying. The highlight stays put for ⌘C.
+	-- (Covers single/double/triple click, plus SHIFT-drag inside TUIs.)
+	{ event = { Up = { streak = 1, button = "Left" } }, mods = "NONE", action = act.Nop },
+	{ event = { Up = { streak = 2, button = "Left" } }, mods = "NONE", action = act.Nop },
+	{ event = { Up = { streak = 3, button = "Left" } }, mods = "NONE", action = act.Nop },
+	{ event = { Up = { streak = 1, button = "Left" } }, mods = "SHIFT", action = act.Nop },
+	{ event = { Up = { streak = 1, button = "Left" } }, mods = "ALT", action = act.Nop }, -- block-select, no auto-copy
+
+	-- ⌘-click opens the link under the cursor (works even when an app is
+	-- grabbing the mouse). The Down→Nop stops ⌘-press from moving the cursor.
+	{ event = { Up = { streak = 1, button = "Left" } }, mods = "CMD", action = act.OpenLinkAtMouseCursor, mouse_reporting = true },
+	{ event = { Down = { streak = 1, button = "Left" } }, mods = "CMD", action = act.Nop, mouse_reporting = true },
+}
 
 config.debug_key_events = true
 config.font_size = 15
