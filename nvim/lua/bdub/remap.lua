@@ -332,6 +332,26 @@ vim.keymap.set({ "n", "v" }, "<C-F15>", function()
   wezterm_cmd("wezterm cli split-pane --bottom")
 end, add_desc("new split"))
 
+-- Cmd+V: wezterm rewrites it to <C-F16> for ANY nvim (matched by binary basename,
+-- see wezterm/config/nvim.lua). So nvim must ALWAYS bind it — it can't live only in
+-- the opt-in taskloop plugin, or Cmd+V emits a raw <C-F16> in normal buffers.
+-- These are plain clipboard pastes; when taskloop is enabled it loads later
+-- (VeryLazy) and overrides the n/i maps with its image-aware smart paste.
+local function paste_clipboard()
+  local clip = vim.fn.getreg("+")
+  if clip ~= "" then
+    vim.api.nvim_paste(clip, true, -1)
+  end
+end
+vim.keymap.set({ "n", "i" }, "<C-F16>", paste_clipboard, add_desc("paste clipboard (Cmd+V)"))
+vim.keymap.set("c", "<C-F16>", "<C-r>+", { desc = "paste clipboard at cmdline (Cmd+V)" })
+vim.keymap.set("t", "<C-F16>", function()
+  local job = vim.b.terminal_job_id
+  if job then
+    vim.fn.chansend(job, vim.fn.getreg("+"))
+  end
+end, add_desc("paste clipboard into terminal (Cmd+V)"))
+
 -- You can then call this function with `:lua open_buffer_in_floating_window()`
 
 -- system clipboard
