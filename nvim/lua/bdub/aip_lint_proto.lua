@@ -32,29 +32,45 @@ local function parse_linter_output(output)
   return diagnostics
 end
 
--- Function to run the api-linter command and set diagnostics
+-- Run api-linter and set diagnostics. Async (vim.system) so nvim's UI never
+-- blocks on the subprocess, and argv form (no shell) so stderr is captured off to
+-- the side instead of leaking onto the screen. A blocking io.popen here used to
+-- stall redraws on every window enter and corrupt the grid.
 function M.run_linter(bufnr)
-  local filepath = vim.api.nvim_buf_get_name(bufnr)
-  local cmd = string.format("api-linter -I ~/code/googleapis --output-format=json %s", filepath)
-  local handle = io.popen(cmd)
-  if not handle then
+  -- Bail if api-linter isn't installed — nothing to run, nothing to leak.
+  if vim.fn.executable("api-linter") ~= 1 then
     return
   end
-
-  local result = handle:read("*a")
-  handle:close()
-
-  if result and result ~= "" then
-    local diagnostics = parse_linter_output(result)
-    vim.diagnostic.set(namespace_id, bufnr, diagnostics, {})
+  local filepath = vim.api.nvim_buf_get_name(bufnr)
+  if filepath == "" then
+    return
   end
+  -- argv form: no shell, so expand ~ ourselves; stdout is JSON, stderr is ignored.
+  vim.system({
+    "api-linter",
+    "-I",
+    vim.fn.expand("~/code/googleapis"),
+    "--output-format=json",
+    filepath,
+  }, { text = true }, function(obj)
+    local out = obj.stdout
+    if not out or out == "" then
+      return
+    end
+    local diagnostics = parse_linter_output(out)
+    -- vim.system's callback is off the main loop; API calls must be scheduled.
+    vim.schedule(function()
+      if vim.api.nvim_buf_is_valid(bufnr) then
+        vim.diagnostic.set(namespace_id, bufnr, diagnostics, {})
+      end
+    end)
+  end)
 end
 
--- Function to run the api-linter command and set diagnostics
-
+-- Lint on open and save only. WinEnter/BufEnter fired this on every focus change,
+-- which is what turned a slow linter into a redraw hazard.
 vim.api.nvim_create_autocmd({
-  "BufEnter",
-  "WinEnter",
+  "BufReadPost",
   "BufWritePost",
 }, {
   pattern = "*.proto",
