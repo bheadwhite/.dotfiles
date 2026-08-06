@@ -38,10 +38,24 @@ config.tab_max_width = 30
 config.window_decorations = "RESIZE"
 config.front_end = "WebGpu"
 config.color_scheme = colors.color_scheme
+-- Keep the kitty keyboard protocol OFF: enabling it makes wezterm re-encode Esc
+-- as a CSI-u sequence (\x1b[27u), which breaks the <Esc> mapping in nvim.
+-- cmd+z/cmd+d/cmd+v are routed into nvim as PLAIN F13/F14/F15/F16 (see
+-- config/nvim.lua) — unmodified F13–F16 use standard xterm sequences, so they
+-- reach nvim WITHOUT needing this protocol.
 config.enable_kitty_keyboard = false
 config.enable_kitty_graphics = false -- Disable graphics to reduce key sequence conflicts
+-- Foreground tuning for the ACTIVE pane, left at identity on purpose: colors
+-- render exactly as the scheme and the running app intend them.
+-- This filter used to sit at brightness = 1.8, which flattened syntax
+-- highlighting — brightness is a multiplier that CLIPS, so bright colors slam
+-- into the top of each RGB channel and all converge on white. Saturation is the
+-- safer knob (it separates hues without blowing them out), but it recolors
+-- app-chosen colors too, which reads as "off" in TUIs that ship their own
+-- palette. Tune from 1.0 in small steps if you want more punch.
 config.foreground_text_hsb = {
-	brightness = 1.8,
+	saturation = 1.0,
+	brightness = 1.0,
 }
 config.colors = color_pointer
 config.inactive_pane_hsb = {
