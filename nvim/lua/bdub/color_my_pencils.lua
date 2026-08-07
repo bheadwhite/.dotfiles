@@ -4,8 +4,11 @@ local shadow = {
   bg_dark = "#182924",
   bg_bright = "#252A2E",
   bg_green = "#1A2A1A",
+  bg_green_dark = "#28402C",
+  bg_red_dark = "#43292D",
   bg_blue = "#1A2A2F",
   bg_blue_bright = "#28343D",
+  bg_blue_text = "#3D5A6E",
   fg = "#E6E7E6",
   fg_dark = "#A0A1A0",
   black = "#242B2D",
@@ -63,6 +66,10 @@ function colorMyPencils()
   vim.cmd([[highlight QuickFixLine guibg=]] .. colors.dark)
   vim.cmd([[highlight Visual guibg=]] .. colors.white .. [[ guifg=]] .. colors.black)
   vim.cmd([[highlight MyInactiveBufferColor guibg=]] .. colors.black)
+  -- Out-of-project Go buffers (module cache OR stdlib) share one tint, applied by
+  -- win_utils.set_window_backgrounds via bdub.go_location. A dark desaturated wine-red
+  -- shift of the base bg (#1D2326) — "you're in read-only code that isn't yours."
+  vim.cmd([[highlight GoExternalBg guibg=#2E1F24]])
   vim.cmd([[highlight Winbar guibg=]] .. colors.bg .. [[ guifg=]] .. colors.white_bright)
   vim.cmd([[highlight WinbarNC guibg=]] .. colors.black .. [[ guifg=]] .. colors.white_bright)
   vim.cmd([[highlight DropbarHover guibg=]] .. colors.bg .. [[ guifg=]] .. colors.white_bright)
@@ -79,9 +86,11 @@ function colorMyPencils()
   vim.cmd([[highlight DiagnosticUnderlineHint guisp=]] .. colors.cyan_bright .. [[ guifg=]] .. colors.cyan_bright .. [[ gui=undercurl,underline]])
 
   vim.api.nvim_set_hl(0, "DiffAdd", { bg = shadow.bg_green_dark })
-  -- vim.api.nvim_set_hl(0, "DiffDelete", { fg = shadow.red })
+  vim.api.nvim_set_hl(0, "DiffDelete", { bg = shadow.bg_red_dark })
   vim.api.nvim_set_hl(0, "DiffChange", { bg = shadow.bg_blue_bright })
-  vim.api.nvim_set_hl(0, "DiffText", { bg = shadow.black })
+  -- DiffText = the changed chars within a changed line; must read brighter
+  -- than DiffChange, not darker.
+  vim.api.nvim_set_hl(0, "DiffText", { bg = shadow.bg_blue_text })
 
   -- vim.cmd([[highlight Cursor guibg=]] .. colors.cursor)
   -- vim.cmd([[highlight Search guibg=]] .. colors.search .. [[ guifg=#000000]])

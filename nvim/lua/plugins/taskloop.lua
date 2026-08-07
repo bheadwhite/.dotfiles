@@ -7,6 +7,9 @@
 return {
   dir = vim.fn.expand("~/.dotfiles/agentic.nvim"),
   name = "agentic.nvim",
+  -- OFF by default. Toggle with :AgenticEnable / :AgenticDisable / :AgenticToggle
+  -- (defined in lua/bdub/agentic.lua); takes effect on the next nvim launch.
+  enabled = require("bdub.agentic").is_enabled(),
   event = "VeryLazy",
   dependencies = { "nvim-telescope/telescope.nvim" },
   config = function()

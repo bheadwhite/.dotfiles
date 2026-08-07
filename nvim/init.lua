@@ -29,6 +29,7 @@ require("bdub.remap")
 require("bdub.autocommands")
 require("bdub.inactive_backgrounds")
 require("bdub.buf-only")
+require("bdub.agentic").setup()
 
 -- Setup lazy.nvim
 require("lazy").setup({

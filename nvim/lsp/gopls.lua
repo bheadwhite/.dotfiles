@@ -8,6 +8,9 @@ return {
       staticcheck = true, -- Enable staticcheck for linting
       analyses = {
         unusedparams = true, -- Enable unused parameter checks
+        ST1003 = false, -- Don't flag initialism casing (e.g. aipApi vs aipAPI)
+        ST1020 = false, -- Don't flag strict comment formatting on methods (e.g. "MethodName is a method" vs "MethodName is a method.")
+        ST1021 = false, -- comment stuff...
       },
       hints = {
         assignVariableTypes = true, -- Show variable type hints

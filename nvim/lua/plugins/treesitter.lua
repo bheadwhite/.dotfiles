@@ -42,4 +42,23 @@ return {
 
     end,
   },
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    event = { "BufReadPost", "BufNewFile" },
+    config = function()
+      require("treesitter-context").setup({
+        max_lines = 8, -- cap total sticky context height (leave room for multi-line headers)
+        multiline_threshold = 20, -- show full multi-line headers (e.g. method chains like ctl.ForPath(...).Exec(...))
+        trim_scope = "outer", -- when over max_lines, drop the outermost scopes first
+        mode = "cursor", -- context reflects where the cursor is, not just the topline
+      })
+      -- Jump up to the context header of the current scope
+      vim.keymap.set("n", "[c", function()
+        require("treesitter-context").go_to_context(vim.v.count1)
+      end, { silent = true, desc = "Jump to context" })
+      -- Toggle the sticky context line
+      vim.keymap.set("n", "<leader>tc", "<cmd>TSContextToggle<CR>", { silent = true, desc = "Toggle TS context" })
+    end,
+  },
 }

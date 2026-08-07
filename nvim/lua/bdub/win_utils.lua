@@ -1,4 +1,5 @@
 local lua_utils = require("bdub.lua_utils")
+local go_location = require("bdub.go_location")
 local WinUtils = {}
 
 -- local duplicateWindows = {}
@@ -89,7 +90,13 @@ function WinUtils.set_window_backgrounds()
       goto continue
     end
 
-    if win == current_win then
+    -- A Go file outside your project (module cache / stdlib) gets its own tint
+    -- regardless of focus, so it's obvious you're in a dependency even in a split.
+    -- This wins over the focus-based colors below; project Go files fall through.
+    local go_bg = go_location.bg_group(vim.api.nvim_win_get_buf(win))
+    if go_bg then
+      vim.api.nvim_win_set_option(win, "winhighlight", "Normal:" .. go_bg)
+    elseif win == current_win then
       -- Set highlight for the focused window
       vim.api.nvim_win_set_option(win, "winhighlight", "Normal:MyNormalColor")
     -- elseif WinUtils.is_win_duplicate_from_store(win, duplicateStore) then
