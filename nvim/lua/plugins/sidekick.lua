@@ -70,22 +70,6 @@ return {
   },
   keys = {
     {
-      "<c-m-i>",
-      function()
-        require("sidekick.cli").toggle()
-      end,
-      mode = { "n", "i", "t" },
-      desc = "Toggle Claude CLI",
-    },
-    {
-      "<c-m-i>",
-      function()
-        require("sidekick.cli").send({ msg = "{this}" })
-      end,
-      mode = { "x" },
-      desc = "Send Selection to Claude CLI",
-    },
-    {
       "<leader>aR",
       function()
         local cli = require("sidekick.cli")

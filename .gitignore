@@ -1,2 +1,5 @@
 packer_compiled.lua
 */DEBUG_DAP*
+
+# local secrets, never commit
+.zshrc.secrets

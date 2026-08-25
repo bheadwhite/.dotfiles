@@ -27,17 +27,58 @@ return {
           enable = true,
         },
       })
+      -- Does the current buffer have a live Treesitter parser? (get_parser
+      -- returns nil / errors for filetypes with no grammar, e.g. `.env`.)
+      local function has_ts_parser()
+        local ok, parser = pcall(vim.treesitter.get_parser, 0)
+        return ok and parser ~= nil
+      end
+
+      -- Fallback "expand selection" for parser-less buffers: instead of walking
+      -- syntax nodes, walk a ladder of native text objects. Level is tracked in
+      -- a buffer-local so repeated presses grow (and <C-M-i> shrinks) the region.
+      -- For `.env`: word (API_KEY) -> WORD (API_KEY=abc123) -> line -> block -> file.
+      local expand_ladder = { "viw", "viW", "V", "Vip", "ggVG" }
+      local esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+      local function apply_level(lvl)
+        vim.b.expand_level = lvl
+        -- Esc first so we re-select cleanly whether we start in normal or visual.
+        vim.cmd("normal! " .. esc .. expand_ladder[lvl])
+      end
+      local function fallback_expand()
+        apply_level(math.min((vim.b.expand_level or 0) + 1, #expand_ladder))
+      end
+      local function fallback_shrink()
+        apply_level(math.max((vim.b.expand_level or 1) - 1, 1))
+      end
+
       vim.keymap.set("n", "<C-M-O>", function()
-        if vim.api.nvim_buf_line_count(0) > 0 and vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] ~= "" then
-          require("treesitter-modules").init_selection()
+        if has_ts_parser() then
+          if vim.api.nvim_buf_line_count(0) > 0 and vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] ~= "" then
+            require("treesitter-modules").init_selection()
+          end
+        else
+          vim.b.expand_level = 0
+          fallback_expand()
         end
       end)
 
       vim.keymap.set("x", "<C-M-O>", function()
-        require("treesitter-modules").node_incremental()
+        if has_ts_parser() then
+          require("treesitter-modules").node_incremental()
+        else
+          fallback_expand()
+        end
       end)
+      -- Shrink is the i/o companion to the <C-M-O> expand key. wezterm's enhanced
+      -- keyboard protocol delivers <C-M-i> as a distinct key (not <Tab>), so this
+      -- works as long as nothing else claims visual <c-m-i> (sidekick used to).
       vim.keymap.set("x", "<C-M-i>", function()
-        require("treesitter-modules").node_decremental()
+        if has_ts_parser() then
+          require("treesitter-modules").node_decremental()
+        else
+          fallback_shrink()
+        end
       end)
 
     end,

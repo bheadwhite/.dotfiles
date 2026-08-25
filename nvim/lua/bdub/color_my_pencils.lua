@@ -85,6 +85,18 @@ function colorMyPencils()
   vim.cmd([[highlight DiagnosticUnderlineInfo guisp=]] .. colors.blue_bright .. [[ guifg=]] .. colors.blue_bright .. [[ gui=undercurl,underline]])
   vim.cmd([[highlight DiagnosticUnderlineHint guisp=]] .. colors.cyan_bright .. [[ guifg=]] .. colors.cyan_bright .. [[ gui=undercurl,underline]])
 
+  -- Comments: shadow ships them as a dim gray-blue (black_bright #485457) that
+  -- recedes into the bg. A brighter blue-gray collides with the theme's cyan
+  -- (#839C98) / blue (#7E9AAB) syntax tokens, so use a NEUTRAL gray instead:
+  -- readable off the dark bg, but hueless so it can't clash with any colored
+  -- token or grab attention. Keep treesitter's @comment in sync (the theme sets
+  -- it explicitly rather than linking to Comment).
+  local comment_fg = "#8B8E8C"
+  vim.api.nvim_set_hl(0, "Comment", { fg = comment_fg })
+  vim.api.nvim_set_hl(0, "@comment", { fg = comment_fg })
+  vim.api.nvim_set_hl(0, "@comment.documentation", { fg = comment_fg })
+  vim.api.nvim_set_hl(0, "TSComment", { fg = comment_fg })
+
   vim.api.nvim_set_hl(0, "DiffAdd", { bg = shadow.bg_green_dark })
   vim.api.nvim_set_hl(0, "DiffDelete", { bg = shadow.bg_red_dark })
   vim.api.nvim_set_hl(0, "DiffChange", { bg = shadow.bg_blue_bright })
@@ -112,6 +124,13 @@ colorMyPencils()
 vim.api.nvim_create_autocmd("ColorScheme", {
   pattern = "*",
   callback = function()
+    -- Reapply the neutral-gray comment color after any colorscheme change
+    local comment_fg = "#8B8E8C"
+    vim.api.nvim_set_hl(0, "Comment", { fg = comment_fg })
+    vim.api.nvim_set_hl(0, "@comment", { fg = comment_fg })
+    vim.api.nvim_set_hl(0, "@comment.documentation", { fg = comment_fg })
+    vim.api.nvim_set_hl(0, "TSComment", { fg = comment_fg })
+
     -- Reapply diagnostic colors after any colorscheme change
     vim.cmd([[highlight DiagnosticUnderlineError guisp=]] .. colors.red_bright .. [[ guifg=]] .. colors.red_bright .. [[ gui=undercurl,underline]])
     vim.cmd(

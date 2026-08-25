@@ -343,7 +343,10 @@ local function paste_clipboard()
     vim.api.nvim_paste(clip, true, -1)
   end
 end
-vim.keymap.set({ "n", "i" }, "<C-F16>", paste_clipboard, add_desc("paste clipboard (Cmd+V)"))
+-- x/s are needed so Cmd+V over a selection (e.g. `S` -> vg_) swaps the text out
+-- instead of doing nothing; nvim_paste deletes the selection first, and unlike
+-- `"_dP` it gets the end-of-line case right.
+vim.keymap.set({ "n", "i", "x", "s" }, "<C-F16>", paste_clipboard, add_desc("paste clipboard (Cmd+V)"))
 vim.keymap.set("c", "<C-F16>", "<C-r>+", { desc = "paste clipboard at cmdline (Cmd+V)" })
 vim.keymap.set("t", "<C-F16>", function()
   local job = vim.b.terminal_job_id

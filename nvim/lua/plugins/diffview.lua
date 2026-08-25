@@ -56,6 +56,85 @@ return {
       end
     end
 
+    -- File-panel l/h: on a directory, expand (l) / collapse (h) it; on a file,
+    -- step the diff to the next (l) / previous (h) hunk while the cursor stays
+    -- put in the panel — the diff window is driven remotely.
+    -- The main diff window for the active view, or nil if the layout isn't ready.
+    local function main_diff_win()
+      local view = lib.get_current_view()
+      if not (view and view.cur_layout and view.cur_layout.get_main_win) then
+        return nil
+      end
+      local main = view.cur_layout:get_main_win()
+      if main and main.id and vim.api.nvim_win_is_valid(main.id) then
+        return main.id
+      end
+      return nil
+    end
+
+    -- File-panel j/k: scroll the diff buffer by a line without leaving the panel.
+    local function panel_scroll(dir)
+      local win = main_diff_win()
+      if not win then
+        return
+      end
+      local key = dir == "j" and "\5" or "\25" -- <C-e> down / <C-y> up
+      vim.api.nvim_win_call(win, function()
+        vim.cmd("normal! " .. key)
+      end)
+    end
+
+    -- File-panel gg / G: jump the diff buffer to top / bottom, focus stays put.
+    local function panel_jump(edge)
+      local win = main_diff_win()
+      if not win then
+        return
+      end
+      local motion = edge == "top" and "gg" or "G"
+      vim.api.nvim_win_call(win, function()
+        vim.cmd("normal! " .. motion .. "zz")
+      end)
+    end
+
+    local function panel_hunk_or_fold(dir)
+      local view = lib.get_current_view()
+      if not (view and view.panel) then
+        return
+      end
+
+      local item = view.panel:get_item_at_cursor()
+      if not item then
+        return
+      end
+
+      -- A DirData carries a boolean `collapsed`; a FileEntry does not. That's
+      -- the same discriminator diffview uses in FilePanel:set_item_fold.
+      if type(item.collapsed) == "boolean" then
+        view.panel:set_item_fold(item, dir == "l") -- l = open, h = close
+        return
+      end
+
+      -- File entry: jump hunks in the main diff window without leaving the panel.
+      local motion = dir == "l" and "]c" or "[c"
+      local function jump_hunk()
+        local win = main_diff_win()
+        if not win then
+          return
+        end
+        vim.api.nvim_win_call(win, function()
+          pcall(vim.cmd, "normal! " .. motion .. "zz")
+        end)
+      end
+
+      if view.cur_entry ~= item then
+        -- Load this file into the diff (focus stays in the panel), then jump.
+        view:set_file(item, false, false)
+        vim.schedule(jump_hunk)
+      else
+        jump_hunk()
+      end
+    end
+
     local function is_floating(win)
       return vim.api.nvim_win_get_config(win).relative ~= ""
     end
@@ -157,6 +236,70 @@ return {
             "K",
             actions.scroll_view(-0.10),
             { desc = "Scroll up" },
+          },
+          {
+            "n",
+            "j",
+            function()
+              panel_scroll("j")
+            end,
+            { desc = "Scroll diff down a line" },
+          },
+          {
+            "n",
+            "k",
+            function()
+              panel_scroll("k")
+            end,
+            { desc = "Scroll diff up a line" },
+          },
+          {
+            "n",
+            "gg",
+            function()
+              panel_jump("top")
+            end,
+            { desc = "Jump diff to top" },
+          },
+          {
+            "n",
+            "G",
+            function()
+              panel_jump("bottom")
+            end,
+            { desc = "Jump diff to bottom" },
+          },
+          {
+            "n",
+            "l",
+            function()
+              panel_hunk_or_fold("l")
+            end,
+            { desc = "Expand folder / next hunk" },
+          },
+          {
+            "n",
+            "<Right>",
+            function()
+              panel_hunk_or_fold("l")
+            end,
+            { desc = "Expand folder / next hunk" },
+          },
+          {
+            "n",
+            "h",
+            function()
+              panel_hunk_or_fold("h")
+            end,
+            { desc = "Collapse folder / prev hunk" },
+          },
+          {
+            "n",
+            "<Left>",
+            function()
+              panel_hunk_or_fold("h")
+            end,
+            { desc = "Collapse folder / prev hunk" },
           },
         },
       },
