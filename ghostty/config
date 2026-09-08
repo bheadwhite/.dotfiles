@@ -110,6 +110,17 @@ keybind = alt+backspace=text:\x17
 keybind = cmd+backspace=text:\x15
 keybind = cmd+l=text:\x05
 
+# Accept the AI/history suggestion — Hyper+Enter (Caps Lock + Enter).
+# Karabiner maps held Caps Lock to right_control+right_alt, so the chord reaches
+# the terminal as ctrl+alt+enter (see karabiner.json).
+# One wire signal across every terminal: CSI 26;7~ is Ctrl+Alt+F14, which zsh
+# binds to autosuggest-accept (config/zsh/keybindings.zsh) and nvim receives as
+# <C-M-F14> to accept a Copilot/sidekick suggestion. WezTerm sends the identical
+# bytes from config/keys.lua, so the same chord means the same thing everywhere.
+# cmux loads this file too (it embeds libghostty and reads ~/.config/ghostty/config),
+# so this one line covers both Ghostty.app and cmux.
+keybind = ctrl+alt+enter=text:\x1b[26;7~
+
 # macOS specific settings
 macos-option-as-alt = true
 

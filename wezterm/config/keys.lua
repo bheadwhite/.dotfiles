@@ -124,6 +124,18 @@ return {
 		action = { SendKey = { key = "End" } },
 	},
 
+	-- Accept the AI/history suggestion — Hyper+Enter (Caps Lock + Enter).
+	-- Karabiner maps held Caps Lock to right_control+right_alt, so the chord
+	-- arrives here as CTRL|ALT (see karabiner.json).
+	-- CSI 26;7~ is Ctrl+Alt+F14: zsh binds it to autosuggest-accept (see
+	-- config/zsh/keybindings.zsh) and nvim reads it as <C-M-F14> to accept a
+	-- Copilot/sidekick suggestion. Ghostty sends the same bytes from its own
+	-- config, so one chord means one thing in every terminal.
+	-- This used to be a BetterTouchTool rewrite scoped to the WezTerm bundle id,
+	-- which is exactly why it never worked in ghostty/cmux — send it natively so
+	-- the binding lives with the terminal config instead of drifting in BTT.
+	{ key = "Enter", mods = "CTRL|ALT", action = act.SendString("\x1b[26;7~") },
+
 	{
 		key = "F12",
 		action = wezterm.action.EmitEvent("toggle_background"),

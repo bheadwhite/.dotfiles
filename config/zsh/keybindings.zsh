@@ -47,9 +47,14 @@ bindkey -M viins '^[[F' end-of-line    # End key, normal cursor mode
 # Ctrl+F → accept via the plugin's dedicated widget (works anywhere on the line).
 bindkey -M viins '^F'   autosuggest-accept
 
-# Cmd+Opt+Enter → accept, matching how the same physical chord accepts a Copilot
-# suggestion in nvim. The chain: BetterTouchTool rewrites Cmd+Opt+Enter to
-# Cmd+Opt+F14 inside WezTerm, which sends this sequence (F14 + Ctrl+Alt) to zsh.
+# Hyper+Enter (Caps Lock + Enter) → accept, matching how the same physical chord
+# accepts a Copilot suggestion in nvim. Karabiner maps held Caps Lock to
+# right_control+right_alt, so the terminal sees ctrl+alt+enter and turns it into
+# \e[26;7~ (CSI 26;7~ = Ctrl+Alt+F14) — the one wire signal every terminal emits
+# for "accept the suggestion": WezTerm from wezterm/config/keys.lua, Ghostty (and
+# cmux, which reads the same file) from ghostty/config. It used to arrive via a
+# BetterTouchTool rewrite scoped to the WezTerm bundle id, which is why it
+# silently did nothing in ghostty/cmux.
 bindkey -M viins '\e[26;7~' autosuggest-accept
 bindkey -M vicmd '\e[26;7~' autosuggest-accept
 
