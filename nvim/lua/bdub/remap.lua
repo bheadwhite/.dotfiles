@@ -336,32 +336,48 @@ function split_line_by()
   vim.cmd(expression)
 end
 
+-- The `wezterm` CLI is not on PATH (it lives inside WezTerm.app). WezTerm exports
+-- $WEZTERM_EXECUTABLE (…/MacOS/wezterm-gui) to child processes; the `wezterm` CLI
+-- binary sits next to it. Resolve from there, falling back to PATH.
+local function wezterm_bin()
+  local exe = vim.env.WEZTERM_EXECUTABLE
+  local dir = exe and exe:match("(.*/)")
+  if dir then
+    return dir .. "wezterm"
+  end
+  return "wezterm"
+end
+
 function wezterm_cmd(cmd)
   -- local curWin = vim.api.nvim_get_current_win()
   local curTab = vim.api.nvim_get_current_tabpage()
+  -- Swap the leading literal `wezterm` for the resolved absolute binary path.
+  cmd = string.format("%q", wezterm_bin()) .. cmd:sub(#"wezterm" + 1)
   vim.cmd("silent ! " .. cmd .. " > /dev/null 2>&1")
   vim.defer_fn(function()
     vim.api.nvim_set_current_tabpage(curTab)
   end, 0)
 end
 
-vim.keymap.set({ "n", "v" }, "<C-F13>", function()
+vim.keymap.set({ "n", "v" }, "<F13>", function()
   wezterm_cmd("wezterm cli zoom-pane --toggle")
 end, add_desc("zoom wezterm"))
 
-vim.keymap.set({ "n", "v" }, "<C-F14>", function()
+vim.keymap.set({ "n", "v" }, "<F14>", function()
   wezterm_cmd("wezterm cli split-pane --right")
 end, add_desc("new split"))
 
-vim.keymap.set({ "n", "v" }, "<C-F15>", function()
+vim.keymap.set({ "n", "v" }, "<F15>", function()
   wezterm_cmd("wezterm cli split-pane --bottom")
 end, add_desc("new split"))
 
--- Cmd+V: wezterm rewrites it to <C-F16> for ANY nvim (matched by binary basename,
--- see wezterm/config/nvim.lua). So nvim must ALWAYS bind it — it can't live only in
--- the opt-in taskloop plugin, or Cmd+V emits a raw <C-F16> in normal buffers.
--- These are plain clipboard pastes; when taskloop is enabled it loads later
--- (VeryLazy) and overrides the n/i maps with its image-aware smart paste.
+-- Cmd+V: wezterm routes the "smart-paste" event to PLAIN <F16> when nvim is
+-- focused (matched by binary basename, see wezterm/config/nvim.lua). Unmodified
+-- F13–F16 encode as standard xterm sequences, so they arrive without needing the
+-- kitty keyboard protocol — which stays off because it breaks <Esc>.
+-- nvim must ALWAYS bind this: it can't live only in the opt-in taskloop plugin,
+-- or Cmd+V emits a raw <F16> into normal buffers. When taskloop is enabled it
+-- loads later (VeryLazy) and overrides the n/i maps with its image-aware paste.
 local function paste_clipboard()
   local clip = vim.fn.getreg("+")
   if clip ~= "" then
@@ -371,9 +387,9 @@ end
 -- x/s are needed so Cmd+V over a selection (e.g. `S` -> vg_) swaps the text out
 -- instead of doing nothing; nvim_paste deletes the selection first, and unlike
 -- `"_dP` it gets the end-of-line case right.
-vim.keymap.set({ "n", "i", "x", "s" }, "<C-F16>", paste_clipboard, add_desc("paste clipboard (Cmd+V)"))
-vim.keymap.set("c", "<C-F16>", "<C-r>+", { desc = "paste clipboard at cmdline (Cmd+V)" })
-vim.keymap.set("t", "<C-F16>", function()
+vim.keymap.set({ "n", "i", "x", "s" }, "<F16>", paste_clipboard, add_desc("paste clipboard (Cmd+V)"))
+vim.keymap.set("c", "<F16>", "<C-r>+", { desc = "paste clipboard at cmdline (Cmd+V)" })
+vim.keymap.set("t", "<F16>", function()
   local job = vim.b.terminal_job_id
   if job then
     vim.fn.chansend(job, vim.fn.getreg("+"))

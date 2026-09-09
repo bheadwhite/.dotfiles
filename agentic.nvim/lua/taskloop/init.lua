@@ -323,7 +323,7 @@ end
 M._attach_image = attach_image
 
 -- ---- smart paste (Cmd+V) ---------------------------------------------------
--- wezterm sends Cmd+V here as <C-F16> whenever nvim is the foreground process.
+-- wezterm sends Cmd+V here as plain <F16> whenever nvim is the foreground process.
 -- Text on the clipboard pastes exactly as a normal paste would; a screenshot
 -- (a path to an image file, or raw image bytes) is saved to .task-assets/ and
 -- dropped at the cursor as a tidy [image #N] placeholder in a composer — the one
@@ -637,13 +637,13 @@ function M.setup(opts)
   mapk("u", M.prune,    "prune consumed verdicts from REVIEW.md")
   mapk("c", M.cancel,   "kill worker under cursor (frees slot for queued tasks)")
   mapk("r", M.restart,  "restart task under cursor (kill worker + re-queue)")
-  -- Cmd+V: wezterm forwards it as <C-F16> when nvim is foreground (see
+  -- Cmd+V: wezterm forwards it as plain <F16> when nvim is foreground (see
   -- wezterm/config/nvim.lua → smart_paste). Normal/insert get the smart paste;
   -- cmdline and terminal fall back to a plain clipboard paste so nothing regresses.
-  vim.keymap.set({ "n", "i" }, "<C-F16>", M.smart_paste,
+  vim.keymap.set({ "n", "i" }, "<F16>", M.smart_paste,
     { desc = "taskloop: smart paste (text, or attach clipboard image)" })
-  vim.keymap.set("c", "<C-F16>", "<C-r>+", { desc = "taskloop: paste clipboard at cmdline" })
-  vim.keymap.set("t", "<C-F16>", function()
+  vim.keymap.set("c", "<F16>", "<C-r>+", { desc = "taskloop: paste clipboard at cmdline" })
+  vim.keymap.set("t", "<F16>", function()
     local job = vim.b.terminal_job_id
     if job then vim.fn.chansend(job, vim.fn.getreg("+")) end
   end, { desc = "taskloop: paste clipboard into terminal" })
