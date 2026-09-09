@@ -17,6 +17,30 @@ end
 
 config.keys = keys
 
+-- Assigning a key_table REPLACES wezterm's built-in one for that mode rather
+-- than merging, so start from the defaults and append. Re-fetch per table:
+-- default_key_tables() hands back a fresh copy each call, but the tables inside
+-- one call are shared, so mutating in place would leak edits between them.
+local function extend_default_key_table(name, extra)
+	local t = wezterm.gui.default_key_tables()[name]
+	for _, binding in ipairs(extra) do
+		table.insert(t, binding)
+	end
+	return t
+end
+
+-- macOS find-again: Cmd+G steps to the next match, Cmd+Shift+G to the previous,
+-- completing the Cmd+F (act.Search) flow in config/keys.lua. Bound in both modes
+-- because Cmd+F lands in search_mode and Enter promotes that to copy_mode --
+-- match cycling should keep working across the handoff.
+-- `phys:G` (not "g"/"G") so the SHIFT variant matches: with shift held, macOS
+-- reports the key as "G" and wezterm's mods/key normalization gets ambiguous.
+-- Same reason as the phys:Comma / phys:Period bindings in config/keys.lua.
+local find_again = {
+	{ key = "phys:G", mods = "CMD", action = wezterm.action.CopyMode("NextMatch") },
+	{ key = "phys:G", mods = "CMD|SHIFT", action = wezterm.action.CopyMode("PriorMatch") },
+}
+
 -- confirm-mode for closing a pane: cmd+w arms this table, a second cmd+w (or y)
 -- confirms the close, Escape or any unknown key cancels.
 config.key_tables = {
@@ -25,6 +49,8 @@ config.key_tables = {
 		{ key = "y", action = wezterm.action.CloseCurrentPane({ confirm = false }) },
 		{ key = "Escape", action = "PopKeyTable" },
 	},
+	search_mode = extend_default_key_table("search_mode", find_again),
+	copy_mode = extend_default_key_table("copy_mode", find_again),
 }
 
 --custom events

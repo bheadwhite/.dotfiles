@@ -58,10 +58,16 @@ config.foreground_text_hsb = {
 	brightness = 1.0,
 }
 config.colors = color_pointer
+-- Inactive panes: DIM ONLY. All three fields are multipliers, and `hue`
+-- multiplies the hue ANGLE, so anything but 1.0 rotates the color wheel --
+-- hue = 10 was turning red ERROR text green. saturation = 4 then clamped every
+-- color to full chroma, flattening what was left. Keep hue and saturation at
+-- 1.0 and turn brightness down alone; that is the only knob that dims without
+-- recoloring.
 config.inactive_pane_hsb = {
-	hue = 10,
-	saturation = 4,
-	brightness = 0.4,
+	hue = 1.0,
+	saturation = 1.0,
+	brightness = 0.5,
 }
 config.color_schemes = {
 	["dark"] = {},
