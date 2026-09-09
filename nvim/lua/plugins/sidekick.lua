@@ -1,3 +1,31 @@
+-- Prompt for a free-text question and send it to the Claude CLI along with
+-- whatever you're looking at: {this} is the visual selection in visual mode,
+-- or the function/line under the cursor in normal mode.
+local function ask_claude()
+  local cli = require("sidekick.cli")
+  -- Pre-warm the Claude session while you type. On a cold start, sidekick's
+  -- send() pastes the text and hits Enter immediately, but the Claude TUI is
+  -- still booting so the Enter gets swallowed -- the text lands in the input
+  -- box but is never submitted. Starting the session here (without stealing
+  -- focus) lets it finish booting during the few seconds you spend typing, so
+  -- the submit below lands on a ready prompt.
+  cli.show({ name = "claude", focus = false })
+  vim.ui.input({ prompt = "Ask Claude: " }, function(q)
+    if not q or q == "" then
+      return
+    end
+    cli.send({
+      msg = "{this}\n\n" .. q,
+      filter = { name = "claude" },
+      submit = true,
+    })
+  end)
+end
+
+-- caps+space. Resolved at spec-load time because lazy.nvim reads `keys` eagerly.
+local ok_bdub, bdub = pcall(require, "bdub")
+local hyper_space = ok_bdub and bdub.hyper_space_key or nil
+
 return {
   "folke/sidekick.nvim",
   event = "VeryLazy",
@@ -69,6 +97,30 @@ return {
     },
   },
   keys = {
+    -- Free-text question about whatever you're looking at.
+    -- Normal mode: {this} is the function/line under the cursor.
+    -- Visual mode: {this} is the selection.
+    {
+      "<leader>aa",
+      ask_claude,
+      mode = { "n", "x" },
+      desc = "Ask Claude about this",
+    },
+    {
+      hyper_space or "<Nop>",
+      ask_claude,
+      mode = { "n", "x" },
+      desc = "Ask Claude about this (caps+space)",
+    },
+    -- Toggle the Claude split without sending anything.
+    {
+      "<leader>at",
+      function()
+        require("sidekick.cli").toggle({ name = "claude", focus = true })
+      end,
+      mode = { "n" },
+      desc = "Toggle Claude CLI",
+    },
     {
       "<leader>aR",
       function()

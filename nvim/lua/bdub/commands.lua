@@ -239,8 +239,87 @@ M.grep_string_within_directories = function()
   pickers.new(dropdown_theme, options):find()
 end
 
+-- Undo JSON string-escaping (\" -> ", \\ -> \, \n -> newline, etc.) so that
+-- text copied out of a log or a JSON-embedded string can still be formatted.
+-- Single pass over each `\<char>` pair so escaped backslashes (\\) are consumed
+-- as a unit and never re-interpreted.
+local JSON_UNESCAPE = {
+  ['\\"'] = '"',
+  ["\\\\"] = "\\",
+  ["\\/"] = "/",
+  ["\\n"] = "\n",
+  ["\\t"] = "\t",
+  ["\\r"] = "\r",
+}
+local function json_unescape(s)
+  return (s:gsub("\\.", function(seq)
+    return JSON_UNESCAPE[seq]
+  end))
+end
+
+-- Hot-reload the hand-written config: bust every cached `bdub.*` Lua module so
+-- edits to them take effect, then re-run the keymap definitions in remap.lua.
+-- Good enough for the edit-test loop; use `:restart` for structural/plugin
+-- changes that need a clean boot.
+M.reload_config = function()
+  for name in pairs(package.loaded) do
+    if name == "bdub" or name:match("^bdub%.") then
+      package.loaded[name] = nil
+    end
+  end
+  local remap = vim.fn.stdpath("config") .. "/lua/bdub/remap.lua"
+  local ok, err = pcall(dofile, remap)
+  if not ok then
+    vim.notify("reload_config: " .. err, vim.log.levels.ERROR)
+    return
+  end
+  vim.notify("reloaded bdub config", vim.log.levels.INFO)
+end
+
 M.format_jq = function()
-  vim.cmd("%!jq .")
+  local bufnr = 0
+  local input = table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n")
+
+  local function jq(text)
+    local ok, res = pcall(function()
+      return vim.system({ "jq", "." }, { stdin = text }):wait()
+    end)
+    if not ok then
+      return nil, tostring(res)
+    end
+    return res
+  end
+
+  local res, err = jq(input)
+  if not res then
+    vim.notify("format_jq: " .. err, vim.log.levels.ERROR)
+    return
+  end
+
+  -- If jq rejected the raw text, it may be backslash-escaped JSON. Unescape and
+  -- retry once before giving up.
+  local unescaped = false
+  if res.code ~= 0 then
+    local stripped = json_unescape(input)
+    if stripped ~= input then
+      local retry = jq(stripped)
+      if retry and retry.code == 0 then
+        res, unescaped = retry, true
+      end
+    end
+  end
+
+  if res.code ~= 0 then
+    local msg = (res.stderr or ""):gsub("%s+$", "")
+    vim.notify("format_jq: invalid JSON\n" .. msg, vim.log.levels.ERROR)
+    return
+  end
+
+  local out = (res.stdout or ""):gsub("\n$", "")
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.split(out, "\n", { plain = true }))
+  if unescaped then
+    vim.notify("format_jq: unescaped JSON before formatting", vim.log.levels.INFO)
+  end
 end
 
 M.list_buffers = function()

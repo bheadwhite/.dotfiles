@@ -39,6 +39,26 @@ local function goToConstructor()
 end
 
 local function handleClose()
+  -- Special buffers must not be :bd'd. The agent panel is a terminal buffer
+  -- with a live job, so `bd` raises E89 ("[NULL] will be killed"); and because
+  -- sidekick's terminal is unlisted, the listed-buffer count below never sees
+  -- it and wrongly picks the `bd` branch. Hide the panel instead -- that keeps
+  -- the CLI session alive so the next toggle reattaches rather than restarting.
+  if vim.bo.filetype == "sidekick_terminal" then
+    local ok, cli = pcall(require, "sidekick.cli")
+    if ok then
+      cli.hide()
+      return
+    end
+  end
+
+  -- Any other non-file buffer (terminal, quickfix, help, ...) -- close the
+  -- window and leave the buffer alone.
+  if vim.bo.buftype ~= "" then
+    pcall(vim.cmd, "close")
+    return
+  end
+
   -- Get a list of all windows
   local windows = vim.api.nvim_list_wins()
 
@@ -68,8 +88,6 @@ end
 -- Copy to system clipboard in visual mode
 vim.keymap.set({ "v", "x" }, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
 
--- Open current file in Cursor
-vim.keymap.set("n", "<leader>j", ":silent !cursor %<CR>", { desc = "Open in Cursor" })
 
 -- local highlight_under_cursor = function()
 --   --get current word under cursor
@@ -240,11 +258,18 @@ local normal_keymaps = {
   { "Q", "<nop>", "disable ex mode" },
   { "<C-M-g>", ToggleGit, "git" },
   {
-    "<leader>Ofj",
+    "<leader>j",
     function()
       require("bdub.commands").format_jq()
     end,
     "format json",
+  },
+  {
+    "<leader>rc",
+    function()
+      require("bdub.commands").reload_config()
+    end,
+    "reload config",
   },
   -- { "<C-S-h>", "<cmd>bprev<CR>", "prev buffer" },
   -- { "<C-S-l>", "<cmd>bnext<CR>", "next buffer" },

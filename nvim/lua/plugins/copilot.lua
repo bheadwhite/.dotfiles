@@ -2,12 +2,10 @@ if vim.version().minor < 10 then
   return {}
 end
 
+-- Insert mode only. Normal/visual are claimed by sidekick's Ask Claude
+-- (see lua/plugins/sidekick.lua).
 local ok_bdub, bdub = pcall(require, "bdub")
 if ok_bdub and type(bdub.hyper_space_key) == "string" and bdub.hyper_space_key ~= "" then
-  vim.keymap.set("v", bdub.hyper_space_key, function()
-    vim.cmd("CopilotChat")
-  end, { noremap = true, silent = true, desc = "Open CopilotChat" })
-
   vim.keymap.set("i", bdub.hyper_space_key, function()
     local copilot_ok, copilot = pcall(require, "copilot.suggestion")
     if copilot_ok then

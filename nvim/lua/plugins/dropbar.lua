@@ -21,6 +21,62 @@ local custom_path = {
   end,
 }
 
+-- ── Go package name, right-aligned in the winbar ──────────────────────────
+-- Shows the `package <name>` of the current Go buffer, flush right in the same
+-- dropbar winbar (see wrap_dropbar_with_go_package below).
+local go_pkg_cache = {} -- buf -> { tick = changedtick, seg = string }
+
+local function go_package_name(buf)
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, 64, false)) do
+    local name = line:match("^package%s+([%w_]+)")
+    if name then
+      return name
+    end
+  end
+  return nil
+end
+
+local function go_package_segment()
+  local buf = vim.api.nvim_get_current_buf()
+  if vim.bo[buf].filetype ~= "go" then
+    return ""
+  end
+  local tick = vim.b[buf].changedtick
+  local cached = go_pkg_cache[buf]
+  if cached and cached.tick == tick then
+    return cached.seg
+  end
+  local name = go_package_name(buf)
+  -- %= pushes to the right edge; %#Grp# ... %* colors then resets.
+  local seg = name and ("%=%#DropBarGoPackage# 󰟓 " .. name .. " %*") or ""
+  go_pkg_cache[buf] = { tick = tick, seg = seg }
+  return seg
+end
+
+-- Wrap dropbar's global __call so its returned winbar string gets our
+-- right-aligned package segment appended. Because the winbar uses the
+-- `%{%v:lua.dropbar()%}` form, the returned string is re-parsed as statusline
+-- items, so `%=`/`%#..#` in our segment take effect.
+local function wrap_dropbar_with_go_package()
+  local mt = getmetatable(_G.dropbar)
+  if not mt or mt.__go_pkg_wrapped then
+    return
+  end
+  local orig_call = mt.__call
+  mt.__call = function(...)
+    local ok, str = pcall(orig_call, ...)
+    if not ok then
+      return ""
+    end
+    return str .. go_package_segment()
+  end
+  mt.__go_pkg_wrapped = true
+end
+
+local function set_go_package_hl()
+  vim.api.nvim_set_hl(0, "DropBarGoPackage", { link = "Special", default = true })
+end
+
 local current_idx = nil
 local initial_idx = nil
 local current_bar = nil
@@ -143,6 +199,15 @@ return {
   cond = not vim.g.vscode,
   commit = "d0c78c570db0f5941f85ba54522c0f01427cdf67", --10.0
   dependencies = { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+  config = function(_, opts)
+    require("dropbar").setup(opts)
+    wrap_dropbar_with_go_package()
+    set_go_package_hl()
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      callback = set_go_package_hl,
+      desc = "Re-apply DropBarGoPackage highlight after colorscheme change",
+    })
+  end,
   opts = {
     sources = {
       treesitter = {
