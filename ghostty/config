@@ -132,3 +132,10 @@ keybind = right=text:\x1b[C
 
 # Ensure proper terminal emulation for Neovim
 term = xterm-256color
+
+# Let Shift+drag always make a native selection, even when a full-screen TUI has
+# mouse reporting on. Ghostty's default (mouse-shift-capture = false) lets the
+# program claim shift for itself via XTSHIFTESCAPE, and lnav does exactly that
+# (it emits CSI > 1 s), which kills shift+drag selection inside it. "never"
+# reserves shift+drag for the terminal no matter what the program asks for.
+mouse-shift-capture = never
