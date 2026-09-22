@@ -1,6 +1,12 @@
 #!/bin/sh
-# Open claude-pin in a split to the right of the current cmux pane.
+# Open claude-pin in a split next to the current cmux pane, replacing this workspace's
+# existing viewer (each viewer records its surface in ~/.cache/claude-pin/viewers/).
 dir=${1:-right}
+old="$HOME/.cache/claude-pin/viewers/$CMUX_WORKSPACE_ID"
+if [ -n "$CMUX_WORKSPACE_ID" ] && [ -f "$old" ]; then
+  cmux close-surface --surface "$(cat "$old")" >/dev/null 2>&1
+  rm -f "$old"
+fi
 surface=$(cmux new-split "$dir" | grep -o 'surface:[0-9]*' | head -1)
 [ -n "$surface" ] || { echo "claude-pin-open: couldn't create split" >&2; exit 1; }
 cmux send --surface "$surface" "exec $HOME/.dotfiles/cmux/claude-pin

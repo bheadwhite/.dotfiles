@@ -9,6 +9,7 @@ into next steps, a summary, and grouped details. Keys: d toggles details, q quit
 """
 import json
 import os
+import re
 import select
 import shutil
 import subprocess
@@ -26,6 +27,8 @@ CLAUDE = Path.home() / ".local" / "bin" / "claude"
 
 DIM, BOLD, RESET = "\033[2m", "\033[1m", "\033[0m"
 BLUE, MINT, ORANGE = "\033[38;5;75m", "\033[38;5;79m", "\033[38;5;214m"
+ITALIC, UNDERLINE, CODE = "\033[3m", "\033[4m", "\033[38;5;180m"
+VIEWERS = Path.home() / ".cache" / "claude-pin" / "viewers"
 
 
 def resolve_transcript():
@@ -60,7 +63,7 @@ class Session:
         self.path, self.offset, self.buf = path, 0, b""
         self.prompt, self.prompt_at, self.prompt_id, self.queued = None, None, None, []
         self.update, self.tool, self.working, self.turn = None, None, False, []
-        self.ended_at = None
+        self.ended_at = self.update_at = None
 
     def poll(self):
         size = self.path.stat().st_size
@@ -100,7 +103,7 @@ class Session:
             content = r["message"].get("content") or []
             for b in content:
                 if b.get("type") == "text" and b.get("text", "").strip():
-                    self.update, self.tool = b["text"], None
+                    self.update, self.tool, self.update_at = b["text"], None, entry_time(r)
                     self.turn.append(b["text"])
                 elif b.get("type") == "tool_use":
                     self.tool = tool_label(b)
@@ -115,21 +118,21 @@ def entry_time(r):
         return time.time()
 
 
+ACTION_ITEM = {
+    "type": "object",
+    "properties": {
+        "kind": {"type": "string", "enum": ["answer", "do", "verify", "optional"]},
+        "text": {"type": "string"},
+    },
+    "required": ["kind", "text"],
+}
+
 DIGEST_SCHEMA = {
     "type": "object",
     "properties": {
         "headline": {"type": "string"},
-        "actions": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "kind": {"type": "string", "enum": ["answer", "do", "verify", "optional"]},
-                    "text": {"type": "string"},
-                },
-                "required": ["kind", "text"],
-            },
-        },
+        "actions": {"type": "array", "items": ACTION_ITEM},
+        "still_open": {"type": "array", "items": ACTION_ITEM},
         "summary": {"type": "array", "items": {"type": "string"}},
         "details": {
             "type": "array",
@@ -140,20 +143,30 @@ DIGEST_SCHEMA = {
             },
         },
     },
-    "required": ["headline", "actions", "summary", "details"],
+    "required": ["headline", "actions", "still_open", "summary", "details"],
 }
 
 DIGEST_PROMPT = """You triage a coding agent's finished turn for a busy engineer who wants to see what needs
 them first and read the details only if they choose to. Use only what the agent wrote; never invent.
 
 - headline: one line, at most 12 words: where things stand now.
-- actions: everything that needs the engineer, most urgent first. kind is "answer" for a
+- actions: what the agent raised THIS turn that needs the engineer, most urgent first. Never
+  copy items from <earlier_open> here; those belong only in still_open. kind is "answer" for a
   question the agent asked, "do" for a manual step only they can take, "verify" for something
   to check or test, "optional" for a follow-up the agent offered. Imperative, one line each.
   Empty if nothing needs them.
+- still_open: items from <earlier_open> that are still unresolved: the engineer's prompt
+  neither answered, declined, nor acted on them, and the agent didn't complete them this
+  turn. A change of subject does not resolve an item. Keep each item's kind and wording;
+  drop anything handled or obsolete. Empty if none remain.
 - summary: 2-4 short bullets: what was done and what changed.
 - details: the rest (files, commands, caveats, reasoning), grouped under 2-5 short topics.
   Terse points; keep paths and commands exact.
+
+Open items from earlier turns:
+<earlier_open>
+{earlier}
+</earlier_open>
 
 Engineer's prompt:
 <prompt>
@@ -191,6 +204,22 @@ def load_digest(transcript):
     return digest
 
 
+def dedupe_actions(actions, still_open):
+    """Drop repeated items; an item raised this turn wins over its carried-over copy."""
+    seen = set()
+
+    def keep(items):
+        out = []
+        for i in items or []:
+            key = " ".join(i.get("text", "").lower().split())
+            if key and key not in seen:
+                seen.add(key)
+                out.append(i)
+        return out
+
+    return keep(actions), keep(still_open)
+
+
 def run_digest(transcript):
     """Digest the latest turn. The file keeps `last` (newest completed digest) and `run`
     (the attempt in flight or its error), so a new run never hides the previous digest."""
@@ -214,18 +243,30 @@ def run_digest(transcript):
     if not s.turn:
         save({"prompt_id": s.prompt_id, "state": "error", "error": "no reply text this turn"})
         return
+    if last and last.get("prompt_id") == s.prompt_id:
+        earlier = last.get("earlier") or []
+    elif last:
+        prev = last.get("digest") or {}
+        earlier = (prev.get("actions") or []) + (prev.get("still_open") or [])
+    else:
+        earlier = []
+    earlier = earlier[:12]
     turn = "\n\n---\n\n".join(s.turn)[-40000:]
     env = {k: v for k, v in os.environ.items() if not k.startswith("CMUX_")}
     env["CLAUDE_PIN_DIGEST"] = "1"
     cmd = [str(CLAUDE), "-p", "--model", "haiku", "--setting-sources", "project", "--strict-mcp-config",
            "--no-session-persistence", "--tools", "", "--output-format", "json",
            "--json-schema", json.dumps(DIGEST_SCHEMA)]
-    prompt = DIGEST_PROMPT.replace("{prompt}", s.prompt[-8000:]).replace("{turn}", turn)
+    earlier_text = "\n".join(f"- [{i['kind']}] {i['text']}" for i in earlier) or "(none)"
+    prompt = DIGEST_PROMPT.replace("{earlier}", earlier_text).replace("{prompt}", s.prompt[-8000:]) \
+        .replace("{turn}", turn)
     try:
         res = subprocess.run(cmd, input=prompt, capture_output=True, text=True, timeout=120,
                              env=env, cwd=DIGESTS)
         digest = json.loads(res.stdout)["structured_output"]
-        save(None, {"prompt_id": s.prompt_id, "prompt": s.prompt[:500], "at": time.time(), "digest": digest})
+        digest["actions"], digest["still_open"] = dedupe_actions(digest.get("actions"), digest.get("still_open"))
+        save(None, {"prompt_id": s.prompt_id, "prompt": s.prompt[:500], "at": time.time(),
+                    "earlier": earlier, "digest": digest})
     except (subprocess.SubprocessError, ValueError, KeyError, TypeError) as e:
         save({"prompt_id": s.prompt_id, "state": "error", "error": str(e)[:200]})
 
@@ -252,37 +293,167 @@ def wrap(text, width, max_lines):
     return out
 
 
+INLINE = re.compile(
+    r"`([^`]+)`"                                  # code
+    r"|\*\*(.+?)\*\*"                               # bold
+    r"|(?<![\w*])\*(?![\s*])(.+?)(?<![\s*])\*(?![\w*])"  # italic (not a_b_c identifiers)
+    r"|\[([^\]]+)\]\(([^)\s]+)\)"                   # link: keep the text
+)
+
+
+def parse_inline(text, base=""):
+    """Markdown inline spans -> (plain text, per-character ANSI style)."""
+    plain, styles, pos = [], [], 0
+    for m in INLINE.finditer(text):
+        plain.append(text[pos:m.start()])
+        styles += [base] * (m.start() - pos)
+        code, bold, italic, link = m.group(1), m.group(2), m.group(3), m.group(4)
+        if code is not None:
+            plain.append(code)
+            styles += [base + CODE] * len(code)
+        else:
+            inner, style = (bold, BOLD) if bold is not None else (italic, ITALIC) if italic is not None \
+                else (link, UNDERLINE)
+            p, st = parse_inline(inner, base + style)
+            plain.append(p)
+            styles += st
+        pos = m.end()
+    plain.append(text[pos:])
+    styles += [base] * (len(text) - pos)
+    return "".join(plain), styles
+
+
+def styled_wrap(text, width, first="", rest="", base=""):
+    """Wrap by visible width, keeping inline styles. `first`/`rest` are line prefixes."""
+    plain, styles = parse_inline(text, base)
+    lines, start, end, prefix = [], None, None, first
+    for m in re.finditer(r"\S+", plain):
+        ws, we = m.start(), m.end()
+        avail = max(1, width - len(visible(prefix)))
+        while we - ws > avail and start is None:  # hard-split a word longer than the line
+            lines.append((prefix, ws, ws + avail))
+            ws, prefix = ws + avail, rest
+            avail = max(1, width - len(visible(prefix)))
+        if start is not None and we - start > avail:
+            lines.append((prefix, start, end))
+            start, prefix = None, rest
+            avail = max(1, width - len(visible(prefix)))
+            while we - ws > avail:
+                lines.append((prefix, ws, ws + avail))
+                ws = ws + avail
+        if start is None:
+            start = ws
+        end = we
+    if start is not None:
+        lines.append((prefix, start, end))
+    out = []
+    for pre, a, b in lines or [(first, 0, 0)]:
+        chunks, cur, run = [], None, ""
+        for ch, st in zip(plain[a:b], styles[a:b]):
+            if st != cur and run:
+                chunks.append((cur or "") + run + (RESET if cur else ""))
+                run = ""
+            cur, run = st, run + ch
+        if run:
+            chunks.append((cur or "") + run + (RESET if cur else ""))
+        out.append(pre + "".join(chunks))
+    return out
+
+
+ANSI = re.compile(r"\033\[[0-9;]*m")
+
+
+def visible(s):
+    return ANSI.sub("", s)
+
+
+def markdown(text, width, max_lines):
+    """Terminal rendering of the markdown Claude writes: headings, lists, code, quotes, tables."""
+    out, in_code, table = [], False, []
+
+    def flush_table():
+        if not table:
+            return
+        rows = [[parse_inline(c.strip())[0] for c in r.strip().strip("|").split("|")] for r in table]
+        cols = max(len(r) for r in rows)
+        widths = [max((len(r[i]) if i < len(r) else 0) for r in rows) for i in range(cols)]
+        for n, r in enumerate(rows):
+            cells = [(r[i] if i < len(r) else "").ljust(widths[i]) for i in range(cols)]
+            head = BOLD if n == 0 else ""
+            line = " │ ".join(cells)[:width].replace("│", f"{DIM}│{RESET}{head}")
+            out.append(head + line + RESET)
+        table.clear()
+
+    for raw in text.splitlines():
+        stripped = raw.strip()
+        if stripped.startswith("|") and not in_code:
+            if not re.fullmatch(r"[|:\-\s]+", stripped):
+                table.append(stripped)
+            continue
+        flush_table()
+        if stripped.startswith("```"):
+            in_code = not in_code
+            continue
+        if in_code:
+            out.append(CODE + "  " + raw[: width - 2] + RESET)
+        elif not stripped:
+            out.append("")
+        elif re.fullmatch(r"[-*_]{3,}", stripped):
+            out.append(DIM + "─" * min(width, 40) + RESET)
+        elif m := re.match(r"#{1,6}\s+(.*)", stripped):
+            out += styled_wrap(m.group(1), width, base=BOLD + BLUE)
+        elif m := re.match(r"(\s*)([-*+]|\d+[.)])\s+(.*)", raw):
+            indent = " " * min(len(m.group(1)), 8)
+            marker = "•" if m.group(2) in "-*+" else m.group(2)
+            first = f"{indent}{DIM}{marker}{RESET} "
+            out += styled_wrap(m.group(3), width, first, indent + " " * (len(marker) + 1))
+        elif m := re.match(r">\s?(.*)", stripped):
+            out += styled_wrap(m.group(1), width, f"{DIM}│{RESET} ", f"{DIM}│{RESET} ", base=DIM)
+        else:
+            out += styled_wrap(stripped, width)
+    flush_table()
+    if len(out) > max_lines:
+        out = out[: max_lines - 1] + [DIM + "…" + RESET]
+    return out
+
+
 def ago(secs):
-    secs = int(secs)
+    secs = max(0, int(secs))
     return f"{secs}s" if secs < 60 else f"{secs // 60}m{secs % 60:02d}s" if secs < 3600 else f"{secs // 3600}h{secs % 3600 // 60:02d}m"
 
 
 ACTION_MARK = {"answer": (ORANGE, "?"), "do": (ORANGE, "→"), "verify": (BLUE, "✓"), "optional": (DIM, "◦")}
 
 
+def action_lines(items, width):
+    lines = []
+    for a in items:
+        color, mark = ACTION_MARK.get(a.get("kind"), (RESET, "•"))
+        lines += styled_wrap(a.get("text", ""), width, f"{color}{mark}{RESET} ", "  ")[:4]
+    return lines
+
+
 def digest_lines(d, show_details, width):
-    lines = [BOLD + d.get("headline", "") + RESET]
+    lines = styled_wrap(d.get("headline", ""), width, base=BOLD)
     actions = d.get("actions") or []
     lines.append(f"{BOLD}{ORANGE}NEXT STEPS{RESET}")
     if not actions:
         lines.append(DIM + "Nothing needs you." + RESET)
-    for a in actions:
-        color, mark = ACTION_MARK.get(a.get("kind"), (RESET, "•"))
-        body = wrap(a.get("text", ""), width - 2, 4)
-        lines.append(f"{color}{mark}{RESET} {body[0]}")
-        lines += ["  " + l for l in body[1:]]
+    lines += action_lines(actions, width)
+    still_open = d.get("still_open") or []
+    if still_open:
+        lines.append(f"{BOLD}{ORANGE}STILL OPEN{RESET}  {DIM}from earlier turns{RESET}")
+        lines += action_lines(still_open, width)
     lines.append(f"{BOLD}{MINT}SUMMARY{RESET}")
     for b in d.get("summary") or []:
-        body = wrap(b, width - 2, 3)
-        lines += [f"• {body[0]}"] + ["  " + l for l in body[1:]]
+        lines += styled_wrap(b, width, "• ", "  ")[:3]
 
     details = d.get("details") or []
     if show_details:
         for group in details:
             lines.append(f"{BOLD}{group.get('topic', '')}{RESET}")
             for p in group.get("points") or []:
-                body = wrap(p, width - 4, 6)
-                lines += [f"  - {body[0]}"] + ["    " + l for l in body[1:]]
+                lines += styled_wrap(p, width, f"  {DIM}-{RESET} ", "    ")[:6]
         lines.append(DIM + "[d] hide details" + RESET)
     elif details:
         topics = ", ".join(g.get("topic", "") for g in details)
@@ -299,37 +470,57 @@ def render(s, record=None, show_details=False):
     run = record.get("run") if (record.get("run") or {}).get("prompt_id") == s.prompt_id else None
 
     if s.working:
-        status = f"{ORANGE}● working{RESET}  {DIM}{ago(time.time() - s.prompt_at)} since prompt{RESET}" if s.prompt_at \
-            else f"{ORANGE}● working{RESET}"
+        status = f"{ORANGE}● working{RESET}"
+        if s.prompt_at:
+            status += f"  {DIM}{ago(time.time() - s.prompt_at)} since prompt{RESET}"
     else:
         status = f"{MINT}● done{RESET}"
         if s.ended_at:
             status += f"  {DIM}{ago(time.time() - s.ended_at)} ago{RESET}"
-        if run and run.get("state") == "pending":
-            status += f"  {DIM}summarizing…{RESET}"
-        elif run and run.get("state") == "error":
-            status += f"  {DIM}summary failed: {run.get('error', '')}{RESET}"
-    head = [status, "", f"{BOLD}{BLUE}PROMPT{RESET}"]
-    head += wrap(s.prompt or "(no prompt yet)", width, max(3, rows // 4))
-    head += [f"{DIM}+ {q.splitlines()[0][: width - 2]}{RESET}" for q in s.queued[-3:]]
-    head.append("")
-    if s.tool and s.working:
-        head += [f"{ORANGE}▶ {s.tool[: width - 2]}{RESET}", ""]
 
-    tail = []
+    # Oldest at the top, newest at the bottom: the digest goes below the prompt and update
+    # once it's newer than both (it summarizes this finished turn), above them otherwise.
+    note = ""
+    if run and run.get("state") == "pending":
+        note = " · summarizing…"
+    elif run and run.get("state") == "error":
+        note = f" · summary failed: {run.get('error', '')}"
+    digest = []
     if last:
         if last.get("prompt_id") == s.prompt_id:
             label = "DIGEST · this turn"
         else:
             first = (last.get("prompt") or "").splitlines()[0] if last.get("prompt") else ""
             label = f"DIGEST · previous turn{': ' + first if first else ''}"
-        tail = ["", DIM + ("── " + label + " ")[:width].ljust(width, "─") + RESET]
-        tail += digest_lines(last["digest"], show_details, width)
+        digest = [DIM + ("── " + label + note + " ")[:width].ljust(width, "─") + RESET]
+        digest += digest_lines(last["digest"], show_details, width)
+    elif note:
+        digest = [DIM + ("── DIGEST" + note + " ")[:width].ljust(width, "─") + RESET]
+    newest_turn = max(t for t in (s.prompt_at, s.update_at, 0) if t is not None)
+    if last and last.get("at"):
+        digest_last = last["at"] >= newest_turn
+    else:  # older digests carry no timestamp
+        digest_last = bool(last) and last.get("prompt_id") == s.prompt_id and not s.working
 
-    # Latest update gets what's left, but never less than 3 lines; overflow trims the digest's tail.
-    update_budget = max(3, rows - len(head) - len(tail) - 1)
-    body = [f"{BOLD}{MINT}LATEST UPDATE{RESET}"] + wrap(s.update or "(nothing yet)", width, update_budget)
-    return "\033[H\033[2J" + "\n".join((head + body + tail)[:rows])
+    prompt = [f"{BOLD}{BLUE}PROMPT{RESET}  {status}"]
+    prompt += wrap(s.prompt or "(no prompt yet)", width, max(3, rows // 4))
+    prompt += [f"{DIM}+ {q.splitlines()[0][: width - 2]}{RESET}" for q in s.queued[-3:]]
+    live = [""]
+    if s.tool and s.working:
+        live += [f"{ORANGE}▶ {s.tool[: width - 2]}{RESET}", ""]
+    live.append(f"{BOLD}{MINT}LATEST UPDATE{RESET}")
+    gap = [""] if digest else []
+
+    # The latest update always keeps 3 lines; the digest trims from its end, then the update
+    # takes whatever room is left.
+    fixed = len(prompt) + len(live) + len(gap)
+    room = rows - fixed - 3
+    if len(digest) > room:
+        digest = digest[: max(0, room - 1)] + [DIM + "…" + RESET] if room > 1 else []
+    update = markdown(s.update or "(nothing yet)", width, max(3, rows - fixed - len(digest)))
+    turn = prompt + live + update
+    out = turn + gap + digest if digest_last else digest + gap + turn
+    return "\033[H\033[2J" + "\n".join(out[:rows])
 
 
 def read_key(timeout):
@@ -349,6 +540,10 @@ def main():
     session = None
     last = None
     show_details = False
+    ws, surface = os.environ.get("CMUX_WORKSPACE_ID"), os.environ.get("CMUX_SURFACE_ID")
+    if ws and surface:
+        VIEWERS.mkdir(parents=True, exist_ok=True)
+        (VIEWERS / ws).write_text(surface + "\n")
     saved = termios.tcgetattr(sys.stdin) if sys.stdin.isatty() else None
     if saved:
         tty.setcbreak(sys.stdin)
