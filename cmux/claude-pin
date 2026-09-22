@@ -192,20 +192,27 @@ def load_digest(transcript):
 
 
 def run_digest(transcript):
+    """Digest the latest turn. The file keeps `last` (newest completed digest) and `run`
+    (the attempt in flight or its error), so a new run never hides the previous digest."""
     s = Session(transcript)
     s.poll()
     if not s.prompt_id:
         return
     DIGESTS.mkdir(parents=True, exist_ok=True)
     out = digest_path(transcript)
-    out.write_text(json.dumps({"prompt_id": s.prompt_id, "pending": True}))
+    last = (load_digest(transcript) or {}).get("last")
+
+    def save(run, new_last=None):
+        out.write_text(json.dumps({"last": new_last or last, "run": run}))
+
+    save({"prompt_id": s.prompt_id, "state": "pending"})
     # Stop fires before the final message lands in the transcript; wait for the turn to close.
     deadline = time.time() + 20
     while s.working and time.time() < deadline:
         time.sleep(0.5)
         s.poll()
     if not s.turn:
-        out.write_text(json.dumps({"prompt_id": s.prompt_id, "error": "no reply text this turn"}))
+        save({"prompt_id": s.prompt_id, "state": "error", "error": "no reply text this turn"})
         return
     turn = "\n\n---\n\n".join(s.turn)[-40000:]
     env = {k: v for k, v in os.environ.items() if not k.startswith("CMUX_")}
@@ -218,9 +225,9 @@ def run_digest(transcript):
         res = subprocess.run(cmd, input=prompt, capture_output=True, text=True, timeout=120,
                              env=env, cwd=DIGESTS)
         digest = json.loads(res.stdout)["structured_output"]
-        out.write_text(json.dumps({"prompt_id": s.prompt_id, "digest": digest}))
+        save(None, {"prompt_id": s.prompt_id, "prompt": s.prompt[:500], "at": time.time(), "digest": digest})
     except (subprocess.SubprocessError, ValueError, KeyError, TypeError) as e:
-        out.write_text(json.dumps({"prompt_id": s.prompt_id, "error": str(e)[:200]}))
+        save({"prompt_id": s.prompt_id, "state": "error", "error": str(e)[:200]})
 
 
 def digest_hook():
@@ -253,12 +260,8 @@ def ago(secs):
 ACTION_MARK = {"answer": (ORANGE, "?"), "do": (ORANGE, "→"), "verify": (BLUE, "✓"), "optional": (DIM, "◦")}
 
 
-def render_digest(s, d, show_details, width, rows):
-    lines = [f"{MINT}● done{RESET}  {DIM}{ago(time.time() - (s.ended_at or time.time()))} ago{RESET}", ""]
-    lines.append(f"{BOLD}{BLUE}PROMPT{RESET}")
-    lines += [DIM + l + RESET for l in wrap(s.prompt or "", width, 3)]
-    lines += ["", BOLD + d.get("headline", "") + RESET, ""]
-
+def digest_lines(d, show_details, width):
+    lines = [BOLD + d.get("headline", "") + RESET]
     actions = d.get("actions") or []
     lines.append(f"{BOLD}{ORANGE}NEXT STEPS{RESET}")
     if not actions:
@@ -268,13 +271,12 @@ def render_digest(s, d, show_details, width, rows):
         body = wrap(a.get("text", ""), width - 2, 4)
         lines.append(f"{color}{mark}{RESET} {body[0]}")
         lines += ["  " + l for l in body[1:]]
-    lines += ["", f"{BOLD}{MINT}SUMMARY{RESET}"]
+    lines.append(f"{BOLD}{MINT}SUMMARY{RESET}")
     for b in d.get("summary") or []:
         body = wrap(b, width - 2, 3)
         lines += [f"• {body[0]}"] + ["  " + l for l in body[1:]]
 
     details = d.get("details") or []
-    lines.append("")
     if show_details:
         for group in details:
             lines.append(f"{BOLD}{group.get('topic', '')}{RESET}")
@@ -284,34 +286,50 @@ def render_digest(s, d, show_details, width, rows):
         lines.append(DIM + "[d] hide details" + RESET)
     elif details:
         topics = ", ".join(g.get("topic", "") for g in details)
-        lines += wrap(f"{DIM}[d] details: {topics}{RESET}", width + len(DIM) + len(RESET), 2)
-    return "\033[H\033[2J" + "\n".join(lines[:rows])
+        lines += [DIM + l + RESET for l in wrap(f"[d] details: {topics}", width, 2)]
+    return lines
 
 
-def render(s, digest=None, show_details=False):
+def render(s, record=None, show_details=False):
     cols, rows = shutil.get_terminal_size()
     width = max(20, cols - 2)
-    lines = []
-    if not s.working and digest and digest.get("prompt_id") == s.prompt_id and "digest" in digest:
-        return render_digest(s, digest["digest"], show_details, width, rows)
-    status = f"{ORANGE}● working{RESET}" if s.working else f"{MINT}● idle{RESET}"
-    if not s.working and digest and digest.get("prompt_id") == s.prompt_id:
-        status += f"  {DIM}{'summarizing…' if digest.get('pending') else 'summary failed: ' + digest.get('error', '')}{RESET}"
-    elapsed = f"  {DIM}{ago(time.time() - s.prompt_at)} since prompt{RESET}" if s.prompt_at and s.working else ""
-    lines += [f"{status}{elapsed}", ""]
+    record = record or {}
+    last = record.get("last") or ({"prompt_id": record.get("prompt_id"), "digest": record["digest"]}
+                                  if "digest" in record else None)
+    run = record.get("run") if (record.get("run") or {}).get("prompt_id") == s.prompt_id else None
 
-    prompt_budget = max(4, rows // 2 - 3)
-    lines.append(f"{BOLD}{BLUE}PROMPT{RESET}")
-    lines += wrap(s.prompt or "(no prompt yet)", width, prompt_budget)
-    for q in s.queued[-3:]:
-        lines += [f"{DIM}+ {q.splitlines()[0][: width - 2]}{RESET}"]
-    lines.append("")
-
+    if s.working:
+        status = f"{ORANGE}● working{RESET}  {DIM}{ago(time.time() - s.prompt_at)} since prompt{RESET}" if s.prompt_at \
+            else f"{ORANGE}● working{RESET}"
+    else:
+        status = f"{MINT}● done{RESET}"
+        if s.ended_at:
+            status += f"  {DIM}{ago(time.time() - s.ended_at)} ago{RESET}"
+        if run and run.get("state") == "pending":
+            status += f"  {DIM}summarizing…{RESET}"
+        elif run and run.get("state") == "error":
+            status += f"  {DIM}summary failed: {run.get('error', '')}{RESET}"
+    head = [status, "", f"{BOLD}{BLUE}PROMPT{RESET}"]
+    head += wrap(s.prompt or "(no prompt yet)", width, max(3, rows // 4))
+    head += [f"{DIM}+ {q.splitlines()[0][: width - 2]}{RESET}" for q in s.queued[-3:]]
+    head.append("")
     if s.tool and s.working:
-        lines += [f"{ORANGE}▶ {s.tool[: width - 2]}{RESET}", ""]
-    lines.append(f"{BOLD}{MINT}LATEST UPDATE{RESET}")
-    lines += wrap(s.update or "(nothing yet)", width, max(3, rows - len(lines) - 1))
-    return "\033[H\033[2J" + "\n".join(lines[:rows])
+        head += [f"{ORANGE}▶ {s.tool[: width - 2]}{RESET}", ""]
+
+    tail = []
+    if last:
+        if last.get("prompt_id") == s.prompt_id:
+            label = "DIGEST · this turn"
+        else:
+            first = (last.get("prompt") or "").splitlines()[0] if last.get("prompt") else ""
+            label = f"DIGEST · previous turn{': ' + first if first else ''}"
+        tail = ["", DIM + ("── " + label + " ")[:width].ljust(width, "─") + RESET]
+        tail += digest_lines(last["digest"], show_details, width)
+
+    # Latest update gets what's left, but never less than 3 lines; overflow trims the digest's tail.
+    update_budget = max(3, rows - len(head) - len(tail) - 1)
+    body = [f"{BOLD}{MINT}LATEST UPDATE{RESET}"] + wrap(s.update or "(nothing yet)", width, update_budget)
+    return "\033[H\033[2J" + "\n".join((head + body + tail)[:rows])
 
 
 def read_key(timeout):
