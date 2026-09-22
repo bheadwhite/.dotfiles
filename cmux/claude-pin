@@ -4,7 +4,8 @@
 Follows the transcript of the Claude session in this cmux workspace (registered by
 claude-pin-hook). Pass a transcript path to follow a specific one.
 
-When a turn ends, a Stop hook runs `claude-pin --digest`, which has Haiku sort the reply
+Hooks run only for interactive Claude sessions inside cmux; SessionStart also opens this
+viewer beside the session if the workspace has none running. When a turn ends, a Stop hook runs `claude-pin --digest`, which has Haiku sort the reply
 into next steps, a summary, and grouped details. Keys: d toggles details, q quits.
 """
 import json
@@ -271,9 +272,60 @@ def run_digest(transcript):
         save({"prompt_id": s.prompt_id, "state": "error", "error": str(e)[:200]})
 
 
+def claude_is_headless():
+    """True when the Claude session running this hook is `claude -p` (task workers, scripts)."""
+    pid = os.getppid()
+    for _ in range(8):
+        try:
+            out = subprocess.run(["ps", "-o", "ppid=,args=", "-p", str(pid)],
+                                 capture_output=True, text=True, timeout=2).stdout.split(None, 1)
+        except (OSError, subprocess.SubprocessError):
+            return False
+        if len(out) < 2:
+            return False
+        argv = out[1].split()
+        if Path(argv[0]).name == "claude":
+            return "-p" in argv or "--print" in argv
+        pid = int(out[0])
+    return False
+
+
+def watched_session():
+    """Digests and viewers only matter for interactive Claude sessions inside cmux."""
+    return bool(os.environ.get("CMUX_WORKSPACE_ID")) and not os.environ.get("CLAUDE_PIN_DIGEST") \
+        and not claude_is_headless()
+
+
+def viewer_alive(ws):
+    try:
+        _, pid = (VIEWERS / ws).read_text().split()
+        os.kill(int(pid), 0)
+        return True
+    except (OSError, ValueError):
+        return False
+
+
+def session_hook():
+    """SessionStart/UserPromptSubmit hook: map this cmux workspace to its transcript, and
+    open a viewer next to the session when it starts and none is running."""
+    if not watched_session():
+        return
+    try:
+        event = json.load(sys.stdin)
+    except ValueError:
+        return
+    ws, path = os.environ["CMUX_WORKSPACE_ID"], event.get("transcript_path")
+    if path:
+        REGISTRY.mkdir(parents=True, exist_ok=True)
+        (REGISTRY / ws).write_text(path + "\n")
+    if event.get("hook_event_name") == "SessionStart" and not viewer_alive(ws):
+        subprocess.Popen([str(Path(__file__).with_name("claude-pin-open"))], start_new_session=True,
+                         stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
 def digest_hook():
     """Stop hook: kick off the digest in the background so the hook returns immediately."""
-    if os.environ.get("CLAUDE_PIN_DIGEST"):
+    if not watched_session():
         return
     try:
         path = json.load(sys.stdin).get("transcript_path")
@@ -532,6 +584,8 @@ def read_key(timeout):
 
 
 def main():
+    if sys.argv[1:2] == ["--hook"]:
+        return session_hook()
     if sys.argv[1:2] == ["--digest"]:
         return digest_hook()
     if sys.argv[1:2] == ["--digest-run"]:
@@ -543,7 +597,7 @@ def main():
     ws, surface = os.environ.get("CMUX_WORKSPACE_ID"), os.environ.get("CMUX_SURFACE_ID")
     if ws and surface:
         VIEWERS.mkdir(parents=True, exist_ok=True)
-        (VIEWERS / ws).write_text(surface + "\n")
+        (VIEWERS / ws).write_text(f"{surface} {os.getpid()}\n")
     saved = termios.tcgetattr(sys.stdin) if sys.stdin.isatty() else None
     if saved:
         tty.setcbreak(sys.stdin)

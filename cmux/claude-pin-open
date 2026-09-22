@@ -4,7 +4,7 @@
 dir=${1:-right}
 old="$HOME/.cache/claude-pin/viewers/$CMUX_WORKSPACE_ID"
 if [ -n "$CMUX_WORKSPACE_ID" ] && [ -f "$old" ]; then
-  cmux close-surface --surface "$(cat "$old")" >/dev/null 2>&1
+  cmux close-surface --surface "$(cut -d" " -f1 "$old")" >/dev/null 2>&1
   rm -f "$old"
 fi
 surface=$(cmux new-split "$dir" | grep -o 'surface:[0-9]*' | head -1)
