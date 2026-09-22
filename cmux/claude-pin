@@ -8,6 +8,7 @@ Hooks run only for interactive Claude sessions inside cmux; SessionStart also op
 viewer beside the session if the workspace has none running. When a turn ends, a Stop hook runs `claude-pin --digest`, which has Haiku sort the reply
 into next steps, a summary, and grouped details. Keys: d toggles details, q quits.
 Hooks that skip a session, and viewer-open failures, are logged to ~/.cache/claude-pin/hook.log.
+Register the hooks on a new machine with claude-pin-install.
 """
 import json
 import os
