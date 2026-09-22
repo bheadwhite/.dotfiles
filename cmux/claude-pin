@@ -1,0 +1,370 @@
+#!/usr/bin/env python3
+"""Pinned view of a Claude Code session: the prompt it's working on and its latest update.
+
+Follows the transcript of the Claude session in this cmux workspace (registered by
+claude-pin-hook). Pass a transcript path to follow a specific one.
+
+When a turn ends, a Stop hook runs `claude-pin --digest`, which has Haiku sort the reply
+into next steps, a summary, and grouped details. Keys: d toggles details, q quits.
+"""
+import json
+import os
+import select
+import shutil
+import subprocess
+import sys
+import termios
+import tty
+import textwrap
+import time
+from datetime import datetime
+from pathlib import Path
+
+REGISTRY = Path.home() / ".cache" / "claude-pin"
+DIGESTS = REGISTRY / "digest"
+CLAUDE = Path.home() / ".local" / "bin" / "claude"
+
+DIM, BOLD, RESET = "\033[2m", "\033[1m", "\033[0m"
+BLUE, MINT, ORANGE = "\033[38;5;75m", "\033[38;5;79m", "\033[38;5;214m"
+
+
+def resolve_transcript():
+    if len(sys.argv) > 1:
+        return Path(sys.argv[1])
+    ws = os.environ.get("CMUX_WORKSPACE_ID")
+    if ws and (REGISTRY / ws).is_file():
+        return Path((REGISTRY / ws).read_text().strip())
+    project = Path.home() / ".claude" / "projects" / str(Path.cwd()).replace("/", "-").replace(".", "-")
+    found = sorted(project.glob("*.jsonl"), key=lambda p: p.stat().st_mtime)
+    return found[-1] if found else None
+
+
+def prompt_text(content):
+    """User-typed text from a message's content, or None for tool results / non-prompts."""
+    if isinstance(content, str):
+        return content
+    texts = [b.get("text", "") for b in content if b.get("type") == "text"]
+    if not texts or any(b.get("type") == "tool_result" for b in content):
+        return None
+    return "\n".join(texts)
+
+
+def tool_label(block):
+    inp = block.get("input") or {}
+    detail = inp.get("description") or inp.get("file_path") or inp.get("pattern") or inp.get("command") or ""
+    return f"{block.get('name')}: {str(detail).splitlines()[0][:120]}" if detail else block.get("name", "tool")
+
+
+class Session:
+    def __init__(self, path):
+        self.path, self.offset, self.buf = path, 0, b""
+        self.prompt, self.prompt_at, self.prompt_id, self.queued = None, None, None, []
+        self.update, self.tool, self.working, self.turn = None, None, False, []
+        self.ended_at = None
+
+    def poll(self):
+        size = self.path.stat().st_size
+        if size < self.offset:
+            self.__init__(self.path)
+        if size == self.offset:
+            return False
+        with self.path.open("rb") as f:
+            f.seek(self.offset)
+            chunk = f.read()
+        self.offset += len(chunk)
+        lines = (self.buf + chunk).split(b"\n")
+        self.buf = lines.pop()
+        for line in lines:
+            try:
+                self.apply(json.loads(line))
+            except (ValueError, AttributeError, TypeError):
+                pass
+        return True
+
+    def apply(self, r):
+        if r.get("isSidechain"):
+            return
+        kind = r.get("type")
+        if kind == "user" and not r.get("isMeta"):
+            text = prompt_text(r["message"]["content"])
+            if text is not None and not text.startswith("<"):
+                self.prompt, self.prompt_at, self.prompt_id, self.queued = text, entry_time(r), r.get("uuid"), []
+                self.update, self.tool, self.working, self.turn = None, None, True, []
+            else:
+                self.tool = None
+        elif kind == "attachment" and r["attachment"].get("type") == "queued_command":
+            text = prompt_text(r["attachment"].get("prompt") or [])
+            if text:
+                self.queued.append(text)
+        elif kind == "assistant":
+            content = r["message"].get("content") or []
+            for b in content:
+                if b.get("type") == "text" and b.get("text", "").strip():
+                    self.update, self.tool = b["text"], None
+                    self.turn.append(b["text"])
+                elif b.get("type") == "tool_use":
+                    self.tool = tool_label(b)
+            self.working = r["message"].get("stop_reason") != "end_turn"
+            self.ended_at = entry_time(r)
+
+
+def entry_time(r):
+    try:
+        return datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00")).timestamp()
+    except (KeyError, ValueError):
+        return time.time()
+
+
+DIGEST_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "headline": {"type": "string"},
+        "actions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "kind": {"type": "string", "enum": ["answer", "do", "verify", "optional"]},
+                    "text": {"type": "string"},
+                },
+                "required": ["kind", "text"],
+            },
+        },
+        "summary": {"type": "array", "items": {"type": "string"}},
+        "details": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"topic": {"type": "string"}, "points": {"type": "array", "items": {"type": "string"}}},
+                "required": ["topic", "points"],
+            },
+        },
+    },
+    "required": ["headline", "actions", "summary", "details"],
+}
+
+DIGEST_PROMPT = """You triage a coding agent's finished turn for a busy engineer who wants to see what needs
+them first and read the details only if they choose to. Use only what the agent wrote; never invent.
+
+- headline: one line, at most 12 words: where things stand now.
+- actions: everything that needs the engineer, most urgent first. kind is "answer" for a
+  question the agent asked, "do" for a manual step only they can take, "verify" for something
+  to check or test, "optional" for a follow-up the agent offered. Imperative, one line each.
+  Empty if nothing needs them.
+- summary: 2-4 short bullets: what was done and what changed.
+- details: the rest (files, commands, caveats, reasoning), grouped under 2-5 short topics.
+  Terse points; keep paths and commands exact.
+
+Engineer's prompt:
+<prompt>
+{prompt}
+</prompt>
+
+Agent's messages this turn (the last one is its final report):
+<turn>
+{turn}
+</turn>"""
+
+
+def digest_path(transcript):
+    return DIGESTS / f"{transcript.stem}.json"
+
+
+_digest_cache = {}
+
+
+def load_digest(transcript):
+    """Parsed digest for a transcript, re-read only when the file changes."""
+    path = digest_path(transcript)
+    try:
+        mtime = path.stat().st_mtime
+    except OSError:
+        return None
+    cached = _digest_cache.get(path)
+    if cached and cached[0] == mtime:
+        return cached[1]
+    try:
+        digest = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return None
+    _digest_cache[path] = (mtime, digest)
+    return digest
+
+
+def run_digest(transcript):
+    s = Session(transcript)
+    s.poll()
+    if not s.prompt_id:
+        return
+    DIGESTS.mkdir(parents=True, exist_ok=True)
+    out = digest_path(transcript)
+    out.write_text(json.dumps({"prompt_id": s.prompt_id, "pending": True}))
+    # Stop fires before the final message lands in the transcript; wait for the turn to close.
+    deadline = time.time() + 20
+    while s.working and time.time() < deadline:
+        time.sleep(0.5)
+        s.poll()
+    if not s.turn:
+        out.write_text(json.dumps({"prompt_id": s.prompt_id, "error": "no reply text this turn"}))
+        return
+    turn = "\n\n---\n\n".join(s.turn)[-40000:]
+    env = {k: v for k, v in os.environ.items() if not k.startswith("CMUX_")}
+    env["CLAUDE_PIN_DIGEST"] = "1"
+    cmd = [str(CLAUDE), "-p", "--model", "haiku", "--setting-sources", "project", "--strict-mcp-config",
+           "--no-session-persistence", "--tools", "", "--output-format", "json",
+           "--json-schema", json.dumps(DIGEST_SCHEMA)]
+    prompt = DIGEST_PROMPT.replace("{prompt}", s.prompt[-8000:]).replace("{turn}", turn)
+    try:
+        res = subprocess.run(cmd, input=prompt, capture_output=True, text=True, timeout=120,
+                             env=env, cwd=DIGESTS)
+        digest = json.loads(res.stdout)["structured_output"]
+        out.write_text(json.dumps({"prompt_id": s.prompt_id, "digest": digest}))
+    except (subprocess.SubprocessError, ValueError, KeyError, TypeError) as e:
+        out.write_text(json.dumps({"prompt_id": s.prompt_id, "error": str(e)[:200]}))
+
+
+def digest_hook():
+    """Stop hook: kick off the digest in the background so the hook returns immediately."""
+    if os.environ.get("CLAUDE_PIN_DIGEST"):
+        return
+    try:
+        path = json.load(sys.stdin).get("transcript_path")
+    except ValueError:
+        return
+    if path:
+        subprocess.Popen([sys.executable, __file__, "--digest-run", path], start_new_session=True,
+                         stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def wrap(text, width, max_lines):
+    out = []
+    for para in text.splitlines() or [""]:
+        out.extend(textwrap.wrap(para, width) or [""])
+    if len(out) > max_lines:
+        out = out[: max_lines - 1] + [DIM + "…" + RESET]
+    return out
+
+
+def ago(secs):
+    secs = int(secs)
+    return f"{secs}s" if secs < 60 else f"{secs // 60}m{secs % 60:02d}s" if secs < 3600 else f"{secs // 3600}h{secs % 3600 // 60:02d}m"
+
+
+ACTION_MARK = {"answer": (ORANGE, "?"), "do": (ORANGE, "→"), "verify": (BLUE, "✓"), "optional": (DIM, "◦")}
+
+
+def render_digest(s, d, show_details, width, rows):
+    lines = [f"{MINT}● done{RESET}  {DIM}{ago(time.time() - (s.ended_at or time.time()))} ago{RESET}", ""]
+    lines.append(f"{BOLD}{BLUE}PROMPT{RESET}")
+    lines += [DIM + l + RESET for l in wrap(s.prompt or "", width, 3)]
+    lines += ["", BOLD + d.get("headline", "") + RESET, ""]
+
+    actions = d.get("actions") or []
+    lines.append(f"{BOLD}{ORANGE}NEXT STEPS{RESET}")
+    if not actions:
+        lines.append(DIM + "Nothing needs you." + RESET)
+    for a in actions:
+        color, mark = ACTION_MARK.get(a.get("kind"), (RESET, "•"))
+        body = wrap(a.get("text", ""), width - 2, 4)
+        lines.append(f"{color}{mark}{RESET} {body[0]}")
+        lines += ["  " + l for l in body[1:]]
+    lines += ["", f"{BOLD}{MINT}SUMMARY{RESET}"]
+    for b in d.get("summary") or []:
+        body = wrap(b, width - 2, 3)
+        lines += [f"• {body[0]}"] + ["  " + l for l in body[1:]]
+
+    details = d.get("details") or []
+    lines.append("")
+    if show_details:
+        for group in details:
+            lines.append(f"{BOLD}{group.get('topic', '')}{RESET}")
+            for p in group.get("points") or []:
+                body = wrap(p, width - 4, 6)
+                lines += [f"  - {body[0]}"] + ["    " + l for l in body[1:]]
+        lines.append(DIM + "[d] hide details" + RESET)
+    elif details:
+        topics = ", ".join(g.get("topic", "") for g in details)
+        lines += wrap(f"{DIM}[d] details: {topics}{RESET}", width + len(DIM) + len(RESET), 2)
+    return "\033[H\033[2J" + "\n".join(lines[:rows])
+
+
+def render(s, digest=None, show_details=False):
+    cols, rows = shutil.get_terminal_size()
+    width = max(20, cols - 2)
+    lines = []
+    if not s.working and digest and digest.get("prompt_id") == s.prompt_id and "digest" in digest:
+        return render_digest(s, digest["digest"], show_details, width, rows)
+    status = f"{ORANGE}● working{RESET}" if s.working else f"{MINT}● idle{RESET}"
+    if not s.working and digest and digest.get("prompt_id") == s.prompt_id:
+        status += f"  {DIM}{'summarizing…' if digest.get('pending') else 'summary failed: ' + digest.get('error', '')}{RESET}"
+    elapsed = f"  {DIM}{ago(time.time() - s.prompt_at)} since prompt{RESET}" if s.prompt_at and s.working else ""
+    lines += [f"{status}{elapsed}", ""]
+
+    prompt_budget = max(4, rows // 2 - 3)
+    lines.append(f"{BOLD}{BLUE}PROMPT{RESET}")
+    lines += wrap(s.prompt or "(no prompt yet)", width, prompt_budget)
+    for q in s.queued[-3:]:
+        lines += [f"{DIM}+ {q.splitlines()[0][: width - 2]}{RESET}"]
+    lines.append("")
+
+    if s.tool and s.working:
+        lines += [f"{ORANGE}▶ {s.tool[: width - 2]}{RESET}", ""]
+    lines.append(f"{BOLD}{MINT}LATEST UPDATE{RESET}")
+    lines += wrap(s.update or "(nothing yet)", width, max(3, rows - len(lines) - 1))
+    return "\033[H\033[2J" + "\n".join(lines[:rows])
+
+
+def read_key(timeout):
+    if not sys.stdin.isatty():
+        time.sleep(timeout)
+        return None
+    ready, _, _ = select.select([sys.stdin], [], [], timeout)
+    return sys.stdin.read(1) if ready else None
+
+
+def main():
+    if sys.argv[1:2] == ["--digest"]:
+        return digest_hook()
+    if sys.argv[1:2] == ["--digest-run"]:
+        return run_digest(Path(sys.argv[2]))
+    path = None
+    session = None
+    last = None
+    show_details = False
+    saved = termios.tcgetattr(sys.stdin) if sys.stdin.isatty() else None
+    if saved:
+        tty.setcbreak(sys.stdin)
+    sys.stdout.write("\033[?25l")
+    try:
+        while True:
+            current = resolve_transcript()
+            if current and current != path:
+                path, session = current, Session(current)
+            if session:
+                try:
+                    session.poll()
+                except FileNotFoundError:
+                    path = session = None
+                frame = render(session, load_digest(path), show_details) if session else None
+            else:
+                frame = "\033[H\033[2JWaiting for a Claude session in this workspace…"
+            size = shutil.get_terminal_size()
+            if frame and (frame, size) != last:
+                sys.stdout.write(frame)
+                sys.stdout.flush()
+                last = (frame, size)
+            key = read_key(1)
+            if key == "q":
+                break
+            if key == "d":
+                show_details, last = not show_details, None
+    except KeyboardInterrupt:
+        pass
+    finally:
+        if saved:
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, saved)
+        sys.stdout.write("\033[?25h\n")
+
+
+if __name__ == "__main__":
+    main()

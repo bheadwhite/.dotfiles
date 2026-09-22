@@ -1,0 +1,7 @@
+#!/bin/sh
+# Open claude-pin in a split to the right of the current cmux pane.
+dir=${1:-right}
+surface=$(cmux new-split "$dir" | grep -o 'surface:[0-9]*' | head -1)
+[ -n "$surface" ] || { echo "claude-pin-open: couldn't create split" >&2; exit 1; }
+cmux send --surface "$surface" "exec $HOME/.dotfiles/cmux/claude-pin
+"
