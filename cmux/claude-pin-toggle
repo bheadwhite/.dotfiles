@@ -1,0 +1,11 @@
+#!/bin/sh
+# Close this workspace's claude-pin viewer if one is running, otherwise open one.
+viewer="$HOME/.cache/claude-pin/viewers/$CMUX_WORKSPACE_ID"
+[ -n "$CMUX_WORKSPACE_ID" ] || { echo "claude-pin-toggle: not in a cmux workspace" >&2; exit 1; }
+if [ -f "$viewer" ] && kill -0 "$(cut -d" " -f2 "$viewer")" 2>/dev/null; then
+  cmux close-surface --surface "$(cut -d" " -f1 "$viewer")" >/dev/null 2>&1
+  rm -f "$viewer"
+  echo "claude-pin closed"
+else
+  "$(dirname "$0")/claude-pin-open" "$@" >/dev/null && echo "claude-pin opened"
+fi

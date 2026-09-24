@@ -3,7 +3,7 @@
 
 Hook commands point at this checkout, wherever it lives. Existing claude-pin entries are
 replaced, other hooks are left alone, and the previous file is kept as settings.json.bak.
---uninstall removes the entries instead.
+Also writes the /claude-pin slash command, which toggles the viewer. --uninstall removes the entries instead.
 """
 import json
 import shutil
@@ -12,6 +12,15 @@ from pathlib import Path
 
 SETTINGS = Path.home() / ".claude" / "settings.json"
 HERE = Path(__file__).resolve().parent
+COMMAND = Path.home() / ".claude" / "commands" / "claude-pin.md"
+COMMAND_BODY = f"""---
+description: Open or close the claude-pin viewer beside this session
+allowed-tools: Bash({HERE}/claude-pin-toggle:*)
+---
+!`{HERE}/claude-pin-toggle`
+
+Reply with just the line above, nothing else.
+"""
 HOOKS = {
     "SessionStart": {"matcher": "", "command": f"{HERE}/claude-pin-hook"},
     "UserPromptSubmit": {"command": f"{HERE}/claude-pin-hook"},
@@ -43,6 +52,12 @@ def main():
         shutil.copy2(SETTINGS, SETTINGS.with_name("settings.json.bak"))
     SETTINGS.write_text(json.dumps(settings, indent=2) + "\n")
     print(f"claude-pin hooks {'removed from' if uninstall else 'registered in'} {SETTINGS}")
+    if uninstall:
+        COMMAND.unlink(missing_ok=True)
+    else:
+        COMMAND.parent.mkdir(parents=True, exist_ok=True)
+        COMMAND.write_text(COMMAND_BODY)
+        print(f"/claude-pin written to {COMMAND}")
     if not uninstall and not (Path.home() / ".local" / "bin" / "claude").exists():
         print("warning: ~/.local/bin/claude not found; digests call claude from there", file=sys.stderr)
 
