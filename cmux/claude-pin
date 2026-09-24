@@ -4,9 +4,19 @@
 Follows the transcript of the Claude session in this cmux workspace (registered by
 claude-pin-hook). Pass a transcript path to follow a specific one.
 
-Hooks run only for interactive Claude sessions inside cmux; SessionStart also opens this
-viewer beside the session if the workspace has none running. When a turn ends, a Stop hook runs `claude-pin --digest`, which has Haiku sort the reply
-into next steps, a summary, and grouped details. Keys: d toggles details, q quits.
+Hooks run only for interactive Claude sessions inside cmux.
+When a turn ends, a Stop hook runs `claude-pin --digest`, which has Haiku sort the reply
+into next steps, a summary, and grouped details. Keys: d toggles details, j/k or ↑/↓ (and the
+mouse wheel) scroll, space/b page, g/G jump to the top/bottom, q quits. The view follows the
+newest section until you scroll, and again once a new prompt arrives.
+/claude-pin in Claude (claude-pin-toggle) opens or closes this workspace's viewer.
+`claude-pin --padding on|off|toggle` sets the margin around the view in every running viewer,
+and viewers restart themselves when this file changes.
+Every turn of the session is a page: [ / ] (or ←/→) step back and forward through earlier turns,
+each with its final update and digest. p pins or unpins the turn on screen (saved across sessions
+in ~/.cache/claude-pin/pinned.json); h/l flip between the session and the pinned list.
+URLs and GitLab refs (!123, #45, group/project!123, group&7) are OSC 8 links: cmd+click opens
+them. Bare refs resolve against the git remote of the session's cwd.
 Hooks that skip a session, and viewer-open failures, are logged to ~/.cache/claude-pin/hook.log.
 Register the hooks on a new machine with claude-pin-install.
 """
@@ -33,6 +43,12 @@ BLUE, MINT, ORANGE = "\033[38;5;75m", "\033[38;5;79m", "\033[38;5;214m"
 ITALIC, UNDERLINE, CODE = "\033[3m", "\033[4m", "\033[38;5;180m"
 VIEWERS = Path.home() / ".cache" / "claude-pin" / "viewers"
 HOOK_LOG = REGISTRY / "hook.log"
+PINS = REGISTRY / "pinned.json"
+DIGEST_HISTORY = 200  # digests kept per session
+SETTINGS = REGISTRY / "settings.json"
+PADDING = (2, 1)  # blank columns left/right and rows top/bottom when padding is on
+PAD_X, PAD_Y = PADDING  # current margin; the viewer re-reads SETTINGS every frame
+PROMPT_LINES = 6  # long prompts are cut to this many wrapped lines
 
 
 def resolve_transcript():
@@ -67,7 +83,13 @@ class Session:
         self.path, self.offset, self.buf = path, 0, b""
         self.prompt, self.prompt_at, self.prompt_id, self.queued = None, None, None, []
         self.update, self.tool, self.working, self.turn = None, None, False, []
-        self.ended_at = self.update_at = None
+        self.ended_at = self.update_at = self.cwd = None
+        self.turns = []  # snapshots of finished turns, oldest first
+
+    def snapshot(self):
+        return {"prompt_id": self.prompt_id, "prompt": self.prompt, "prompt_at": self.prompt_at,
+                "update": self.update, "update_at": self.update_at, "ended_at": self.ended_at,
+                "session": self.path.stem, "cwd": self.cwd}
 
     def poll(self):
         size = self.path.stat().st_size
@@ -92,9 +114,12 @@ class Session:
         if r.get("isSidechain"):
             return
         kind = r.get("type")
+        self.cwd = r.get("cwd") or self.cwd
         if kind == "user" and not r.get("isMeta"):
             text = prompt_text(r["message"]["content"])
             if text is not None and not text.startswith("<"):
+                if self.prompt_id:
+                    self.turns.append(self.snapshot())
                 self.prompt, self.prompt_at, self.prompt_id, self.queued = text, entry_time(r), r.get("uuid"), []
                 self.update, self.tool, self.working, self.turn = None, None, True, []
             else:
@@ -134,6 +159,7 @@ ACTION_ITEM = {
 DIGEST_SCHEMA = {
     "type": "object",
     "properties": {
+        "focus": {"type": "string"},
         "headline": {"type": "string"},
         "actions": {"type": "array", "items": ACTION_ITEM},
         "still_open": {"type": "array", "items": ACTION_ITEM},
@@ -147,12 +173,15 @@ DIGEST_SCHEMA = {
             },
         },
     },
-    "required": ["headline", "actions", "still_open", "summary", "details"],
+    "required": ["focus", "headline", "actions", "still_open", "summary", "details"],
 }
 
 DIGEST_PROMPT = """You triage a coding agent's finished turn for a busy engineer who wants to see what needs
 them first and read the details only if they choose to. Use only what the agent wrote; never invent.
 
+- focus: at most 8 words naming what this session is working on overall (the project or
+  feature, not this turn's step), e.g. "claude-pin viewer: prompt truncation". Keep
+  <previous_focus> word for word unless the work has clearly moved on.
 - headline: one line, at most 12 words: where things stand now.
 - actions: what the agent raised THIS turn that needs the engineer, most urgent first. Never
   copy items from <earlier_open> here; those belong only in still_open. kind is "answer" for a
@@ -166,6 +195,15 @@ them first and read the details only if they choose to. Use only what the agent 
 - summary: 2-4 short bullets: what was done and what changed.
 - details: the rest (files, commands, caveats, reasoning), grouped under 2-5 short topics.
   Terse points; keep paths and commands exact.
+Anywhere: keep MR/issue refs (!123, #45, group/project!123) and URLs exactly as written.
+
+Session focus so far, and the engineer's recent prompts (oldest first):
+<previous_focus>
+{focus}
+</previous_focus>
+<recent_prompts>
+{recent}
+</recent_prompts>
 
 Open items from earlier turns:
 <earlier_open>
@@ -208,6 +246,66 @@ def load_digest(transcript):
     return digest
 
 
+def digest_for(record, prompt_id):
+    """The digest a record holds for one turn, or None."""
+    record = record or {}
+    entry = (record.get("history") or {}).get(prompt_id) or record.get("last") or {}
+    if entry.get("prompt_id") == prompt_id:
+        return entry.get("digest")
+    if record.get("prompt_id") == prompt_id:  # oldest format: the digest at the top level
+        return record.get("digest")
+    return None
+
+
+def load_pins():
+    try:
+        return json.loads(PINS.read_text())
+    except (OSError, ValueError):
+        return []
+
+
+def load_settings():
+    try:
+        return json.loads(SETTINGS.read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def apply_settings():
+    global PAD_X, PAD_Y
+    PAD_X, PAD_Y = PADDING if load_settings().get("padding", True) else (0, 0)
+
+
+def set_padding(arg):
+    """`claude-pin --padding on|off|toggle`: flip the margin in every running viewer."""
+    settings = load_settings()
+    on = settings.get("padding", True)
+    if arg not in ("on", "off", "toggle", None):
+        sys.exit("usage: claude-pin --padding [on|off|toggle]")
+    settings["padding"] = not on if arg in ("toggle", None) else arg == "on"
+    REGISTRY.mkdir(parents=True, exist_ok=True)
+    tmp = SETTINGS.with_suffix(".tmp")
+    tmp.write_text(json.dumps(settings))
+    tmp.replace(SETTINGS)
+    print(f"claude-pin padding {'on' if settings['padding'] else 'off'}")
+
+
+def save_pins(pins):
+    REGISTRY.mkdir(parents=True, exist_ok=True)
+    tmp = PINS.with_suffix(".tmp")
+    tmp.write_text(json.dumps(pins))
+    tmp.replace(PINS)
+
+
+def toggle_pin(pins, entry):
+    """Pin a turn snapshot, or unpin it if it's already pinned. Returns the new list."""
+    kept = [p for p in pins if p.get("prompt_id") != entry.get("prompt_id")]
+    if len(kept) == len(pins):
+        kept.append({**entry, "pinned_at": time.time()})
+    save_pins(kept)
+    return kept
+
+
 def dedupe_actions(actions, still_open):
     """Drop repeated items; an item raised this turn wins over its carried-over copy."""
     seen = set()
@@ -233,10 +331,18 @@ def run_digest(transcript):
         return
     DIGESTS.mkdir(parents=True, exist_ok=True)
     out = digest_path(transcript)
-    last = (load_digest(transcript) or {}).get("last")
+    record = load_digest(transcript) or {}
+    last = record.get("last")
+    history = dict(record.get("history") or {})  # prompt_id -> digest entry, oldest first
+    if last and last.get("prompt_id") not in history:
+        history[last.get("prompt_id")] = last
 
     def save(run, new_last=None):
-        out.write_text(json.dumps({"last": new_last or last, "run": run}))
+        if new_last:
+            history[new_last["prompt_id"]] = new_last
+            for pid in list(history)[:-DIGEST_HISTORY]:
+                del history[pid]
+        out.write_text(json.dumps({"last": new_last or last, "run": run, "history": history}))
 
     save({"prompt_id": s.prompt_id, "state": "pending"})
     # Stop fires before the final message lands in the transcript; wait for the turn to close.
@@ -261,8 +367,12 @@ def run_digest(transcript):
     cmd = [str(CLAUDE), "-p", "--model", "haiku", "--setting-sources", "project", "--strict-mcp-config",
            "--no-session-persistence", "--tools", "", "--output-format", "json",
            "--json-schema", json.dumps(DIGEST_SCHEMA)]
+    focus = ((last or {}).get("digest") or {}).get("focus") or "(none yet)"
+    recent = "\n".join(f"- {(t.get('prompt') or '').strip().splitlines()[0][:200]}"
+                       for t in s.turns[-5:] if (t.get("prompt") or "").strip()) or "(none)"
     earlier_text = "\n".join(f"- [{i['kind']}] {i['text']}" for i in earlier) or "(none)"
-    prompt = DIGEST_PROMPT.replace("{earlier}", earlier_text).replace("{prompt}", s.prompt[-8000:]) \
+    prompt = DIGEST_PROMPT.replace("{focus}", focus).replace("{recent}", recent) \
+        .replace("{earlier}", earlier_text).replace("{prompt}", s.prompt[-8000:]) \
         .replace("{turn}", turn)
     try:
         res = subprocess.run(cmd, input=prompt, capture_output=True, text=True, timeout=120,
@@ -318,18 +428,8 @@ def watched_session(hook):
     return True
 
 
-def viewer_alive(ws):
-    try:
-        _, pid = (VIEWERS / ws).read_text().split()
-        os.kill(int(pid), 0)
-        return True
-    except (OSError, ValueError):
-        return False
-
-
 def session_hook():
-    """SessionStart/UserPromptSubmit hook: map this cmux workspace to its transcript, and
-    open a viewer next to the session when it starts and none is running."""
+    """SessionStart/UserPromptSubmit hook: map this cmux workspace to its transcript."""
     if not watched_session("session"):
         return
     try:
@@ -340,11 +440,6 @@ def session_hook():
     if path:
         REGISTRY.mkdir(parents=True, exist_ok=True)
         (REGISTRY / ws).write_text(path + "\n")
-    if event.get("hook_event_name") == "SessionStart" and not viewer_alive(ws):
-        log_hook("session", f"opening viewer for workspace {ws}")
-        with open(HOOK_LOG, "a") as log:  # claude-pin-open's own errors (e.g. cmux auth) land here too
-            subprocess.Popen([str(Path(__file__).with_name("claude-pin-open"))], start_new_session=True,
-                             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=log)
 
 
 def digest_hook():
@@ -365,7 +460,8 @@ def wrap(text, width, max_lines):
     for para in text.splitlines() or [""]:
         out.extend(textwrap.wrap(para, width) or [""])
     if len(out) > max_lines:
-        out = out[: max_lines - 1] + [DIM + "…" + RESET]
+        hidden = len(out) - max_lines + 1
+        out = out[: max_lines - 1] + [f"{DIM}… +{hidden} more line{'s' if hidden > 1 else ''}{RESET}"]
     return out
 
 
@@ -377,19 +473,76 @@ INLINE = re.compile(
 )
 
 
+LINK_END = "\033]8;;\033\\"
+DEFAULT_GIT_HOST = "git.tcncloud.net"  # for group/project!N refs when the cwd has no remote
+REF = re.compile(
+    r"(https?://[^\s<>()\[\]`'\"\x00-\x1f]*[^\s<>()\[\]`'\".,;:!?\x00-\x1f])"  # URL, minus trailing punctuation
+    r"|(?<![\w/.&!#-])((?:[\w.-]+/)+[\w.-]+)?([!#&])(\d+)\b"   # [group/project]!MR, #issue, group&epic
+)
+_projects = {}
+LINK_PROJECT = None  # (host, project path) of the turn on screen; bare !N / #N resolve against it
+
+
+def link(url):
+    return f"\033]8;;{re.sub(r'[\x00-\x1f]', '', url)}\033\\"
+
+
+def set_link_project(cwd):
+    """Point bare MR/issue refs at the git remote of `cwd` (cached per directory)."""
+    global LINK_PROJECT
+    if cwd and cwd not in _projects:
+        try:
+            remote = subprocess.run(["git", "-C", cwd, "remote", "get-url", "origin"],
+                                    capture_output=True, text=True, timeout=2).stdout.strip()
+        except (OSError, subprocess.SubprocessError):
+            remote = ""
+        m = re.match(r"(?:\w+://)?(?:[^@/]+@)?([^/:]+)(?::\d+)?[:/](.+?)(?:\.git)?/?$", remote)
+        _projects[cwd] = (m.group(1), m.group(2)) if m else None
+    LINK_PROJECT = _projects.get(cwd)
+
+
+def ref_url(path, sigil, num):
+    host, project = LINK_PROJECT or (DEFAULT_GIT_HOST, None)
+    if sigil == "&":  # epics live on groups, so only link one whose group is named
+        return f"https://{host}/groups/{path}/-/epics/{num}" if path else None
+    path = path or project
+    if not path:
+        return None
+    if host == "github.com":
+        return f"https://{host}/{path}/{'pull' if sigil == '!' else 'issues'}/{num}"
+    return f"https://{host}/{path}/-/{'merge_requests' if sigil == '!' else 'issues'}/{num}"
+
+
+def linkify(plain, styles):
+    """Make URLs and GitLab refs in rendered text clickable (OSC 8; cmd+click in cmux)."""
+    for m in REF.finditer(plain):
+        span = styles[m.start():m.end()]
+        if any("\033]8;;" in st for st in span):  # already a markdown link
+            continue
+        if m.group(1):
+            url = m.group(1)
+        elif any(CODE in st for st in span):  # `!1` in code is more likely code than a ref
+            continue
+        else:
+            url = ref_url(m.group(2), m.group(3), m.group(4))
+        if url:
+            styles[m.start():m.end()] = [st + UNDERLINE + link(url) for st in span]
+    return styles
+
+
 def parse_inline(text, base=""):
     """Markdown inline spans -> (plain text, per-character ANSI style)."""
     plain, styles, pos = [], [], 0
     for m in INLINE.finditer(text):
         plain.append(text[pos:m.start()])
         styles += [base] * (m.start() - pos)
-        code, bold, italic, link = m.group(1), m.group(2), m.group(3), m.group(4)
+        code, bold, italic, label = m.group(1), m.group(2), m.group(3), m.group(4)
         if code is not None:
             plain.append(code)
             styles += [base + CODE] * len(code)
         else:
             inner, style = (bold, BOLD) if bold is not None else (italic, ITALIC) if italic is not None \
-                else (link, UNDERLINE)
+                else (label, UNDERLINE + link(m.group(5)))
             p, st = parse_inline(inner, base + style)
             plain.append(p)
             styles += st
@@ -402,6 +555,7 @@ def parse_inline(text, base=""):
 def styled_wrap(text, width, first="", rest="", base=""):
     """Wrap by visible width, keeping inline styles. `first`/`rest` are line prefixes."""
     plain, styles = parse_inline(text, base)
+    styles = linkify(plain, styles)
     lines, start, end, prefix = [], None, None, first
     for m in re.finditer(r"\S+", plain):
         ws, we = m.start(), m.end()
@@ -425,18 +579,22 @@ def styled_wrap(text, width, first="", rest="", base=""):
     out = []
     for pre, a, b in lines or [(first, 0, 0)]:
         chunks, cur, run = [], None, ""
+
+        def close(st):
+            return "" if not st else RESET + LINK_END if "\033]8;;" in st else RESET
+
         for ch, st in zip(plain[a:b], styles[a:b]):
             if st != cur and run:
-                chunks.append((cur or "") + run + (RESET if cur else ""))
+                chunks.append((cur or "") + run + close(cur))
                 run = ""
             cur, run = st, run + ch
         if run:
-            chunks.append((cur or "") + run + (RESET if cur else ""))
+            chunks.append((cur or "") + run + close(cur))
         out.append(pre + "".join(chunks))
     return out
 
 
-ANSI = re.compile(r"\033\[[0-9;]*m")
+ANSI = re.compile(r"\033\[[0-9;]*m|\033\]8;;[^\033]*\033\\")
 
 
 def visible(s):
@@ -489,7 +647,8 @@ def markdown(text, width, max_lines):
             out += styled_wrap(stripped, width)
     flush_table()
     if len(out) > max_lines:
-        out = out[: max_lines - 1] + [DIM + "…" + RESET]
+        hidden = len(out) - max_lines + 1
+        out = out[: max_lines - 1] + [f"{DIM}… +{hidden} more line{'s' if hidden > 1 else ''}{RESET}"]
     return out
 
 
@@ -505,7 +664,7 @@ def action_lines(items, width):
     lines = []
     for a in items:
         color, mark = ACTION_MARK.get(a.get("kind"), (RESET, "•"))
-        lines += styled_wrap(a.get("text", ""), width, f"{color}{mark}{RESET} ", "  ")[:4]
+        lines += styled_wrap(a.get("text", ""), width, f"{color}{mark}{RESET} ", "  ")
     return lines
 
 
@@ -522,14 +681,14 @@ def digest_lines(d, show_details, width):
         lines += action_lines(still_open, width)
     lines.append(f"{BOLD}{MINT}SUMMARY{RESET}")
     for b in d.get("summary") or []:
-        lines += styled_wrap(b, width, "• ", "  ")[:3]
+        lines += styled_wrap(b, width, "• ", "  ")
 
     details = d.get("details") or []
     if show_details:
         for group in details:
             lines.append(f"{BOLD}{group.get('topic', '')}{RESET}")
             for p in group.get("points") or []:
-                lines += styled_wrap(p, width, f"  {DIM}-{RESET} ", "    ")[:6]
+                lines += styled_wrap(p, width, f"  {DIM}-{RESET} ", "    ")
         lines.append(DIM + "[d] hide details" + RESET)
     elif details:
         topics = ", ".join(g.get("topic", "") for g in details)
@@ -537,9 +696,14 @@ def digest_lines(d, show_details, width):
     return lines
 
 
+def content_width():
+    """Columns available to text once the side padding is taken out."""
+    return max(20, shutil.get_terminal_size().columns - 2 * PAD_X)
+
+
 def render(s, record=None, show_details=False):
-    cols, rows = shutil.get_terminal_size()
-    width = max(20, cols - 2)
+    """Every line of the view, untrimmed, and the index of the newest section's first line."""
+    width = content_width()
     record = record or {}
     last = record.get("last") or ({"prompt_id": record.get("prompt_id"), "digest": record["digest"]}
                                   if "digest" in record else None)
@@ -579,32 +743,106 @@ def render(s, record=None, show_details=False):
         digest_last = bool(last) and last.get("prompt_id") == s.prompt_id and not s.working
 
     prompt = [f"{BOLD}{BLUE}PROMPT{RESET}  {status}"]
-    prompt += wrap(s.prompt or "(no prompt yet)", width, max(3, rows // 4))
+    prompt += wrap(s.prompt or "(no prompt yet)", width, PROMPT_LINES)
     prompt += [f"{DIM}+ {q.splitlines()[0][: width - 2]}{RESET}" for q in s.queued[-3:]]
     live = [""]
     if s.tool and s.working:
         live += [f"{ORANGE}▶ {s.tool[: width - 2]}{RESET}", ""]
     live.append(f"{BOLD}{MINT}LATEST UPDATE{RESET}")
     gap = [""] if digest else []
-
-    # The latest update always keeps 3 lines; the digest trims from its end, then the update
-    # takes whatever room is left.
-    fixed = len(prompt) + len(live) + len(gap)
-    room = rows - fixed - 3
-    if len(digest) > room:
-        digest = digest[: max(0, room - 1)] + [DIM + "…" + RESET] if room > 1 else []
-    update = markdown(s.update or "(nothing yet)", width, max(3, rows - fixed - len(digest)))
-    turn = prompt + live + update
-    out = turn + gap + digest if digest_last else digest + gap + turn
-    return "\033[H\033[2J" + "\n".join(out[:rows])
+    turn = prompt + live + markdown(s.update or "(nothing yet)", width, sys.maxsize)
+    if digest_last:
+        return turn + gap + digest, (len(turn) + len(gap) if digest else 0)
+    return digest + gap + turn, len(digest) + len(gap)
 
 
-def read_key(timeout):
+def when(ts):
+    if not ts:
+        return ""
+    t = datetime.fromtimestamp(ts)
+    return f"{t:%H:%M}" if t.date() == datetime.now().date() else f"{t:%b} {t.day} {t:%H:%M}"
+
+
+def past_render(entry, digest, show_details, meta=""):
+    """A finished turn (from history or the pinned list): prompt, final update, digest."""
+    width = content_width()
+    lines = [f"{BOLD}{BLUE}PROMPT{RESET}  {DIM}{meta}{RESET}"]
+    lines += wrap(entry.get("prompt") or "(no prompt)", width, PROMPT_LINES)
+    lines += ["", f"{BOLD}{MINT}LATEST UPDATE{RESET}"]
+    lines += markdown(entry.get("update") or "(no reply)", width, sys.maxsize)
+    if digest:
+        lines += ["", DIM + "── DIGEST "[:width].ljust(width, "─") + RESET]
+        lines += digest_lines(digest, show_details, width)
+    return lines
+
+
+def header_line(width, view, position, pinned):
+    """Sticky top line: which list is showing, where you are in it, and the paging keys."""
+    def tab(name, on):
+        return f"{BOLD}{BLUE}{name}{RESET}" if on else f"{DIM}{name}{RESET}"
+    left = f"{tab('SESSION', view == 'session')} {tab('PINNED', view == 'pinned')}  {DIM}{position}{RESET}"
+    if pinned:
+        left += f"  {ORANGE}★ pinned{RESET}"
+    hints = f"[ ] turn · p {'unpin' if view == 'pinned' else 'pin'} · h/l list"
+    pad = width - len(visible(left)) - len(hints)
+    return left + " " * pad + DIM + hints + RESET if pad >= 2 else left
+
+
+def context_lines(session, record, width):
+    """Sticky lines under the header: what the session is working on, then its directory."""
+    cwd = session.cwd or ""
+    home = str(Path.home())
+    cwd = "~" + cwd[len(home):] if cwd == home or cwd.startswith(home + "/") else cwd
+    if len(cwd) > width:
+        cwd = "…" + cwd[len(cwd) - width + 1:]
+    focus = (((record or {}).get("last") or {}).get("digest") or {}).get("focus") or ""
+    lines = []
+    if focus:
+        wrapped = styled_wrap(focus, width - 1, base=BOLD)  # styled so refs in it stay clickable
+        lines.append(wrapped[0] + ("…" if len(wrapped) > 1 else ""))
+    if cwd:
+        lines.append(f"{DIM}{cwd}{RESET}")
+    return lines
+
+
+def viewport(head, lines, top, rows, width):
+    """The frame: the `head` lines pinned to the top, then as many lines of `lines` from `top`
+    (returned clamped) as fit. Content that overflows gets a position bar on the last line."""
+    head = [head] if isinstance(head, str) else head
+    rows -= len(head) + 2 * PAD_Y
+    if len(lines) <= rows:
+        return draw(head + lines), 0
+    height = rows - 1
+    top = max(0, min(top, len(lines) - height))
+    above, below = ("▲" if top else " "), ("▼" if top + height < len(lines) else " ")
+    bar = f"── {above}{below} {top + 1}-{top + height} of {len(lines)} · j/k scroll · space/b page · g/G ends "
+    bar = DIM + bar[:width].ljust(width, "─") + RESET
+    return draw(head + lines[top:top + height] + [bar]), top
+
+
+def draw(lines):
+    """Clear the screen and draw `lines` inside the PAD_X/PAD_Y margin."""
+    return "\033[H\033[2J" + "\n" * PAD_Y + "\n".join(" " * PAD_X + l for l in lines)
+
+
+KEY_SEQ = re.compile(r"\033\[[0-9;]*[A-Za-z~]|\033O[A-Za-z]|.", re.DOTALL)
+ESCAPES = {"\033[A": "up", "\033OA": "up", "\033[B": "down", "\033OB": "down",
+           "\033[D": "left", "\033OD": "left", "\033[C": "right", "\033OC": "right",
+           "\033[5~": "pgup", "\033[6~": "pgdn", "\033[H": "home", "\033OH": "home",
+           "\033[1~": "home", "\033[F": "end", "\033OF": "end", "\033[4~": "end"}
+
+
+def read_keys(timeout):
+    """Keys pressed within `timeout`; arrows and paging keys come back as names. A wheel
+    tick arrives as a burst of arrows (alternate-scroll mode), so return them all."""
     if not sys.stdin.isatty():
         time.sleep(timeout)
-        return None
+        return []
     ready, _, _ = select.select([sys.stdin], [], [], timeout)
-    return sys.stdin.read(1) if ready else None
+    if not ready:
+        return []
+    data = os.read(sys.stdin.fileno(), 1024).decode(errors="ignore")
+    return [ESCAPES.get(k, k) for k in KEY_SEQ.findall(data)]
 
 
 def main():
@@ -614,10 +852,18 @@ def main():
         return digest_hook()
     if sys.argv[1:2] == ["--digest-run"]:
         return run_digest(Path(sys.argv[2]))
+    if sys.argv[1:2] == ["--padding"]:
+        return set_padding(sys.argv[2] if len(sys.argv) > 2 else None)
+    script = Path(__file__).resolve()
+    built = script.stat().st_mtime
     path = None
     session = None
     last = None
     show_details = False
+    top, follow, seen_prompt = 0, True, None
+    # view is "session" (this session's turns) or "pinned"; turn is an index into
+    # session.turns, or None for the live turn; pin indexes the pinned list.
+    view, turn, pin = "session", None, None
     ws, surface = os.environ.get("CMUX_WORKSPACE_ID"), os.environ.get("CMUX_SURFACE_ID")
     if ws and surface:
         VIEWERS.mkdir(parents=True, exist_ok=True)
@@ -625,36 +871,110 @@ def main():
     saved = termios.tcgetattr(sys.stdin) if sys.stdin.isatty() else None
     if saved:
         tty.setcbreak(sys.stdin)
-    sys.stdout.write("\033[?25l")
+    # Alternate screen, cursor hidden; mode 1007 turns the mouse wheel into arrow keys there.
+    sys.stdout.write("\033[?1049h\033[?1007h\033[?25l")
     try:
         while True:
             current = resolve_transcript()
             if current and current != path:
-                path, session = current, Session(current)
+                path, session, turn = current, Session(current), None
             if session:
                 try:
                     session.poll()
                 except FileNotFoundError:
-                    path = session = None
-                frame = render(session, load_digest(path), show_details) if session else None
-            else:
-                frame = "\033[H\033[2JWaiting for a Claude session in this workspace…"
+                    path = session = turn = None
+            if script.stat().st_mtime != built:  # edited: restart on the new code
+                if saved:
+                    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, saved)
+                sys.stdout.write("\033[?25h\033[?1049l")
+                sys.stdout.flush()
+                os.execv(sys.executable, [sys.executable, str(script)] + sys.argv[1:])
+            apply_settings()
             size = shutil.get_terminal_size()
-            if frame and (frame, size) != last:
+            width = content_width()
+            pins = load_pins()
+            pinned_ids = {p.get("prompt_id") for p in pins}
+            record = load_digest(path) if path else None
+            shown = None  # the turn on screen, as a snapshot `p` can pin
+            if view == "pinned":
+                pin = None if not pins else len(pins) - 1 if pin is None else max(0, min(pin, len(pins) - 1))
+                if pin is None:
+                    head = header_line(width, view, "empty", False)
+                    lines, anchor = ["", DIM + "Nothing pinned yet. Press p on a turn to pin it." + RESET], 0
+                else:
+                    shown = pins[pin]
+                    set_link_project(shown.get("cwd"))
+                    if not shown.get("digest"):  # pinned before its digest landed
+                        digest = digest_for(load_digest(Path(f"{shown.get('session')}.jsonl")), shown["prompt_id"])
+                        if digest:
+                            shown["digest"] = digest
+                            save_pins(pins)
+                    meta = " · ".join(x for x in (Path(shown.get("cwd") or "").name, when(shown.get("prompt_at"))) if x)
+                    head = header_line(width, view, f"{pin + 1}/{len(pins)}", True)
+                    lines, anchor = past_render(shown, shown.get("digest"), show_details, meta), 0
+            elif session:
+                set_link_project(session.cwd)
+                context = context_lines(session, record, width)
+                if turn is not None and turn >= len(session.turns):
+                    turn = None
+                if turn is None and session.prompt_id != seen_prompt:
+                    seen_prompt, follow = session.prompt_id, True
+                total = len(session.turns) + 1
+                if turn is None:
+                    shown = session.snapshot() if session.prompt_id else None
+                    head = header_line(width, view, f"turn {total}/{total} · live", session.prompt_id in pinned_ids)
+                    lines, anchor = render(session, record, show_details)
+                    head = [head] + context
+                else:
+                    shown = session.turns[turn]
+                    head = header_line(width, view, f"turn {turn + 1}/{total}", shown["prompt_id"] in pinned_ids)
+                    digest = digest_for(record, shown["prompt_id"])
+                    lines, anchor = past_render(shown, digest, show_details, when(shown.get("prompt_at"))), 0
+                    head = [head] + context
+            if view == "pinned" or session:
+                frame, top = viewport(head, lines, anchor if follow else top, size.lines, width)
+            else:
+                frame = draw(["Waiting for a Claude session in this workspace…"])
+            if (frame, size) != last:
                 sys.stdout.write(frame)
                 sys.stdout.flush()
                 last = (frame, size)
-            key = read_key(1)
-            if key == "q":
-                break
-            if key == "d":
-                show_details, last = not show_details, None
+            page = max(1, size.lines - 3 - 2 * PAD_Y)
+            for key in read_keys(1):
+                if key == "q":
+                    return
+                if key == "d":
+                    show_details, last = not show_details, None
+                elif key in ("h", "l"):  # two lists, so either key flips to the other
+                    view = "pinned" if view == "session" else "session"
+                    top, follow = 0, view == "session" and turn is None
+                elif key in ("[", "]", "left", "right"):
+                    back = key in ("[", "left")
+                    if view == "pinned" and pin is not None:
+                        pin += -1 if back else 1
+                    elif view == "session" and session:
+                        if back:
+                            turn = max(0, turn - 1) if turn is not None else len(session.turns) - 1 if session.turns else None
+                        elif turn is not None:
+                            turn = turn + 1 if turn + 1 < len(session.turns) else None
+                        top, follow = 0, turn is None
+                elif key == "p" and shown and shown.get("prompt_id"):
+                    if view == "session":
+                        shown["digest"] = digest_for(record, shown["prompt_id"])
+                    toggle_pin(pins, shown)
+                    last = None
+                step = {"j": 1, "down": 1, "k": -1, "up": -1, " ": page, "pgdn": page, "f": page,
+                        "b": -page, "pgup": -page, "g": -sys.maxsize, "home": -sys.maxsize,
+                        "G": sys.maxsize, "end": sys.maxsize}.get(key)
+                if step:
+                    top, follow = top + step, False  # viewport() clamps it
     except KeyboardInterrupt:
         pass
     finally:
         if saved:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, saved)
-        sys.stdout.write("\033[?25h\n")
+        sys.stdout.write("\033[?25h\033[?1049l")
+        sys.stdout.flush()
 
 
 if __name__ == "__main__":
