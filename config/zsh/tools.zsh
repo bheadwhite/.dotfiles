@@ -37,5 +37,11 @@ if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-clou
 [ -f ~/.python_helpers.sh ] && source ~/.python_helpers.sh
 [ -f ~/.tcnrc ] && source ~/.tcnrc
 
+# --- glogs fzf completion --------------------------------------------------
+# After fzf (so its TAB binding is what we fall back to), before syntax
+# highlighting. Only intercepts TAB on a `glogs` line; everything else is
+# unchanged.
+[ -f "$ZSH_CONFIG_DIR/glogs.zsh" ] && source "$ZSH_CONFIG_DIR/glogs.zsh"
+
 # --- zsh-syntax-highlighting (KEEP LAST) -----------------------------------
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

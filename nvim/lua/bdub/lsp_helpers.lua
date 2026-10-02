@@ -94,44 +94,50 @@ function glanceOrJumpToFirstReference()
       print("Error during references request: " .. err.message)
       return
     end
+
+    if not result or vim.tbl_isempty(result) then
+      print("No references found.")
+      return
+    end
+
     --sort results by line number
     table.sort(result, function(a, b)
       return a.range.start.line > b.range.start.line
     end)
 
-    -- Filter out unwanted references and the current file's URI
+    -- Filter out unwanted references and the current file's URI. Dedupe by
+    -- location (uri + line + character), NOT by uri -- several call sites in
+    -- the same file are still several references and must show the picker.
     local filtered_result = {}
-    local added_uris = {}
-    for _, ref in ipairs(result or {}) do
-      -- vim.print(ref)
+    local seen = {}
+    for _, ref in ipairs(result) do
       local uri = ref.uri or ""
+      local key = string.format("%s:%d:%d", uri, ref.range.start.line, ref.range.start.character)
       if
-        not added_uris[uri]
+        not seen[key]
         and uri ~= current_uri
         and not (
           string.find(uri, "%.test%.")
           or string.find(uri, "stories")
           or string.find(uri, "mock")
-          or string.find(uri, "test.go")
+          or string.find(uri, "_test%.go$")
           or string.find(uri, "logging")
         )
       then
         table.insert(filtered_result, ref)
-        added_uris[uri] = true
+        seen[key] = true
       end
     end
 
-    if filtered_result and #filtered_result == 1 then
+    if #filtered_result == 1 then
       local uri = filtered_result[1].uri
       local bufnr = vim.uri_to_bufnr(uri)
 
       -- Jump to the location of the single reference
       vim.lsp.util.show_document(filtered_result[1], "utf-8", { focus = true })
       vim.api.nvim_set_current_buf(bufnr)
-    elseif result then
-      vim.cmd("Glance references")
     else
-      print("No references found.")
+      vim.cmd("Glance references")
     end
   end)
 end

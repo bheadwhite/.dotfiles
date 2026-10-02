@@ -40,6 +40,12 @@ return {
       ft = function()
         return "markdown"
       end,
+      win = {
+        -- Vertical split on the far right instead of a floating modal.
+        position = "right",
+        -- Fraction of the editor width; height is ignored for a vsplit.
+        width = 0.4,
+      },
     },
     statuscolumn = { enabled = true },
     words = { enabled = false },

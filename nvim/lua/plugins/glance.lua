@@ -7,11 +7,37 @@ return {
   config = function()
     local glance = require("glance")
 
-    local function gatherFilteredResults(results)
+    -- LSP servers always return the declaration itself in the reference list
+    -- (glance hardcodes includeDeclaration = true), so drop the occurrence the
+    -- cursor is already sitting on -- for gp that is the definition.
+    local function isUnderCursor(result, bufUri, cursorLine, cursorCol)
+      local resultUri = (result.uri or result.targetUri or ""):lower()
+      if resultUri ~= bufUri then
+        return false
+      end
+
+      local range = result.range or result.targetSelectionRange or result.targetRange
+      if not range then
+        return false
+      end
+
+      local afterStart = cursorLine > range.start.line
+        or (cursorLine == range.start.line and cursorCol >= range.start.character)
+      local beforeEnd = cursorLine < range["end"].line
+        or (cursorLine == range["end"].line and cursorCol < range["end"].character)
+
+      return afterStart and beforeEnd
+    end
+
+    local function gatherFilteredResults(results, bufUri, cursorLine, cursorCol)
       local filtered_results = {}
       for _, result in ipairs(results) do
-        local resultUri = result.uri:lower() or result.targetUri:lower()
+        local resultUri = (result.uri or result.targetUri or ""):lower()
         local testFound = resultUri:find(".test") or resultUri:find("mock")
+
+        if isUnderCursor(result, bufUri, cursorLine, cursorCol) then
+          goto continue
+        end
 
         if not testFound then
           table.insert(filtered_results, result)
@@ -20,6 +46,8 @@ return {
         if require("bdub.lsp_helpers").glanceState.findTests and testFound then
           table.insert(filtered_results, result)
         end
+
+        ::continue::
       end
 
       return filtered_results
@@ -37,7 +65,8 @@ return {
       hooks = {
         before_open = function(results, open, jump)
           local bufUri = vim.uri_from_bufnr(0):lower()
-          local ok, filtered_results = pcall(gatherFilteredResults, results)
+          local cursor = vim.api.nvim_win_get_cursor(0)
+          local ok, filtered_results = pcall(gatherFilteredResults, results, bufUri, cursor[1] - 1, cursor[2])
 
           if not ok then
             print("Error gathering filtered results")
@@ -52,14 +81,10 @@ return {
 
           require("bdub.lsp_helpers").showFilterNotify()
 
+          -- one result left after filtering -- go straight there, in this file
+          -- or any other. show_document handles the cross-file case.
           if #filtered_results == 1 then
-            local target_uri = results[1].uri or results[1].targetUri
-
-            if target_uri == bufUri then
-              jump(filtered_results[1])
-            else
-              open(filtered_results)
-            end
+            jump(filtered_results[1])
           else
             open(filtered_results)
           end

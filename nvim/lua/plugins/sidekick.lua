@@ -22,6 +22,37 @@ local function ask_claude()
   end)
 end
 
+-- Sidekick's CLI split is winfixwidth, so equalizing never steals its 80
+-- columns -- it only redistributes what's left among the other windows, which
+-- otherwise stay lopsided from before the split appeared. Fire on the
+-- open/close transition only, so unrelated splits keep their manual sizing.
+local function sidekick_split_open()
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.w[win].sidekick_cli ~= nil and vim.api.nvim_win_get_config(win).relative == "" then
+      return true
+    end
+  end
+  return false
+end
+
+local function balance_on_sidekick_toggle()
+  local group = vim.api.nvim_create_augroup("bdub_sidekick_balance", { clear = true })
+  vim.api.nvim_create_autocmd({ "WinNew", "WinClosed" }, {
+    group = group,
+    callback = function()
+      -- WinNew fires inside nvim_open_win (before the w: marker is set) and
+      -- WinClosed before the window is gone, so settle on the next tick.
+      vim.schedule(function()
+        local open = sidekick_split_open()
+        if open ~= (vim.t.sidekick_split_open == true) then
+          vim.t.sidekick_split_open = open
+          vim.cmd("wincmd =")
+        end
+      end)
+    end,
+  })
+end
+
 -- caps+space. Resolved at spec-load time because lazy.nvim reads `keys` eagerly.
 local ok_bdub, bdub = pcall(require, "bdub")
 local hyper_space = ok_bdub and bdub.hyper_space_key or nil
@@ -29,6 +60,7 @@ local hyper_space = ok_bdub and bdub.hyper_space_key or nil
 return {
   "folke/sidekick.nvim",
   event = "VeryLazy",
+  init = balance_on_sidekick_toggle,
   opts = {
     -- Next Edit Suggestions (NES) configuration
     nes = {

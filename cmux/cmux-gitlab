@@ -1,0 +1,466 @@
+#!/usr/bin/env python3
+"""GitLab state for cmux workspaces, shown as clickable sidebar status pills.
+
+    cmux-gitlab refresh [--all] [--workspace ID]   update pills (default: this workspace)
+    cmux-gitlab hook                                refresh --all, at most once a minute (Claude hooks)
+    cmux-gitlab watch [SECONDS]                     refresh every workspace forever
+    cmux-gitlab epic REF [--workspace ID]           mark a workspace as an epic session
+    cmux-gitlab epic --clear [--workspace ID]
+    cmux-gitlab show                                print what each workspace resolves to
+
+REF is an epic URL, `group/path&42`, or `&42` / `42` (looked up in the groups above this
+workspace's repo). The MR pill comes from the branch checked out in the workspace directory,
+looked up on the origin project and, for forks, on the upstream project.
+
+A workspace WorkBar launched for an issue (its session JSON names the workspace or the
+worktree) gets an issue pill instead, plus MR pills for that issue's related MRs in the repos
+the session's topology group releases to — so relay repos like room303posc, whose MRs land in
+canonical repos under different branch names, still show them.
+
+Pills go over the cmux socket's `set_status` as markdown (the `cmux set-status` CLI can't
+set a format), with the link inline on the `!N` / `&N` so the rest of the row stays inert. Branch/PR badges (`report_review`) aren't used: cmux drops them while
+sidebar.watchGitStatus is off.
+
+With socketControlMode cmuxOnly, only live descendants of cmux may use the socket: a launchd
+agent or a detached (orphaned) child is refused. So refreshes ride on Claude Code hooks
+registered async (see cmux-gitlab-install), which Claude keeps as its own children.
+"""
+import fcntl
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+from pathlib import Path
+from urllib.parse import quote
+
+HOST = "git.tcncloud.net"
+SOCKET = os.environ.get("CMUX_SOCKET_PATH") or str(Path.home() / ".local/state/cmux/cmux.sock")
+STATE = Path.home() / ".local/state/cmux-gitlab/state.json"
+LOCK = STATE.with_name("refresh.lock")
+HOOK_EVERY = 60
+CMUX = "/Applications/cmux.app/Contents/Resources/bin/cmux"
+GLAB = "/opt/homebrew/bin/glab"
+MR_KEY, EPIC_KEY, PROJECT_KEY = "gitlab-mr", "gitlab-epic", "gitlab-project"
+ISSUE_KEY = "gitlab-issue"
+MAX_ISSUE_MRS = 3
+WORKBAR = Path.home() / "Library/Application Support/WorkBar"
+TRUNKS = {"master", "main", "develop", "HEAD"}
+
+# Project badge: first pattern found in the GitLab project path or the workspace directory
+# wins → (label, color). Directories count so deleted worktrees still get tagged.
+PROJECT_TAGS = [
+    (r"room303", ("room303", "#E0457B")),
+    (r"compliance", ("compliance", "#1F9E89")),
+]
+
+# detailed_merge_status → (label, SF symbol, color)
+MR_OPEN = {
+    "mergeable": ("Ready to merge", "checkmark.circle.fill", "#2DA160"),
+    "not_approved": ("In review", "eye.fill", "#E2A03F"),
+    "discussions_not_resolved": ("Threads open", "bubble.left.and.bubble.right.fill", "#E2A03F"),
+    "ci_still_running": ("Pipeline running", "clock.fill", "#4C8DFF"),
+    "ci_must_pass": ("Pipeline failed", "xmark.octagon.fill", "#DD2B0E"),
+    "conflict": ("Conflicts", "exclamationmark.triangle.fill", "#DD2B0E"),
+    "need_rebase": ("Needs rebase", "exclamationmark.triangle.fill", "#DD2B0E"),
+    "draft_status": ("Draft", "pencil.circle.fill", "#8B8B8B"),
+}
+MR_DEFAULT_OPEN = ("Open", "arrow.triangle.pull", "#E2A03F")
+MR_DONE = {
+    "merged": ("Merged", "arrow.triangle.merge", "#8A5CF5"),
+    "closed": ("Closed", "xmark.circle", "#8B8B8B"),
+}
+
+
+# --- state -----------------------------------------------------------------------------
+
+def load_state():
+    try:
+        return json.loads(STATE.read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def save_state(state):
+    STATE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = STATE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(state, indent=2))
+    tmp.replace(STATE)
+
+
+# --- cmux ------------------------------------------------------------------------------
+
+def sock(line):
+    """One v1 command over the socket; the shell integration sends these the same way."""
+    import socket
+
+    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    s.settimeout(2)
+    try:
+        s.connect(SOCKET)
+        s.sendall((line + "\n").encode())
+        return s.recv(4096).decode().strip()
+    except OSError as e:
+        return f"ERROR {e}"
+    finally:
+        s.close()
+
+
+def q(value):
+    """Quote a value for the v1 socket parser (double quotes, backslash escapes)."""
+    return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def md(text):
+    """Escape markdown so titles render literally."""
+    return re.sub(r"([\\`*_\[\]()#<>|~])", r"\\\1", text)
+
+
+def set_pill(ws, key, text, icon, color, priority, url=None):
+    """A markdown pill. With `url`, the pill's first word becomes the link, so only that
+    text opens it; a pill-level --url would make the whole sidebar row a link."""
+    if url:
+        head, _, rest = text.partition(" ")
+        text = f"[{md(head)}]({url})" + (f" {md(rest)}" if rest else "")
+    else:
+        text = md(text)
+    sock(f"set_status {key} {q(text)} --icon={icon} --color={color} --format=markdown "
+         f"--priority={priority} --tab={ws}")
+
+
+def clear_pill(ws, key):
+    sock(f"clear_status {key} --tab={ws}")
+
+
+def workspaces():
+    out = subprocess.run([CMUX, "rpc", "extension.sidebar.snapshot", "{}"],
+                         capture_output=True, text=True, timeout=10)
+    if out.returncode != 0:
+        sys.exit(f"cmux-gitlab: cmux rpc failed: {out.stderr.strip()}")
+    return json.loads(out.stdout).get("workspaces", [])
+
+
+def current_workspace():
+    ws = os.environ.get("CMUX_WORKSPACE_ID")
+    if not ws:
+        sys.exit("cmux-gitlab: not in a cmux workspace; pass --workspace ID")
+    return ws
+
+
+# --- git / glab ------------------------------------------------------------------------
+
+def git(d, *args):
+    out = subprocess.run(["git", "-C", d, *args], capture_output=True, text=True)
+    return out.stdout.strip() if out.returncode == 0 else ""
+
+
+def project_path(remote):
+    """`group/sub/repo` for a git.tcncloud.net remote, else None."""
+    m = re.match(rf"^(?:ssh://)?(?:git@)?(?:https?://)?{re.escape(HOST)}[:/](.+?)(?:\.git)?/?$", remote)
+    return m.group(1) if m else None
+
+
+def api(path):
+    out = subprocess.run([GLAB, "api", path], capture_output=True, text=True, timeout=30,
+                         env={**os.environ, "GITLAB_HOST": HOST})
+    if out.returncode != 0:
+        return None
+    try:
+        return json.loads(out.stdout)
+    except ValueError:
+        return None
+
+
+def enc(path):
+    return quote(path, safe="")
+
+
+def project(path, cache):
+    """Project id + upstream id, cached for a day (forks don't change parents often)."""
+    hit = cache.get(path)
+    if hit and time.time() - hit["at"] < 86400:
+        return hit
+    p = api(f"projects/{enc(path)}")
+    if not p:
+        return None
+    hit = {"id": p["id"], "upstream": (p.get("forked_from_project") or {}).get("id"), "at": time.time()}
+    cache[path] = hit
+    return hit
+
+
+def find_mr(path, branch, cache):
+    proj = project(path, cache)
+    if not proj:
+        return None
+    b = quote(branch, safe="")
+    for target in filter(None, [proj["id"], proj["upstream"]]):
+        mrs = api(f"projects/{target}/merge_requests?source_branch={b}&state=all"
+                  f"&order_by=updated_at&per_page=20") or []
+        mrs = [m for m in mrs if m.get("source_project_id") == proj["id"]]
+        if mrs:
+            # An open MR beats a newer merged/closed one for the same branch.
+            return next((m for m in mrs if m["state"] == "opened"), mrs[0])
+    return None
+
+
+def read_json(path):
+    try:
+        return json.loads(path.read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def workbar_sessions():
+    """{workspace uuid or worktree dir: session} for WorkBar issue sessions, newest last."""
+    found = []
+    for f in (WORKBAR / "sessions").glob("*.json"):
+        s = read_json(f)
+        if s and (s.get("issue") or {}).get("iid"):
+            found.append(s)
+    found.sort(key=lambda s: s.get("startedAt") or "")
+    index = {}
+    for s in found:
+        if s.get("workspace"):
+            index[s["workspace"].upper()] = s
+        for d in (s.get("worktree"), (s.get("launch") or {}).get("cwd")):
+            if d:
+                index[os.path.realpath(os.path.expanduser(d))] = s
+    return index
+
+
+def session_for(w, sessions):
+    return (sessions.get(w["id"].upper())
+            or sessions.get(os.path.realpath(w.get("current_directory") or "/nonexistent")))
+
+
+def released_projects(authored):
+    """Projects the authored repo's topology group releases into (derived + generators)."""
+    topo = read_json(WORKBAR / "topology.json") or {}
+    for g in (topo.get("groups") or {}).values():
+        authored_repos = [g.get("origin") or {}, *(g.get("peers") or [])]
+        if authored not in {r.get("project") for r in authored_repos}:
+            continue
+        out = {authored}
+        out.update(d["project"] for d in g.get("derived") or [] if d.get("project"))
+        for gen in g.get("generators") or []:
+            out.update(gen.get("produces") or [])
+        return out
+    return {authored}
+
+
+def issue_mrs(issue, targets):
+    related = api(f"projects/{enc(issue['project'])}/issues/{issue['iid']}"
+                  f"/related_merge_requests?per_page=50") or []
+    mrs = [m for m in related if m["references"]["full"].split("!")[0] in targets]
+    mrs.sort(key=lambda m: m["updated_at"], reverse=True)
+    mrs.sort(key=lambda m: {"opened": 0, "merged": 1}.get(m["state"], 2))
+    return [api(f"projects/{m['project_id']}/merge_requests/{m['iid']}") or m
+            for m in mrs[:MAX_ISSUE_MRS]]
+
+
+def session_pills(ws, session, state, fallback=None):
+    issue = session["issue"]
+    i = api(f"projects/{enc(issue['project'])}/issues/{issue['iid']}")
+    if not i:
+        return  # keep the last pills on a transient failure
+    title = i["title"] if len(i["title"]) <= 40 else i["title"][:39] + "…"
+    closed = i["state"] == "closed"
+    weight = f"w{i['weight']} · " if i.get("weight") is not None else "w? · "
+    set_pill(ws, ISSUE_KEY, f"#{i['iid']} {weight}{title}" + (" (closed)" if closed else ""),
+             "checkmark.circle" if closed else "smallcircle.filled.circle",
+             "#8B8B8B" if closed else "#1F75CB", 85, i["web_url"])
+    mrs = issue_mrs(issue, released_projects(session.get("project")))
+    if not mrs and fallback:
+        mrs = [m for m in [fallback()] if m]
+    for n, mr in enumerate(mrs):
+        label, icon, color = mr_look(mr)
+        repo = mr["references"]["full"].split("!")[0].split("/")[-1]
+        set_pill(ws, MR_KEY if n == 0 else f"{MR_KEY}-{n}", f"!{mr['iid']} {repo} · {label}",
+                 icon, color, 80 - n, mr["web_url"])
+    if not mrs:
+        clear_pill(ws, MR_KEY)
+    shown = state.setdefault("mr_pills", {})
+    for n in range(max(len(mrs), 1), shown.get(ws, 1)):
+        clear_pill(ws, f"{MR_KEY}-{n}")
+    shown[ws] = max(len(mrs), 1)
+
+
+def mr_look(mr):
+    if mr["state"] in MR_DONE:
+        return MR_DONE[mr["state"]]
+    if mr.get("draft") or mr.get("work_in_progress"):
+        return MR_OPEN["draft_status"]
+    return MR_OPEN.get(mr.get("detailed_merge_status"), MR_DEFAULT_OPEN)
+
+
+# --- epics -----------------------------------------------------------------------------
+
+def parent_groups(path):
+    parts = path.split("/")[:-1]
+    return ["/".join(parts[:i]) for i in range(len(parts), 0, -1)]
+
+
+def resolve_epic(ref, repo_path):
+    """(group_path, iid) from a URL, `group&iid`, or bare `&iid` walked up from repo_path."""
+    m = re.search(r"/groups/(.+?)/-/epics/(\d+)", ref)
+    if m:
+        return m.group(1), int(m.group(2))
+    m = re.fullmatch(r"(.+?)&(\d+)", ref)
+    if m:
+        return m.group(1), int(m.group(2))
+    m = re.fullmatch(r"&?(\d+)", ref)
+    if not m:
+        sys.exit(f"cmux-gitlab: can't read epic ref {ref!r}")
+    if not repo_path:
+        sys.exit("cmux-gitlab: bare epic number needs a GitLab repo in the workspace; use group&N or a URL")
+    iid = int(m.group(1))
+    for group in parent_groups(repo_path):
+        if api(f"groups/{enc(group)}/epics/{iid}"):
+            return group, iid
+    sys.exit(f"cmux-gitlab: no epic &{iid} in {', '.join(parent_groups(repo_path))}")
+
+
+def epic_pill(ws, epic):
+    e = api(f"groups/{enc(epic['group'])}/epics/{epic['iid']}")
+    if not e:
+        return  # keep the last pill on a transient failure
+    issues = api(f"groups/{enc(epic['group'])}/epics/{epic['iid']}/issues?per_page=100") or []
+    done = sum(1 for i in issues if i["state"] == "closed")
+    title = e["title"] if len(e["title"]) <= 40 else e["title"][:39] + "…"
+    text = f"&{epic['iid']} {title}" + (f" · {done}/{len(issues)}" if issues else "")
+    closed = e["state"] == "closed"
+    set_pill(ws, EPIC_KEY, text + (" (closed)" if closed else ""),
+             "flag.checkered" if closed else "flag.fill",
+             "#8B8B8B" if closed else "#6E49CB", 90, e["web_url"])
+
+
+# --- commands --------------------------------------------------------------------------
+
+def workspace_repo(w):
+    """(directory, project_path, branch) for a workspace's main directory."""
+    d = w.get("current_directory") or ""
+    if not d or not os.path.isdir(d):
+        return d, None, None
+    path = project_path(git(d, "remote", "get-url", "origin"))
+    return d, path, git(d, "rev-parse", "--abbrev-ref", "HEAD") if path else None
+
+
+def project_tag(path, directory):
+    for pattern, tag in PROJECT_TAGS:
+        if re.search(pattern, path or "") or re.search(pattern, directory or ""):
+            return tag
+    return None
+
+
+def refresh(ws_list, state):
+    cache = state.setdefault("projects", {})
+    epics = state.setdefault("epics", {})
+    sessions = workbar_sessions()
+    for w in ws_list:
+        ws = w["id"]
+        d, path, branch = workspace_repo(w)
+        tag = project_tag(path, d)
+        if tag:
+            set_pill(ws, PROJECT_KEY, tag[0], "tag.fill", tag[1], 100)
+        else:
+            clear_pill(ws, PROJECT_KEY)
+        if ws in epics:
+            epic_pill(ws, epics[ws])
+        session = session_for(w, sessions)
+        if session:
+            branch_mr = None if not path or not branch or branch in TRUNKS else (
+                lambda: find_mr(path, branch, cache))
+            session_pills(ws, session, state, branch_mr)
+            continue
+        clear_pill(ws, ISSUE_KEY)
+        if not path or not branch or branch in TRUNKS:
+            clear_pill(ws, MR_KEY)
+            continue
+        mr = find_mr(path, branch, cache)
+        if not mr:
+            clear_pill(ws, MR_KEY)
+            continue
+        label, icon, color = mr_look(mr)
+        set_pill(ws, MR_KEY, f"!{mr['iid']} {label}", icon, color, 80, mr["web_url"])
+    # Forget epic marks for workspaces that are gone.
+    live = {w["id"] for w in ws_list}
+    if len(ws_list) > 1:
+        for ws in [k for k in epics if k not in live]:
+            del epics[ws]
+
+
+def main():
+    args = sys.argv[1:]
+    cmd = args.pop(0) if args else "refresh"
+    ws_id = None
+    if "--workspace" in args:
+        i = args.index("--workspace")
+        ws_id = args[i + 1]
+        del args[i:i + 2]
+    if cmd == "hook":
+        sys.stdin.close()
+        LOCK.parent.mkdir(parents=True, exist_ok=True)
+        with open(LOCK, "a") as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                return  # another session is refreshing
+            if time.time() - LOCK.stat().st_mtime < HOOK_EVERY and LOCK.stat().st_size:
+                return
+            state = load_state()
+            refresh(workspaces(), state)
+            save_state(state)
+            lock.truncate(0)
+            lock.write("1")
+        return
+
+    state = load_state()
+    all_ws = workspaces()
+
+    if cmd == "refresh":
+        if "--all" in args:
+            targets = all_ws
+        else:
+            ws_id = ws_id or current_workspace()
+            targets = [w for w in all_ws if w["id"] == ws_id]
+        refresh(targets, state)
+    elif cmd == "watch":
+        interval = int(args[0]) if args else 120
+        while True:
+            refresh(workspaces(), state)
+            save_state(state)
+            time.sleep(interval)
+    elif cmd == "epic":
+        ws_id = ws_id or current_workspace()
+        epics = state.setdefault("epics", {})
+        if not args:
+            sys.exit("usage: cmux-gitlab epic REF|--clear [--workspace ID]")
+        if args[0] == "--clear":
+            epics.pop(ws_id, None)
+            clear_pill(ws_id, EPIC_KEY)
+        else:
+            w = next((w for w in all_ws if w["id"] == ws_id), {})
+            _, path, _ = workspace_repo(w)
+            group, iid = resolve_epic(args[0], path)
+            epics[ws_id] = {"group": group, "iid": iid}
+            epic_pill(ws_id, epics[ws_id])
+            print(f"marked workspace as epic {group}&{iid}")
+    elif cmd == "show":
+        epics = state.get("epics", {})
+        sessions = workbar_sessions()
+        for w in all_ws:
+            _, path, branch = workspace_repo(w)
+            e = epics.get(w["id"])
+            s = session_for(w, sessions)
+            print(f"{w['ref']:<14} {path or '-':<40} {branch or '-':<45} "
+                  f"{e['group'] + '&' + str(e['iid']) if e else '':<14} "
+                  f"{s['issue']['reference'] if s else ''}")
+        return
+    else:
+        sys.exit(__doc__)
+    save_state(state)
+
+
+if __name__ == "__main__":
+    main()
