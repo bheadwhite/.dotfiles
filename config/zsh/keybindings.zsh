@@ -58,6 +58,16 @@ bindkey -M viins '^F'   autosuggest-accept
 bindkey -M viins '\e[26;7~' autosuggest-accept
 bindkey -M vicmd '\e[26;7~' autosuggest-accept
 
+# Hyper+R (Caps Lock + R) → copy the current directory to the clipboard. Ghostty,
+# cmux and WezTerm all turn ctrl+alt+r into \e[28;7~ (CSI 28;7~ = Ctrl+Alt+F15).
+copy-pwd() {
+    print -rn -- "$PWD" | pbcopy
+    zle -M "Copied: $PWD"
+}
+zle -N copy-pwd
+bindkey -M viins '\e[28;7~' copy-pwd
+bindkey -M vicmd '\e[28;7~' copy-pwd
+
 # Tab: ONLY ever do real path/command completion — never accept the gray
 # autosuggestion. Accept a history suggestion deliberately with Ctrl+E / Ctrl+F
 # / End. Shift-Tab walks backward through the completion menu.

@@ -121,6 +121,11 @@ keybind = cmd+l=text:\x05
 # so this one line covers both Ghostty.app and cmux.
 keybind = ctrl+alt+enter=text:\x1b[26;7~
 
+# Copy the shell's cwd — Hyper+R (Caps Lock + R, i.e. ctrl+alt+r).
+# CSI 28;7~ is Ctrl+Alt+F15; zsh binds it to copy-pwd (config/zsh/keybindings.zsh).
+# WezTerm sends the same bytes from config/keys.lua.
+keybind = ctrl+alt+r=text:\x1b[28;7~
+
 # macOS specific settings
 macos-option-as-alt = true
 

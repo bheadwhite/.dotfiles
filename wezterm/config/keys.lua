@@ -136,6 +136,11 @@ return {
 	-- the binding lives with the terminal config instead of drifting in BTT.
 	{ key = "Enter", mods = "CTRL|ALT", action = act.SendString("\x1b[26;7~") },
 
+	-- Copy the shell's cwd — Hyper+R (Caps Lock + R, i.e. CTRL|ALT+r).
+	-- CSI 28;7~ is Ctrl+Alt+F15; zsh binds it to copy-pwd (see
+	-- config/zsh/keybindings.zsh). Ghostty/cmux send the same bytes.
+	{ key = "r", mods = "CTRL|ALT", action = act.SendString("\x1b[28;7~") },
+
 	{
 		key = "F12",
 		action = wezterm.action.EmitEvent("toggle_background"),
