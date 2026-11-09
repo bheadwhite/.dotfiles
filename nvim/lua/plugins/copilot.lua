@@ -2,8 +2,8 @@ if vim.version().minor < 10 then
   return {}
 end
 
--- Insert mode only. Normal/visual are claimed by sidekick's Ask Claude
--- (see lua/plugins/sidekick.lua).
+-- Insert mode only. Normal/visual are claimed by claudecode.nvim
+-- (see lua/plugins/claudecode.lua).
 local ok_bdub, bdub = pcall(require, "bdub")
 if ok_bdub and type(bdub.hyper_space_key) == "string" and bdub.hyper_space_key ~= "" then
   vim.keymap.set("i", bdub.hyper_space_key, function()
