@@ -18,6 +18,10 @@ cleanmerged() {
     git branch --merged | egrep -v "(^\*|master|release)" | xargs git branch -D
 }
 
+portkill() {
+  lsof -ti $1 | xargs kill -9
+}
+
 del_branch_below() {
   dry_run=false
   if [ "$1" = "--dry" ]; then
